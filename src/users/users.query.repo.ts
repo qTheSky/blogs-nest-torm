@@ -47,9 +47,9 @@ export class UsersQueryRepo {
       .getManyAndCount();
 
     return {
+      pagesCount: Math.ceil(total / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
-      pagesCount: Math.ceil(total / query.pageSize),
       totalCount: total,
       items: users.map(this.viewModelMapper.getUserViewModel),
     };
