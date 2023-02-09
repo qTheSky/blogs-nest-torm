@@ -1,7 +1,5 @@
-import { Types } from 'mongoose';
-
 export type UserViewModel = {
-  id: Types.ObjectId;
+  id: string;
   login: string;
   email: string;
   createdAt: string;

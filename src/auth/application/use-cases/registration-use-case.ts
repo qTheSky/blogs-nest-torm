@@ -1,9 +1,9 @@
 import { AuthService } from '../auth.service';
 import { EmailsManager } from '../../../common/managers/emails-manager';
-import { UsersRepository } from '../../../users/users.repository';
 import { CreateUserModel } from '../../../users/models/CreateUserModel';
-import { User } from '../../../users/user.schema';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UsersRepo } from '../../../users/users.repo';
+import { User } from '../../../users/entities/user.entity';
 
 export class RegistrationCommand {
   constructor(public createUserModel: CreateUserModel, public isByAdmin: boolean) {}
@@ -11,25 +11,17 @@ export class RegistrationCommand {
 
 @CommandHandler(RegistrationCommand)
 export class RegistrationUseCase implements ICommandHandler<RegistrationCommand> {
-  constructor(
-    private emailsManager: EmailsManager,
-    private usersRepository: UsersRepository,
-    private authService: AuthService,
-  ) {}
+  constructor(private emailsManager: EmailsManager, private usersRepo: UsersRepo, private authService: AuthService) {}
   async execute(command: RegistrationCommand): Promise<User | null> {
-    const passwordHash = await this.authService.generateHash(command.createUserModel.password);
-    const newUser = await this.usersRepository.create(
-      command.createUserModel.email,
-      command.createUserModel.login,
-      passwordHash,
-      command.isByAdmin,
-    );
+    const { password, login, email } = command.createUserModel;
+    const passwordHash = await this.authService.generateHash(password);
+    const newUser = await this.usersRepo.create({ login, email, passwordHash, isConfirmedEmail: command.isByAdmin });
     if (command.isByAdmin) return newUser;
     try {
       await this.emailsManager.sendEmailConfirmationMessage(newUser);
     } catch (e) {
       console.error(e);
-      await this.usersRepository.deleteUser(newUser._id);
+      await this.usersRepo.delete(newUser.id);
       return null;
     }
     return newUser;

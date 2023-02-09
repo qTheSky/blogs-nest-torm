@@ -1,4 +1,3 @@
-import { User } from '../users/user.schema';
 import { UserViewModel } from '../users/models/UserViewModel';
 import { Blog } from '../blogs/blog.schema';
 import { BlogForSAViewModel, BlogViewModel } from '../blogs/models/BlogViewModel';
@@ -15,10 +14,11 @@ import { LikePost, LikePostDocument } from '../posts/likes/likePost.schema';
 import { PostsService } from '../posts/posts.service';
 import { LikesInfoViewModel, NewestLikes } from './like.types';
 import { SessionViewModel } from '../security/models/SessionViewModel';
-import { Session } from '../security/session.schema';
 import { BannedUserInBlog } from '../blogs/banned-user-in-blog.schema';
 import { BannedUserInBlogViewModel } from '../blogs/models/BannedUserInBlogViewModel';
 import { PostsRepository } from '../posts/posts.repository';
+import { User } from '../users/entities/user.entity';
+import { Session } from '../security/entities/session.entity';
 
 @Injectable()
 export class ViewModelMapper {
@@ -30,10 +30,10 @@ export class ViewModelMapper {
 
   getUserViewModel(user: User): UserViewModel {
     return {
-      id: user._id,
-      email: user.accountData.email,
-      login: user.accountData.login,
-      createdAt: user.accountData.createdAt.toISOString(),
+      id: user.id.toString(),
+      email: user.email,
+      login: user.login,
+      createdAt: user.createdAt.toISOString(),
       banInfo: {
         isBanned: user.banInfo.isBanned,
         banDate: user.banInfo.banDate?.toISOString() || null,

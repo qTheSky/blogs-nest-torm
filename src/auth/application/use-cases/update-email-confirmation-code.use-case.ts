@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
-import { UsersRepository } from '../../../users/users.repository';
 import { EmailsManager } from '../../../common/managers/emails-manager';
+import { UsersRepo } from '../../../users/users.repo';
 
 export class UpdateEmailConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -9,13 +9,13 @@ export class UpdateEmailConfirmationCodeCommand {
 
 @CommandHandler(UpdateEmailConfirmationCodeCommand)
 export class UpdateEmailConfirmationCodeUseCase implements ICommandHandler<UpdateEmailConfirmationCodeCommand> {
-  constructor(private usersRepository: UsersRepository, private emailsManager: EmailsManager) {}
+  constructor(private usersRepo: UsersRepo, private emailsManager: EmailsManager) {}
 
   async execute(command: UpdateEmailConfirmationCodeCommand): Promise<void> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(command.email);
+    const user = await this.usersRepo.findUserByLoginOrEmail(command.email);
     if (!user) throw new InternalServerErrorException('User not found');
     user.updateConfirmationCode();
-    await this.usersRepository.save(user);
+    await this.usersRepo.save(user);
     await this.emailsManager.sendEmailConfirmationMessage(user);
   }
 }

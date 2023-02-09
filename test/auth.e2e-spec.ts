@@ -3,24 +3,22 @@ import * as request from 'supertest';
 import { CreateUserModel } from '../src/users/models/CreateUserModel';
 import { randomUUID } from 'crypto';
 import { AuthCredentialsModel } from '../src/auth/models/AuthCredentialsModel';
-import { createTestingModule } from './bolerplate';
 import { newUser } from './models-for-tests/positive/create/User';
 import { createCommonUser } from './utils/create-user-and-get-token/create-common-user';
+import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
+import { cleanDb } from './utils/cleanDb';
+import { createUserAndGetTokens } from './utils/create-user-and-get-token/create-user-and-get-token';
+import { EmailResendModel } from '../src/auth/models/EmailResendModel';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
-
   beforeAll(async () => {
-    app = await createTestingModule(app);
-  });
-
-  afterAll(() => {
-    return request(app.getHttpServer()).delete('/testing/all-data').expect(204);
+    app = await getAppAndCleanDB();
   });
 
   describe('/registration', () => {
-    beforeAll(() => {
-      return request(app.getHttpServer()).delete('/testing/all-data').expect(204);
+    beforeAll(async () => {
+      await cleanDb(app);
     });
     const user1Email = 'smirnov.mic@yandex.ru';
     const user1Login = 'qTheSky';
@@ -53,8 +51,8 @@ describe('AuthController (e2e)', () => {
     });
   });
   describe('/login', () => {
-    beforeAll(() => {
-      return request(app.getHttpServer()).delete('/testing/all-data').expect(204);
+    beforeAll(async () => {
+      await cleanDb(app);
     });
     it('should create new user by admin and logged in with his credentials', async () => {
       await createCommonUser(app);
@@ -74,8 +72,8 @@ describe('AuthController (e2e)', () => {
     });
   });
   describe('/me', () => {
-    beforeAll(() => {
-      return request(app.getHttpServer()).delete('/testing/all-data').expect(204);
+    beforeAll(async () => {
+      await cleanDb(app);
     });
     it('me request should return correct user data', async () => {
       const createdUser = await createCommonUser(app);
@@ -90,6 +88,58 @@ describe('AuthController (e2e)', () => {
       expect(meResponse.body.email).toBe(newUser.email);
       expect(meResponse.body.login).toBe(newUser.login);
       expect(meResponse.body.userId).toBe(createdUser.id);
+    });
+  });
+  describe('/logout', () => {
+    let refreshToken1;
+    beforeAll(async () => {
+      await cleanDb(app);
+      const { accessToken, refreshToken, user } = await createUserAndGetTokens(app);
+      refreshToken1 = refreshToken;
+    });
+    it('should logout user', () => {
+      return request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Cookie', `refreshToken=${refreshToken1}`)
+        .expect(204);
+    });
+    it('shouldnt logout second time the same refreshToken', () => {
+      return request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Cookie', `refreshToken=${refreshToken1}`)
+        .expect(401);
+    });
+  });
+  describe('/refresh-token', () => {
+    beforeAll(async () => {
+      await cleanDb(app);
+    });
+
+    it('should get 2 new tokens', async () => {
+      const { accessToken, refreshToken, user } = await createUserAndGetTokens(app);
+      const response = await request(app.getHttpServer())
+        .post('/auth/refresh-token')
+        .set('Cookie', `refreshToken=${refreshToken}`)
+        .expect(200);
+      expect(response.body.accessToken).toEqual(expect.stringContaining('.'));
+      expect(response.headers['set-cookie'][0]).not.toEqual(`refreshToken=${refreshToken}`);
+    });
+  });
+
+  describe('/email-resending', () => {
+    beforeAll(async () => {
+      await cleanDb(app);
+    });
+    it('should register user and resend email for him', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/registration')
+        .send(newUser as CreateUserModel)
+        .expect(204);
+
+      await request(app.getHttpServer())
+        .post('/auth/registration-email-resending')
+        .send({ email: newUser.email } as EmailResendModel)
+        .expect(204);
     });
   });
 });

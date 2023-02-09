@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AuthService } from '../auth.service';
-import { SessionsService } from '../../../security/sessions.service';
+import { SessionsService } from '../../../security/application/sessions.service';
 
 export class LogoutCommand {
-  constructor(public refreshToken: any) {}
+  constructor(public refreshToken: string) {}
 }
 
 @CommandHandler(LogoutCommand)

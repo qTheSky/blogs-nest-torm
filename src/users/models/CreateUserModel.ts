@@ -1,14 +1,14 @@
 import { IsEmail, Length, Matches, Validate, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../users.repository';
+import { UsersRepo } from '../users.repo';
 
 @Injectable()
 @ValidatorConstraint({ async: true })
 export class IsEmailOrLoginUniqueConstraint implements ValidatorConstraintInterface {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepo: UsersRepo) {}
 
   async validate(loginOrEmail: string) {
-    const user = await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+    const user = await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
     return !user;
   }
 }

@@ -1,13 +1,13 @@
-import { User } from '../../users/user.schema';
 import { EmailAdapter } from '../adapters/email.adapter';
 import { Injectable } from '@nestjs/common';
+import { User } from '../../users/entities/user.entity';
 
 @Injectable()
 export class EmailsManager {
   constructor(private emailAdapter: EmailAdapter) {}
   async sendEmailConfirmationMessage(user: User) {
     await this.emailAdapter.sendEmail(
-      user.accountData.email,
+      user.email,
       'email confirmation',
       ` <h1>Thank for your registration</h1>
                      <p>To finish registration please follow the link below:

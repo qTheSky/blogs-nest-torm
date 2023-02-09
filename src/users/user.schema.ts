@@ -36,7 +36,7 @@ class UserBanInfo {
 }
 
 @Schema()
-export class User {
+export class _User {
   _id: Types.ObjectId;
 
   @Prop({ required: true })
@@ -100,18 +100,18 @@ export class User {
   }
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(_User);
 
 UserSchema.methods = {
-  isEmailCanBeConfirmed: User.prototype.isEmailCanBeConfirmed,
-  confirmEmail: User.prototype.confirmEmail,
-  updateConfirmationCode: User.prototype.updateConfirmationCode,
-  ban: User.prototype.ban,
-  unBan: User.prototype.unBan,
+  isEmailCanBeConfirmed: _User.prototype.isEmailCanBeConfirmed,
+  confirmEmail: _User.prototype.confirmEmail,
+  updateConfirmationCode: _User.prototype.updateConfirmationCode,
+  ban: _User.prototype.ban,
+  unBan: _User.prototype.unBan,
 };
 
 const userStaticMethods: UserModelStatic = {
-  createUser: User.createUser,
+  createUser: _User.createUser,
 };
 
 UserSchema.statics = userStaticMethods;
@@ -126,6 +126,6 @@ type UserModelStatic = {
   ) => UserDocument;
 };
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<_User>;
 
 export type UserModel = Model<UserDocument> & UserModelStatic;

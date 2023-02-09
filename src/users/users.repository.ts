@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModel } from './user.schema';
+import { _User, UserDocument, UserModel } from './user.schema';
 import { Types } from 'mongoose';
 
 /////MONGOOSE
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private UserModel: UserModel) {}
+  constructor(@InjectModel(_User.name) private UserModel: UserModel) {}
 
-  async create(email: string, login: string, passwordHash: string, isByAdmin: boolean): Promise<User> {
+  async create(email: string, login: string, passwordHash: string, isByAdmin: boolean): Promise<_User> {
     const user = this.UserModel.createUser(this.UserModel, login, email, passwordHash, isByAdmin);
     return await this.save(user);
   }
@@ -47,6 +47,7 @@ export class UsersRepository {
 //   findUserByLoginOrEmail: (loginOrEmail: string) => Promise<UserDocument | null>;
 //   findUserByEmailConfirmationCode: (code: string) => Promise<UserDocument | null>;
 // }
+
 ////////SQL
 // @Injectable()
 // export class UsersRepository implements IUsersRepository {

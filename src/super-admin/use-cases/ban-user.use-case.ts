@@ -1,24 +1,24 @@
 import { Types } from 'mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../users/users.repository';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BanUserModel } from '../models/BanUserModel';
-import { SessionsRepository } from '../../security/sessions.repository';
 import { AuthService } from '../../auth/application/auth.service';
-import { UserDocument } from '../../users/user.schema';
 import { CommentsRepository } from '../../posts/comments/comments.repository';
 import { LikesPostsRepository } from '../../posts/likes/likesPosts.repository';
 import { LikesCommentsRepository } from '../../posts/comments/likes/likesComments.repository';
+import { UsersRepo } from '../../users/users.repo';
+import { User } from '../../users/entities/user.entity';
+import { SessionsRepo } from '../../security/sessions.repo';
 
 export class BanUserCommand {
-  constructor(public userId: Types.ObjectId, public banUserModel: BanUserModel) {}
+  constructor(public userId: number, public banUserModel: BanUserModel) {}
 }
 
 @CommandHandler(BanUserCommand)
 export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
   constructor(
-    private usersRepository: UsersRepository,
-    private sessionsRepository: SessionsRepository,
+    private usersRepo: UsersRepo,
+    private sessionsRepo: SessionsRepo,
     private authService: AuthService,
     private commentsRepository: CommentsRepository,
     private likesPostsRepository: LikesPostsRepository,
@@ -26,7 +26,7 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
   ) {}
 
   async execute(command: BanUserCommand): Promise<void> {
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersRepo.findUserById(command.userId);
     if (!user) throw new NotFoundException();
 
     try {
@@ -36,22 +36,22 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
       if (command.banUserModel.isBanned === false) {
         await this.unBan(user);
       }
-      await this.usersRepository.save(user);
+      await this.usersRepo.save(user);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
     }
   }
 
-  async ban(user: UserDocument, banReason: string) {
+  async ban(user: User, banReason: string) {
     user.ban(banReason);
-    await this.banSessions(user._id);
-    await this.updateIsbBannedForAllSubjects(user._id, true); // comments,likes for comments, likes for posts
+    // await this.banSessions(user.id);
+    // await this.updateIsbBannedForAllSubjects(user.id, true); // comments,likes for comments, likes for posts
   }
 
-  async unBan(user: UserDocument) {
+  async unBan(user: User) {
     user.unBan();
-    await this.updateIsbBannedForAllSubjects(user._id, false);
+    // await this.updateIsbBannedForAllSubjects(user.id, false);
   }
 
   async updateIsbBannedForAllSubjects(userId: Types.ObjectId, isBanned: boolean) {
@@ -75,12 +75,12 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
     );
   }
 
-  async banSessions(userId: Types.ObjectId) {
-    const userSessions = await this.sessionsRepository.findAllSessionsOfUser(userId);
+  async banSessions(userId: number) {
+    const userSessions = await this.sessionsRepo.findAllSessionsOfUser(userId);
     for (let i = 0; i < userSessions.length; i++) {
       await this.authService.putRefreshTokenToBlackList(userSessions[i].refreshToken);
     }
-    await this.sessionsRepository.deleteAllSessionsOfUser(userId);
+    await this.sessionsRepo.deleteAllSessionsOfUser(userId);
   }
 
   async updateIsBannedForSubject<R extends { save: (document: any) => any }>(

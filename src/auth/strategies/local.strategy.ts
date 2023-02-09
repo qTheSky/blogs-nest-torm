@@ -2,31 +2,31 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthCredentialsModel } from '../models/AuthCredentialsModel';
-import { UserDocument } from '../../users/user.schema';
 import * as bcrypt from 'bcrypt';
-import { UsersRepository } from '../../users/users.repository';
+import { UsersRepo } from '../../users/users.repo';
+import { User } from '../../users/entities/user.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private usersRepository: UsersRepository) {
+  constructor(private usersRepo: UsersRepo) {
     super({
       usernameField: 'loginOrEmail',
     });
   }
 
-  async validate(loginOrEmail: string, password: string): Promise<any> {
+  async validate(loginOrEmail: string, password: string): Promise<User> {
     const user = await this.checkAuthCredentials({ loginOrEmail, password });
     if (!user) throw new UnauthorizedException();
     return user;
   }
 
-  async checkAuthCredentials(authCredentialsModel: AuthCredentialsModel): Promise<UserDocument> {
+  async checkAuthCredentials(authCredentialsModel: AuthCredentialsModel): Promise<User> {
     const { loginOrEmail, password } = authCredentialsModel;
-    const user = await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+    const user = await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
     if (!user) throw new UnauthorizedException('Incorrect credentials');
     if (!user.emailConfirmation.isConfirmed) throw new UnauthorizedException('Confirm your email first');
     if (user.banInfo.isBanned) throw new UnauthorizedException();
-    const isHashesEquals = await bcrypt.compare(password, user.accountData.passwordHash);
+    const isHashesEquals = await bcrypt.compare(password, user.passwordHash);
     if (!isHashesEquals) throw new UnauthorizedException('Incorrect credentials');
     return user;
   }

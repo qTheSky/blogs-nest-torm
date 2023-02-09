@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users/users.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './users/user.schema';
+import { _User, UserSchema } from './users/user.schema';
 import { ViewModelMapper } from './common/view-model-mapper';
 import { QueryNormalizer } from './common/query-normalizer';
-import { UsersQueryRepository } from './users/users.query.repository';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsRepository } from './blogs/blogs.repository';
 import { Blog, BlogSchema } from './blogs/blog.schema';
@@ -32,11 +31,7 @@ import { LikesCommentsRepository } from './posts/comments/likes/likesComments.re
 import { LikeComment, LikeCommentSchema } from './posts/comments/likes/likeComment.schema';
 import { LikesPostsRepository } from './posts/likes/likesPosts.repository';
 import { LikePost, LikePostSchema } from './posts/likes/likePost.schema';
-import { Session, SessionSchema } from './security/session.schema';
-import { SessionsService } from './security/sessions.service';
-import { SessionsRepository } from './security/sessions.repository';
-import { RefreshTokenBL, RefreshTokenBLSchema } from './auth/refreshTokenBlackList.schema';
-import { RefreshTokenBlackListRepository } from './auth/refreshTokenBlackList.repository';
+import { SessionsService } from './security/application/sessions.service';
 import { SessionsController } from './security/sessions.controller';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -78,6 +73,18 @@ import { UpdateEmailConfirmationCodeUseCase } from './auth/application/use-cases
 import { DeleteCommentUseCase } from './posts/comments/use-cases/delete-comment.use-case';
 import { PutLikeToCommentUseCase } from './posts/comments/use-cases/put-like-to-comment.use-case';
 import { PutLikeToPostUseCase } from './posts/use-cases/put-like-to-post.use-case';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
+import { UserEmailConfirmation } from './users/entities/userEmailConfirmation.entity';
+import { UsersRepo } from './users/users.repo';
+import { UserBanInfo } from './users/entities/userBanInfo.entity';
+import { SessionsRepo } from './security/sessions.repo';
+import { Session } from './security/entities/session.entity';
+import { DeleteSessionByDeviceIdUseCase } from './security/application/use-cases/delete-session-by-device-id-use.case';
+import { DeleteSessionsExceptCurrentUseCase } from './security/application/use-cases/delete-sessions-except-current.use-case';
+import { RefreshTokenBL } from './security/entities/refreshTokenBlackList.entity';
+import { RefreshTokenBlackListRepo } from './security/refreshTokenBlackList.repo';
+import { UsersQueryRepo } from './users/users.query.repo';
 
 //USE CASES
 const authUseCases = [
@@ -94,11 +101,18 @@ const blogsUseCases = [DeleteBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, 
 const postsUseCases = [CreatePostUseCase, DeletePostUseCase, UpdatePostUseCase, PutLikeToPostUseCase];
 const commentsUseCases = [CreateCommentUseCase, UpdateCommentUseCase, DeleteCommentUseCase, PutLikeToCommentUseCase];
 const saUseCases = [BindBlogWithUserUseCase, DeleteUserUseCase, BanUserUseCase, BanBlogUseCase];
-const useCases = [...commentsUseCases, ...authUseCases, ...blogsUseCases, ...postsUseCases, ...saUseCases];
+const sessionsUseCases = [DeleteSessionByDeviceIdUseCase, DeleteSessionsExceptCurrentUseCase];
+const useCases = [
+  ...commentsUseCases,
+  ...authUseCases,
+  ...blogsUseCases,
+  ...postsUseCases,
+  ...saUseCases,
+  ...sessionsUseCases,
+];
 //USE CASES
 
 const adapters = [
-  UsersQueryRepository,
   BlogsRepository,
   BlogsQueryRepository,
   PostsRepository,
@@ -109,10 +123,12 @@ const adapters = [
   LikesCommentsRepository,
   LikesPostsRepository,
   CommentsRepository,
-  SessionsRepository,
-  RefreshTokenBlackListRepository,
   BannedUsersInBlogsRepository,
   BannedUsersInBlogQueryRepository,
+  UsersRepo,
+  SessionsRepo,
+  RefreshTokenBlackListRepo,
+  UsersQueryRepo,
 ];
 
 const constraints = [
@@ -126,30 +142,31 @@ const services = [BlogsService, PostsService, CommentsService, SessionsService, 
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 
+export const typeOrmOptions: TypeOrmModuleOptions = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'postgres',
+  password: '02121998',
+  database: 'Blogs',
+  autoLoadEntities: true,
+  synchronize: true,
+};
+
 @Module({
   imports: [
     CqrsModule,
     ConfigModule.forRoot(),
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: 'localhost',
-    //   port: 5432,
-    //   username: 'postgres',
-    //   password: '02121998',
-    //   database: 'Bloggers',
-    //   autoLoadEntities: false,
-    //   synchronize: false,
-    // }),
+    TypeOrmModule.forFeature([User, UserEmailConfirmation, UserBanInfo, Session, RefreshTokenBL]),
+    TypeOrmModule.forRoot(typeOrmOptions),
     MongooseModule.forRoot(process.env.MONGO_URI),
     MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
+      { name: _User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: LikePost.name, schema: LikePostSchema },
       { name: LikeComment.name, schema: LikeCommentSchema },
-      { name: Session.name, schema: SessionSchema },
-      { name: RefreshTokenBL.name, schema: RefreshTokenBLSchema },
       { name: BannedUserInBlog.name, schema: BannedUserInBlogSchema },
     ]),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),

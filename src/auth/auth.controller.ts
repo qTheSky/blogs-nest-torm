@@ -12,7 +12,6 @@ import {
 import { CreateUserModel } from '../users/models/CreateUserModel';
 import { ConfirmationCodeModel } from './models/ConfirmationCodeModel';
 import { EmailResendModel } from './models/EmailResendModel';
-import { Types } from 'mongoose';
 import { Request, Response } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guards';
@@ -21,13 +20,12 @@ import { ConfirmEmailCommand } from './application/use-cases/confirm-email-use-c
 import { RegistrationCommand } from './application/use-cases/registration-use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateEmailConfirmationCodeCommand } from './application/use-cases/update-email-confirmation-code.use-case';
-import { User } from '../users/user.schema';
 import { LogoutCommand } from './application/use-cases/logout.use-case';
 import { RefreshTokenCommand } from './application/use-cases/refresh-token.use-case';
 import { LoginCommand } from './application/use-cases/login.use-case';
 import { AuthUserDataModel } from './models/AuthUserDataModel';
 import { GetAuthUserDataCommand } from './application/use-cases/get-auth-user-data.use-case';
-import { Throttle } from '@nestjs/throttler';
+import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -55,7 +53,6 @@ export class AuthController {
   @Post('/refresh-token')
   @HttpCode(200)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<{ accessToken: string }> {
-    debugger;
     const { refreshToken, accessToken } = await this.commandBus.execute<
       RefreshTokenCommand,
       { refreshToken: string; accessToken: string }
@@ -106,7 +103,7 @@ export class AuthController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
-  async getAuthUserData(@CurrentUserId() currentUserId: Types.ObjectId): Promise<AuthUserDataModel> {
+  async getAuthUserData(@CurrentUserId() currentUserId: number): Promise<AuthUserDataModel> {
     return this.commandBus.execute<GetAuthUserDataCommand, AuthUserDataModel>(
       new GetAuthUserDataCommand(currentUserId),
     );

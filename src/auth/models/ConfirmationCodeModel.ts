@@ -1,11 +1,11 @@
 import { IsUUID, Validate, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../../users/users.repository';
+import { UsersRepo } from '../../users/users.repo';
 
 @Injectable()
 @ValidatorConstraint({ async: true })
 export class IsConfirmationCodeValidConstraint implements ValidatorConstraintInterface {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepository: UsersRepo) {}
   async validate(code: string) {
     const user = await this.usersRepository.findUserByEmailConfirmationCode(code);
     if (!user) return false;

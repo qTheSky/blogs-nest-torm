@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AuthService } from '../auth.service';
-import { User } from '../../../users/user.schema';
-import { SessionsService } from '../../../security/sessions.service';
+import { SessionsService } from '../../../security/application/sessions.service';
+import { User } from '../../../users/entities/user.entity';
 
 export class LoginCommand {
   constructor(public user: User, public ip: string, public deviceName: string) {}
@@ -12,9 +12,10 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
   constructor(private authService: AuthService, private sessionsService: SessionsService) {}
 
   async execute(command: LoginCommand): Promise<{ refreshToken: string; accessToken: string }> {
-    const { refreshToken, accessToken } = await this.authService.generateTokens(command.user._id);
+    const { refreshToken, accessToken } = await this.authService.generateTokens(command.user.id);
     await this.sessionsService.createSession(
-      { userId: command.user._id, ip: command.ip, deviceName: command.deviceName },
+      command.user,
+      { userId: command.user.id, ip: command.ip, deviceName: command.deviceName || 'unknown' },
       refreshToken,
     );
     return { accessToken, refreshToken };

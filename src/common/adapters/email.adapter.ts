@@ -18,6 +18,7 @@ export class EmailAdapter {
       subject,
       html: message,
     });
+
     return info;
   }
 }

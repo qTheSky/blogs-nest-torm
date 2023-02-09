@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Types } from 'mongoose';
 import { BlogsRepository } from '../../blogs/blogs.repository';
-import { UsersRepository } from '../../users/users.repository';
 import { BadRequestException } from '@nestjs/common';
+import { UsersRepository } from '../../users/users.repository';
 
 export class BindBlogWithUserCommand {
   constructor(public id: Types.ObjectId, public userId: Types.ObjectId) {}

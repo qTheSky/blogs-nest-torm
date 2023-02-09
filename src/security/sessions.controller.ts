@@ -1,38 +1,44 @@
 import { Controller, Delete, Get, HttpCode, Param, Req } from '@nestjs/common';
-import { SessionsService } from './sessions.service';
+import { SessionsService } from './application/sessions.service';
 import { SessionViewModel } from './models/SessionViewModel';
 import { ViewModelMapper } from '../common/view-model-mapper';
 import { Request } from 'express';
 import { AuthService } from '../auth/application/auth.service';
-import { SessionsRepository } from './sessions.repository';
+import { SessionsRepo } from './sessions.repo';
+import { CommandBus } from '@nestjs/cqrs';
+import { DeleteSessionByDeviceIdCommand } from './application/use-cases/delete-session-by-device-id-use.case';
+import { DeleteSessionsExceptCurrentCommand } from './application/use-cases/delete-sessions-except-current.use-case';
 
-@Controller('security')
+@Controller('security/devices')
 export class SessionsController {
   constructor(
-    private sessionsRepository: SessionsRepository,
+    private sessionsRepo: SessionsRepo,
     private sessionsService: SessionsService,
     private viewModelConverter: ViewModelMapper,
     private authService: AuthService,
+    private commandBus: CommandBus,
   ) {}
 
-  @Get('/devices')
+  @Get()
   async getSessionsOfUser(@Req() req: Request): Promise<SessionViewModel[]> {
     const userId = this.authService.getUserIdByTokenOrThrow(req.cookies.refreshToken);
-    const sessions = await this.sessionsRepository.findAllSessionsOfUser(userId);
+    const sessions = await this.sessionsRepo.findAllSessionsOfUser(userId);
     return sessions.map(this.viewModelConverter.getSessionViewModel);
   }
 
-  @Delete('/devices/:id')
+  @Delete(':deviceId')
   @HttpCode(204)
-  async deleteSession(@Param('id') id: string, @Req() req: Request): Promise<void> {
-    const userId = this.authService.getUserIdByTokenOrThrow(req.cookies.refreshToken); //todo put refreshtokens to BL when delete session
-    await this.sessionsService.deleteSessionByDeviceId(id, userId);
+  async deleteSessionByDeviceId(@Param('deviceId') deviceId: string, @Req() req: Request): Promise<void> {
+    await this.commandBus.execute<DeleteSessionByDeviceIdCommand, void>(
+      new DeleteSessionByDeviceIdCommand(req.cookies.refreshToken, deviceId),
+    );
   }
 
-  @Delete('/devices')
+  @Delete()
   @HttpCode(204)
-  async deleteSessionExceptCurrent(@Param('id') id: string, @Req() req: Request): Promise<void> {
-    const userId = this.authService.getUserIdByTokenOrThrow(req.cookies.refreshToken); //todo put refreshtokens to BL when delete session
-    await this.sessionsService.deleteSessionsExceptCurrent(userId, req.cookies.refreshToken);
+  async deleteSessionExceptCurrent(@Req() req: Request): Promise<void> {
+    await this.commandBus.execute<DeleteSessionsExceptCurrentCommand, void>(
+      new DeleteSessionsExceptCurrentCommand(req.cookies.refreshToken),
+    );
   }
 }

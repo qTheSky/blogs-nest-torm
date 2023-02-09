@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id-pipe';
 import { Types } from 'mongoose';
@@ -15,11 +27,11 @@ import { UserViewModel } from '../users/models/UserViewModel';
 import { RegistrationCommand } from '../auth/application/use-cases/registration-use-case';
 import { DeleteUserCommand } from './use-cases/delete-user.use-case';
 import { QueryUserModel } from '../users/models/QueryUserModel';
-import { UsersQueryRepository } from '../users/users.query.repository';
 import { BanUserModel } from './models/BanUserModel';
 import { BanUserCommand } from './use-cases/ban-user.use-case';
 import { BanBlogInputModel } from './models/BanBlogInputModel';
 import { BanBlogCommand } from './use-cases/ban-blog.use-case';
+import { UsersQueryRepo } from '../users/users.query.repo';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
@@ -29,8 +41,9 @@ export class SuperAdminController {
     private queryNormalizer: QueryNormalizer,
     private viewModelConverter: ViewModelMapper,
     private blogsQueryRepository: BlogsQueryRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepo: UsersQueryRepo,
   ) {}
+
   // =====blogs========
   @Put('/blogs/:blogId/ban')
   @HttpCode(204)
@@ -61,19 +74,21 @@ export class SuperAdminController {
       items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogForSAViewModel),
     };
   }
+
   // =====blogs========
 
   // =======users=========
 
   @Put('/users/:id/ban')
-  async banUser(@Param('id', ParseObjectIdPipe) id: Types.ObjectId, @Body() banUserModel: BanUserModel): Promise<void> {
+  @HttpCode(204)
+  async banUser(@Param('id', ParseIntPipe) id: number, @Body() banUserModel: BanUserModel): Promise<void> {
     await this.commandBus.execute<BanUserCommand, void>(new BanUserCommand(id, banUserModel));
   }
 
   @Get('/users')
   async findUsers(@Query() query: QueryUserModel): Promise<PaginatorResponseType<UserViewModel[]>> {
     const normalizedUsersQuery = this.queryNormalizer.normalizeUsersQuery(query);
-    return this.usersQueryRepository.findUsers(normalizedUsersQuery);
+    return this.usersQueryRepo.findUsers(normalizedUsersQuery);
   }
 
   @Post('/users')
@@ -84,8 +99,9 @@ export class SuperAdminController {
 
   @Delete('/users/:id')
   @HttpCode(204)
-  async deleteUser(@Param('id', ParseObjectIdPipe) id: Types.ObjectId): Promise<void> {
+  async deleteUser(@Param('id', ParseIntPipe) id): Promise<void> {
     await this.commandBus.execute<DeleteUserCommand, void>(new DeleteUserCommand(id));
   }
+
   // =======users=========
 }

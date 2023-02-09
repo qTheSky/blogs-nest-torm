@@ -4,7 +4,7 @@ import { INestApplication } from '@nestjs/common';
 import { newBlog } from './models-for-tests/positive/create/Blog';
 import { BlogViewModel } from '../src/blogs/models/BlogViewModel';
 import { updateBlogModel } from './models-for-tests/positive/udate/Blog';
-import { createUserAndGetToken } from './utils/create-user-and-get-token/create-user-and-get-token';
+import { createUserAndGetAccessToken } from './utils/create-user-and-get-token/create-user-and-get-token';
 
 describe('BLOGS', () => {
   let app: INestApplication;
@@ -22,7 +22,7 @@ describe('BLOGS', () => {
     let accessToken: string;
     beforeAll(async () => {
       await request(app.getHttpServer()).delete('/testing/all-data').expect(204);
-      const { token, user } = await createUserAndGetToken(app);
+      const { token, user } = await createUserAndGetAccessToken(app);
       createdUser = user;
       accessToken = token;
     });
