@@ -141,7 +141,7 @@ const constraints = [
 const services = [BlogsService, PostsService, CommentsService, SessionsService, UsersService, AuthService];
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
-
+//CLOUD
 export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'snuffleupagus.db.elephantsql.com',
@@ -152,6 +152,8 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
   autoLoadEntities: true,
   synchronize: true,
 };
+//CLOUD
+//LOCAL
 export const _typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
@@ -162,6 +164,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
   autoLoadEntities: true,
   synchronize: true,
 };
+//LOCAL
 
 @Module({
   imports: [

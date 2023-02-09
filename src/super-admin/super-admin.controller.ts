@@ -32,6 +32,7 @@ import { BanUserCommand } from './use-cases/ban-user.use-case';
 import { BanBlogInputModel } from './models/BanBlogInputModel';
 import { BanBlogCommand } from './use-cases/ban-blog.use-case';
 import { UsersQueryRepo } from '../users/users.query.repo';
+import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
@@ -99,8 +100,8 @@ export class SuperAdminController {
 
   @Delete('users/:id')
   @HttpCode(204)
-  async deleteUser(@Param('id') id: string): Promise<void> {
-    await this.commandBus.execute<DeleteUserCommand, void>(new DeleteUserCommand(+id));
+  async deleteUser(@Param('id', ParseNumberPipe) id: number): Promise<void> {
+    await this.commandBus.execute<DeleteUserCommand, void>(new DeleteUserCommand(id));
   }
 
   // =======users=========
