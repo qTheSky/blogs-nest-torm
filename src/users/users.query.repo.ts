@@ -19,7 +19,7 @@ export class UsersQueryRepo {
     builder.orderBy(`u.${query.sortBy}`, query.sortDirection.toUpperCase() as 'ASC' | 'DESC');
 
     if (query.searchLoginTerm) {
-      builder.andWhere('u.login ILIKE :login', { login: `%${query.searchLoginTerm}%` });
+      builder.where('u.login ILIKE :login', { login: `%${query.searchLoginTerm}%` });
     }
     if (query.searchEmailTerm) {
       builder.orWhere('u.email ILIKE :email', { email: `%${query.searchEmailTerm}%` });
