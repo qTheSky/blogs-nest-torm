@@ -87,7 +87,7 @@ export class AuthController {
   }
 
   @Post('/registration-email-resending')
-  @Throttle(5, 9.5)
+  @Throttle(4, 10)
   @HttpCode(204)
   async resendEmailConfirmationCode(@Body() emailResendModel: EmailResendModel): Promise<void> {
     await this.commandBus.execute<UpdateEmailConfirmationCodeCommand, void>(
