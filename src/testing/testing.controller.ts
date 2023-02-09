@@ -25,6 +25,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 SELECT truncate_tables('postgres');
+SELECT truncate_tables('fqidihfj');
         `);
       return;
     } catch (e) {
