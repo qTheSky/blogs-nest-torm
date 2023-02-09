@@ -97,10 +97,10 @@ export class SuperAdminController {
     return this.viewModelConverter.getUserViewModel(newUser);
   }
 
-  @Delete('/users/:id')
+  @Delete('users/:id')
   @HttpCode(204)
-  async deleteUser(@Param('id', ParseIntPipe) id): Promise<void> {
-    await this.commandBus.execute<DeleteUserCommand, void>(new DeleteUserCommand(id));
+  async deleteUser(@Param('id') id: string): Promise<void> {
+    await this.commandBus.execute<DeleteUserCommand, void>(new DeleteUserCommand(+id));
   }
 
   // =======users=========
