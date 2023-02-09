@@ -144,6 +144,16 @@ const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 
 export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
+  host: 'snuffleupagus.db.elephantsql.com',
+  port: 5432,
+  username: 'fqidihfj',
+  password: 'GsfjixstNork6WFqSctdeNAXCyLL4mAC',
+  database: 'fqidihfj',
+  autoLoadEntities: true,
+  synchronize: true,
+};
+export const _typeOrmOptions: TypeOrmModuleOptions = {
+  type: 'postgres',
   host: 'localhost',
   port: 5432,
   username: 'postgres',
