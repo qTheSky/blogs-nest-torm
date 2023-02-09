@@ -11,7 +11,7 @@ export class QueryNormalizer {
       pageSize: query.pageSize ? +query.pageSize : 10,
       searchEmailTerm: query.searchEmailTerm || '',
       searchLoginTerm: query.searchLoginTerm || '',
-      sortBy: 'createdAt',
+      sortBy: query.sortBy || 'createdAt',
       sortDirection: query.sortDirection || 'desc',
       banStatus: query.banStatus || 'all',
     };
