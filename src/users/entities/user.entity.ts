@@ -12,7 +12,7 @@ export class User {
   @Column()
   email: string;
 
-  @Column({ collation: 'C' })
+  @Column({ collation: 'en_US.utf8' })
   login: string;
 
   @Column()
