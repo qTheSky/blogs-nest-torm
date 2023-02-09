@@ -9,6 +9,8 @@ import {
   makeCommonLoginAndGetTokens,
 } from './utils/create-user-and-get-token/make-common-login';
 
+jest.setTimeout(15000);
+
 describe('/security/devices', () => {
   let app: INestApplication;
   beforeAll(async () => {

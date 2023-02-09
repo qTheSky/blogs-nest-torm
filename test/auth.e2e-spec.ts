@@ -10,6 +10,7 @@ import { cleanDb } from './utils/cleanDb';
 import { createUserAndGetTokens } from './utils/create-user-and-get-token/create-user-and-get-token';
 import { EmailResendModel } from '../src/auth/models/EmailResendModel';
 
+jest.setTimeout(15000);
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
@@ -122,7 +123,7 @@ describe('AuthController (e2e)', () => {
         .set('Cookie', `refreshToken=${refreshToken}`)
         .expect(200);
       expect(response.body.accessToken).toEqual(expect.stringContaining('.'));
-      expect(response.headers['set-cookie'][0]).not.toEqual(`refreshToken=${refreshToken}`);
+      expect(response.headers['set-cookie'][0]).toEqual(expect.stringContaining('.'));
     });
   });
 

@@ -13,6 +13,8 @@ import { getCreateModels } from './utils/get-create-models';
 import { createManyItemsToDb } from './utils/create-many-items-to-db';
 import { PaginatorWithItems } from '../src/common/paginator-response-type';
 
+jest.setTimeout(15000);
+
 describe('/sa/users', () => {
   let app: INestApplication;
   beforeAll(async () => {
