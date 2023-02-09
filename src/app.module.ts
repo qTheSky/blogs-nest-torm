@@ -142,7 +142,7 @@ const services = [BlogsService, PostsService, CommentsService, SessionsService, 
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 //CLOUD
-export const _typeOrmOptions: TypeOrmModuleOptions = {
+export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'snuffleupagus.db.elephantsql.com',
   port: 5432,
@@ -154,7 +154,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
 };
 //CLOUD
 //LOCAL
-export const typeOrmOptions: TypeOrmModuleOptions = {
+export const _typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
