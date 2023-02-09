@@ -19,11 +19,9 @@ export class UsersQueryRepo {
     builder.orderBy(`u.${query.sortBy}`, query.sortDirection.toUpperCase() as 'ASC' | 'DESC');
 
     if (query.searchLoginTerm) {
-      // builder.andWhere('LOWER(u.login) LIKE LOWER (:login)', { login: `%${query.searchLoginTerm}%` });
       builder.andWhere('u.login ILIKE :login', { login: `%${query.searchLoginTerm}%` });
     }
     if (query.searchEmailTerm) {
-      // builder.orWhere('LOWER(u.email) LIKE LOWER (:email)', { email: `%${query.searchEmailTerm}%` });
       builder.orWhere('u.email ILIKE :email', { email: `%${query.searchEmailTerm}%` });
     }
     if (query.banStatus !== 'all') {
