@@ -17,7 +17,6 @@ import { Types } from 'mongoose';
 import { CommandBus } from '@nestjs/cqrs';
 import { BindBlogWithUserCommand } from './use-cases/bind-blog-with-user.use-case';
 import { PaginatorResponseType } from '../common/paginator-response-type';
-import { BlogForSAViewModel } from '../blogs/models/BlogViewModel';
 import { QueryBlogModel } from '../blogs/models/QueryBlogModel';
 import { QueryNormalizer } from '../common/query-normalizer';
 import { ViewModelMapper } from '../common/view-model-mapper';
@@ -65,15 +64,17 @@ export class SuperAdminController {
   }
 
   @Get('/blogs')
-  async findBlogs(@Query() query: QueryBlogModel): Promise<PaginatorResponseType<BlogForSAViewModel[]>> {
-    const normalizeBlogsQuery = this.queryNormalizer.normalizeBlogsQuery(query);
-    const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizeBlogsQuery, {
-      isAdminRequesting: true,
-    });
-    return {
-      ...foundBlogsWithPagination,
-      items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogForSAViewModel),
-    };
+  async findBlogs(
+    @Query() query: QueryBlogModel, // : Promise<PaginatorResponseType<BlogForSAViewModel[]>>
+  ) {
+    // const normalizeBlogsQuery = this.queryNormalizer.normalizeBlogsQuery(query);
+    // const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizeBlogsQuery, {
+    //   isAdminRequesting: true,
+    // });
+    // return {
+    //   ...foundBlogsWithPagination,
+    //   items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogForSAViewModel),
+    // };
   }
 
   // =====blogs========

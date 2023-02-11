@@ -11,7 +11,7 @@ class BlogBanInfo {
 }
 
 @Schema()
-export class Blog {
+export class _Blog {
   _id: Types.ObjectId;
 
   @Prop({ required: true })
@@ -81,16 +81,16 @@ export class Blog {
   }
 }
 
-export const BlogSchema = SchemaFactory.createForClass(Blog);
+export const BlogSchema = SchemaFactory.createForClass(_Blog);
 
 BlogSchema.methods = {
-  ban: Blog.prototype.ban,
-  unBan: Blog.prototype.unBan,
-  createBannedUser: Blog.prototype.createBannedUser,
+  ban: _Blog.prototype.ban,
+  unBan: _Blog.prototype.unBan,
+  createBannedUser: _Blog.prototype.createBannedUser,
 };
 
 const blogStaticMethods: BlogStatics = {
-  createBlog: Blog.createBlog,
+  createBlog: _Blog.createBlog,
 };
 
 BlogSchema.statics = blogStaticMethods;
@@ -106,6 +106,6 @@ type BlogStatics = {
   ) => BlogDocument;
 };
 
-export type BlogDocument = HydratedDocument<Blog>;
+export type BlogDocument = HydratedDocument<_Blog>;
 
 export type BlogModel = Model<BlogDocument> & BlogStatics;

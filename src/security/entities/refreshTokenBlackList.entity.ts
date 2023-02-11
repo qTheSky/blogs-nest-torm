@@ -5,7 +5,7 @@ import { User } from '../../users/entities/user.entity';
 export class RefreshTokenBL {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 
   @Column()

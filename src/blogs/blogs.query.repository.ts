@@ -1,11 +1,11 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModel } from './blog.schema';
+import { _Blog, BlogModel } from './blog.schema';
 import { PaginatorResponseType } from '../common/paginator-response-type';
 import { NormalizedBlogsQuery } from '../common/query-normalizer';
 import { Types } from 'mongoose';
 
 export class BlogsQueryRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: BlogModel) {}
+  constructor(@InjectModel(_Blog.name) private BlogModel: BlogModel) {}
 
   async findBlogs(
     query: NormalizedBlogsQuery,
@@ -13,7 +13,7 @@ export class BlogsQueryRepository {
       blogsOfSpecifiedUserId: undefined,
       isAdminRequesting: false,
     },
-  ): Promise<PaginatorResponseType<Blog[]>> {
+  ): Promise<PaginatorResponseType<_Blog[]>> {
     const filter: any = {
       'banInfo.isBanned': { $ne: true },
     };

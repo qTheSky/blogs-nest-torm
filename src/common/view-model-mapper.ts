@@ -1,5 +1,4 @@
 import { UserViewModel } from '../users/models/UserViewModel';
-import { Blog } from '../blogs/blog.schema';
 import { BlogForSAViewModel, BlogViewModel } from '../blogs/models/BlogViewModel';
 import { PostViewModel } from '../posts/models/PostViewModel';
 import { Post } from '../posts/post.schema';
@@ -19,6 +18,7 @@ import { BannedUserInBlogViewModel } from '../blogs/models/BannedUserInBlogViewM
 import { PostsRepository } from '../posts/posts.repository';
 import { User } from '../users/entities/user.entity';
 import { Session } from '../security/entities/session.entity';
+import { Blog } from '../blogs/entities/blog.entity';
 
 @Injectable()
 export class ViewModelMapper {
@@ -44,25 +44,25 @@ export class ViewModelMapper {
 
   getBlogForSAViewModel(blog: Blog): BlogForSAViewModel {
     return {
-      id: blog._id,
-      name: blog.name,
-      description: blog.description,
-      createdAt: blog.createdAt.toISOString(),
-      websiteUrl: blog.websiteUrl,
-      blogOwnerInfo: { userId: blog.userId, userLogin: blog.userLogin },
-      banInfo: { isBanned: blog.banInfo.isBanned, banDate: blog.banInfo.banDate?.toISOString() || null },
-      isMembership: false,
-    };
+      // id: blog.id,
+      // name: blog.name,
+      // description: blog.description,
+      // createdAt: blog.createdAt.toISOString(),
+      // websiteUrl: blog.websiteUrl,
+      // blogOwnerInfo: { userId: blog.userId, userLogin: blog.userLogin },
+      // banInfo: { isBanned: blog.banInfo.isBanned, banDate: blog.banInfo.banDate?.toISOString() || null },
+      // isMembership: false,
+    } as BlogForSAViewModel; //todo remove as
   }
 
   getBlogViewModel(blog: Blog): BlogViewModel {
     return {
-      id: blog._id,
+      id: blog.id.toString(),
       name: blog.name,
       description: blog.description,
       createdAt: blog.createdAt.toISOString(),
       websiteUrl: blog.websiteUrl,
-      isMembership: false,
+      isMembership: true,
     };
   }
 

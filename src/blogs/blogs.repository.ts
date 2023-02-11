@@ -1,14 +1,14 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModel } from './blog.schema';
+import { _Blog, BlogDocument, BlogModel } from './blog.schema';
 import { CreateBlogModel } from './models/CreateBlogModel';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: BlogModel) {}
+  constructor(@InjectModel(_Blog.name) private BlogModel: BlogModel) {}
 
-  async create(userId: Types.ObjectId, userLogin: string, createBlogModel: CreateBlogModel): Promise<Blog> {
+  async create(userId: Types.ObjectId, userLogin: string, createBlogModel: CreateBlogModel): Promise<_Blog> {
     const blog = this.BlogModel.createBlog(
       this.BlogModel,
       userId,

@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface BlogViewModel {
-  id: Types.ObjectId;
+  id: string;
   name: string;
   description: string;
   websiteUrl: string;

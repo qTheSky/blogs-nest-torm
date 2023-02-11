@@ -17,7 +17,6 @@ import { CreateBlogModel } from './models/CreateBlogModel';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
 import { BlogViewModel } from './models/BlogViewModel';
 import { CreateBlogCommand } from './application/use-cases/create-blog.use-case';
-import { Blog } from './blog.schema';
 import { ViewModelMapper } from '../common/view-model-mapper';
 import { CommandBus } from '@nestjs/cqrs';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id-pipe';
@@ -44,6 +43,8 @@ import { BannedUserInBlogQueryModel } from './models/BannedUserInBlogQueryModel'
 import { BannedUserInBlogViewModel } from './models/BannedUserInBlogViewModel';
 import { BannedUsersInBlogQueryRepository } from './banned-users-in-blog.query.repository';
 import { BlogsRepository } from './blogs.repository';
+import { Blog } from './entities/blog.entity';
+import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 
 @Controller('blogger')
 export class BloggerController {
@@ -78,9 +79,9 @@ export class BloggerController {
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async updateBlog(
-    @Param('blogId', ParseObjectIdPipe) blogId: Types.ObjectId,
+    @Param('blogId', ParseNumberPipe) blogId: number,
     @Body() updateBlogModel: UpdateBlogModel,
-    @CurrentUserId() currentUserId,
+    @CurrentUserId() currentUserId: number,
   ): Promise<void> {
     await this.commandBus.execute<UpdateBlogCommand, void>(
       new UpdateBlogCommand(blogId, currentUserId, updateBlogModel),
@@ -91,15 +92,18 @@ export class BloggerController {
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async deleteBlog(
-    @Param('id', ParseObjectIdPipe) blogId: Types.ObjectId,
-    @CurrentUserId() currentUserId,
+    @Param('id', ParseNumberPipe) blogId: number,
+    @CurrentUserId() currentUserId: number,
   ): Promise<void> {
     await this.commandBus.execute<DeleteBlogCommand, void>(new DeleteBlogCommand(currentUserId, blogId));
   }
 
   @Post('/blogs')
   @UseGuards(JwtAuthGuard)
-  async createBlog(@Body() createBlogModel: CreateBlogModel, @CurrentUserId() currentUserId): Promise<BlogViewModel> {
+  async createBlog(
+    @Body() createBlogModel: CreateBlogModel,
+    @CurrentUserId() currentUserId: number,
+  ): Promise<BlogViewModel> {
     const createdBlog = await this.commandBus.execute<CreateBlogCommand, Blog>(
       new CreateBlogCommand(currentUserId, createBlogModel),
     );
@@ -110,16 +114,16 @@ export class BloggerController {
   @UseGuards(JwtAuthGuard)
   async getOwnBlogs(
     @Query() query: QueryBlogModel,
-    @CurrentUserId() currentUserId,
-  ): Promise<PaginatorResponseType<BlogViewModel[]>> {
-    const normalizedBlogQuery = this.queryNormalizer.normalizeBlogsQuery(query);
-    const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizedBlogQuery, {
-      blogsOfSpecifiedUserId: currentUserId,
-    });
-    return {
-      ...foundBlogsWithPagination,
-      items: foundBlogsWithPagination.items.map(this.viewModelMapper.getBlogViewModel),
-    };
+    @CurrentUserId() currentUserId, // : Promise<PaginatorResponseType<BlogViewModel[]>>
+  ) {
+    // const normalizedBlogQuery = this.queryNormalizer.normalizeBlogsQuery(query);
+    // const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizedBlogQuery, {
+    //   blogsOfSpecifiedUserId: currentUserId,
+    // });
+    // return {
+    //   ...foundBlogsWithPagination,
+    //   items: foundBlogsWithPagination.items.map(this.viewModelMapper.getBlogViewModel),
+    // };
   }
 
   // POSTS FOR BLOG
@@ -160,6 +164,7 @@ export class BloggerController {
   ): Promise<void> {
     await this.commandBus.execute<DeletePostCommand, void>(new DeletePostCommand(blogId, postId, currentUserId));
   }
+
   // POSTS FOR BLOG
 
   // USERS
@@ -189,5 +194,6 @@ export class BloggerController {
     const normalizedBannedUsersInBlogQuery = this.queryNormalizer.normalizeBannedUsersInBlogQuery(query);
     return this.bannedUsersInBlogQueryRepository.findUsers(normalizedBannedUsersInBlogQuery, blog._id);
   }
+
   // USERS
 }

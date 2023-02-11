@@ -6,7 +6,7 @@ import { ViewModelMapper } from './common/view-model-mapper';
 import { QueryNormalizer } from './common/query-normalizer';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsRepository } from './blogs/blogs.repository';
-import { Blog, BlogSchema } from './blogs/blog.schema';
+import { _Blog, BlogSchema } from './blogs/blog.schema';
 import { BlogsQueryRepository } from './blogs/blogs.query.repository';
 import { PostsRepository } from './posts/posts.repository';
 import { PostsQueryRepository } from './posts/posts.query.repository';
@@ -85,6 +85,9 @@ import { DeleteSessionsExceptCurrentUseCase } from './security/application/use-c
 import { RefreshTokenBL } from './security/entities/refreshTokenBlackList.entity';
 import { RefreshTokenBlackListRepo } from './security/refreshTokenBlackList.repo';
 import { UsersQueryRepo } from './users/users.query.repo';
+import { BlogsRepo } from './blogs/blogs.repo';
+import { Blog } from './blogs/entities/blog.entity';
+import { BlogBanInfo } from './blogs/entities/blog-ban-info.entity';
 
 //USE CASES
 const authUseCases = [
@@ -129,6 +132,7 @@ const adapters = [
   SessionsRepo,
   RefreshTokenBlackListRepo,
   UsersQueryRepo,
+  BlogsRepo,
 ];
 
 const constraints = [
@@ -142,7 +146,7 @@ const services = [BlogsService, PostsService, CommentsService, SessionsService, 
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 //CLOUD
-export const typeOrmOptions: TypeOrmModuleOptions = {
+export const _typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'snuffleupagus.db.elephantsql.com',
   port: 5432,
@@ -154,7 +158,7 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
 };
 //CLOUD
 //LOCAL
-export const _typeOrmOptions: TypeOrmModuleOptions = {
+export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -164,18 +168,19 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
   autoLoadEntities: true,
   synchronize: true,
 };
+
 //LOCAL
 
 @Module({
   imports: [
     CqrsModule,
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([User, UserEmailConfirmation, UserBanInfo, Session, RefreshTokenBL]),
+    TypeOrmModule.forFeature([User, UserEmailConfirmation, UserBanInfo, Session, RefreshTokenBL, Blog, BlogBanInfo]),
     TypeOrmModule.forRoot(typeOrmOptions),
     MongooseModule.forRoot(process.env.MONGO_URI),
     MongooseModule.forFeature([
       { name: _User.name, schema: UserSchema },
-      { name: Blog.name, schema: BlogSchema },
+      { name: _Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: LikePost.name, schema: LikePostSchema },

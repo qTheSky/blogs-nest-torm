@@ -6,7 +6,7 @@ export class Session {
   @PrimaryColumn({ unique: true })
   deviceId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 
   @Column()

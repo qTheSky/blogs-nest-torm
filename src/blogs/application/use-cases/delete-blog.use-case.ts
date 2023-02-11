@@ -1,19 +1,18 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Types } from 'mongoose';
-import { BlogsRepository } from '../../blogs.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BlogsRepo } from '../../blogs.repo';
 
 export class DeleteBlogCommand {
-  constructor(public userId: Types.ObjectId, public blogId: Types.ObjectId) {}
+  constructor(public userId: number, public blogId: number) {}
 }
 
 @CommandHandler(DeleteBlogCommand)
 export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(private blogsRepo: BlogsRepo) {}
   async execute(command: DeleteBlogCommand) {
-    const blog = await this.blogsRepository.get(command.blogId);
+    const blog = await this.blogsRepo.get(command.blogId);
     if (!blog) throw new NotFoundException();
-    if (!blog.userId.equals(command.userId)) throw new ForbiddenException();
-    await this.blogsRepository.deleteBlog(command.blogId);
+    if (blog.userId !== command.userId) throw new ForbiddenException();
+    await this.blogsRepo.deleteBlog(command.blogId);
   }
 }

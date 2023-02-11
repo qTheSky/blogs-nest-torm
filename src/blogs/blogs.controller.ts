@@ -13,11 +13,14 @@ import { ParseObjectIdPipe } from '../common/pipes/parse-object-id-pipe';
 import { GetCurrentUserIdOrNull } from '../auth/get-user.decorator';
 import { IfAuthGuard } from '../auth/guards/if-auth.guard';
 import { BlogsRepository } from './blogs.repository';
+import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
+import { BlogsRepo } from './blogs.repo';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsRepository: BlogsRepository,
+    private blogsRepo: BlogsRepo,
     private viewModelConverter: ViewModelMapper,
     private queryNormalizer: QueryNormalizer,
     private blogsQueryRepository: BlogsQueryRepository,
@@ -26,18 +29,20 @@ export class BlogsController {
 
   //BLOGS
   @Get('')
-  async findBlogs(@Query() query: QueryBlogModel): Promise<PaginatorResponseType<BlogViewModel[]>> {
-    const normalizedBlogQuery = this.queryNormalizer.normalizeBlogsQuery(query);
-    const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizedBlogQuery);
-    return {
-      ...foundBlogsWithPagination,
-      items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogViewModel),
-    };
+  async findBlogs(
+    @Query() query: QueryBlogModel, // : Promise<PaginatorResponseType<BlogViewModel[]>>
+  ) {
+    // const normalizedBlogQuery = this.queryNormalizer.normalizeBlogsQuery(query);
+    // const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizedBlogQuery);
+    // return {
+    //   ...foundBlogsWithPagination,
+    //   items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogViewModel),
+    // };
   }
 
-  @Get('/:id')
-  async getBlogById(@Param('id', ParseObjectIdPipe) id: Types.ObjectId): Promise<BlogViewModel> {
-    const blog = await this.blogsRepository.findById(id);
+  @Get(':id')
+  async getBlogById(@Param('id', ParseNumberPipe) id: number): Promise<BlogViewModel> {
+    const blog = await this.blogsRepo.findById(id);
     if (!blog) throw new NotFoundException('Blog doesnt exist');
     return this.viewModelConverter.getBlogViewModel(blog);
   }

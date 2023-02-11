@@ -45,7 +45,7 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true, //todo => if developing secure false otherwise true
+      secure: false, //todo => if developing secure false otherwise true
       maxAge: 180 * 24 * 60 * 60 * 1000,
     });
     return { accessToken };
@@ -61,7 +61,7 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true, //todo => if developing secure false otherwise true
+      secure: false, //todo => if developing secure false otherwise true
       maxAge: 180 * 24 * 60 * 60 * 1000,
     });
 
