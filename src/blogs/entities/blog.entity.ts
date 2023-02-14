@@ -15,7 +15,7 @@ export class Blog {
   @Column({ nullable: true })
   userId: number;
 
-  @Column()
+  @Column({ collation: 'C' })
   name: string;
   @Column()
   description: string;

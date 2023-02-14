@@ -1,4 +1,4 @@
 import { Like } from '../common/like.entity';
 
-export const cutLikesByBannedUsers = <TL extends Like>(likes: TL[]): TL[] =>
+export const cutLikesByBannedUsers = <LIKETYPE extends Like>(likes: LIKETYPE[]): LIKETYPE[] =>
   likes.filter((l) => !l.user.banInfo.isBanned);

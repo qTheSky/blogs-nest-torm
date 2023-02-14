@@ -20,10 +20,11 @@ export class PostsQueryRepo {
 
     const [foundPosts, total] = await this.repo.findAndCount({
       where: filter,
-      order: { [query.sortBy]: query.sortDirection },
+      order: { [query.sortBy]: query.sortDirection.toUpperCase() },
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
     });
+
     let posts;
     if (foundPosts) {
       posts = foundPosts.map((p) => ({ ...p, likes: cutLikesByBannedUsers<LikePost>(p.likes) })) as Post[];
