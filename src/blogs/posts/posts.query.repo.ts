@@ -20,6 +20,7 @@ export class PostsQueryRepo {
 
     const [foundPosts, total] = await this.repo.findAndCount({
       where: filter,
+      order: { [query.sortBy]: query.sortDirection },
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
     });
