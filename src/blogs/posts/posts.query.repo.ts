@@ -18,20 +18,22 @@ export class PostsQueryRepo {
       filter.blogId = blogId;
     }
 
-    const [foundPost, total] = await this.repo.findAndCount({
+    const [foundPosts, total] = await this.repo.findAndCount({
       where: filter,
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
     });
-
-    const posts = foundPost.map((p) => ({ ...p, likes: cutLikesByBannedUsers<LikePost>(p.likes) })) as Post[];
+    let posts;
+    if (foundPosts) {
+      posts = foundPosts.map((p) => ({ ...p, likes: cutLikesByBannedUsers<LikePost>(p.likes) })) as Post[];
+    }
 
     return {
       pagesCount: Math.ceil(total / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: total,
-      items: posts,
+      items: posts ?? [],
     };
   }
 }

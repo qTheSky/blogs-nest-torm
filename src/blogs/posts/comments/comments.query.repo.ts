@@ -27,18 +27,20 @@ export class CommentsQueryRepo {
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
     });
-
-    const comments = foundComments.map((p) => ({
-      ...p,
-      likes: cutLikesByBannedUsers<LikeComment>(p.likes),
-    })) as Comment[];
+    let comments;
+    if (foundComments.length > 0) {
+      comments = foundComments.map((p) => ({
+        ...p,
+        likes: cutLikesByBannedUsers<LikeComment>(p.likes),
+      }));
+    }
 
     return {
       pagesCount: Math.ceil(total / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: total,
-      items: comments,
+      items: comments ?? [],
     };
   }
 }

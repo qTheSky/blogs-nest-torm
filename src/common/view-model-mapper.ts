@@ -52,7 +52,7 @@ export class ViewModelMapper {
       websiteUrl: blog.websiteUrl,
       blogOwnerInfo: { userId: blog.userId.toString(), userLogin: blog.user.login },
       banInfo: { isBanned: blog.banInfo.isBanned, banDate: blog.banInfo.banDate?.toISOString() || null },
-      isMembership: false,
+      isMembership: blog.isMembership,
     };
   }
 
@@ -63,7 +63,7 @@ export class ViewModelMapper {
       description: blog.description,
       createdAt: blog.createdAt.toISOString(),
       websiteUrl: blog.websiteUrl,
-      isMembership: true,
+      isMembership: blog.isMembership,
     };
   }
   async getPostViewModel(post: Post, userIdForLikeStatus: number | null): Promise<PostViewModel> {

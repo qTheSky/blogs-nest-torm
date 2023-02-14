@@ -25,6 +25,8 @@ export class Blog {
   createdAt: Date;
   @OneToOne(() => BlogBanInfo, (banInfo) => banInfo.blog, { eager: true, cascade: true, onDelete: 'CASCADE' })
   banInfo: BlogBanInfo;
+  @Column()
+  isMembership: boolean;
 
   @OneToMany(() => Post, (p) => p.blog)
   posts: Post[];
@@ -47,6 +49,7 @@ export class Blog {
     blog.description = dto.description;
     blog.websiteUrl = dto.websiteUrl;
     blog.createdAt = new Date();
+    blog.isMembership = false;
 
     const banInfo = new BlogBanInfo();
     banInfo.isBanned = false;

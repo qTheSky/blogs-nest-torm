@@ -22,7 +22,9 @@ export class CommentsRepo {
 
   async findCommentById(id: number): Promise<Comment | null> {
     const comment = await this.repo.findOneBy({ id, user: { banInfo: { isBanned: false } } });
-    comment.likes = cutLikesByBannedUsers(comment.likes);
+    if (comment) {
+      comment.likes = cutLikesByBannedUsers(comment.likes);
+    }
     return comment;
   }
 

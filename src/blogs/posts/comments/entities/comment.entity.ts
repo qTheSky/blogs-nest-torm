@@ -16,7 +16,7 @@ export class Comment {
   user: User;
   @Column({ nullable: true })
   userId: number;
-  @OneToMany(() => LikeComment, (l) => l.comment)
+  @OneToMany(() => LikeComment, (l) => l.comment, { eager: true, cascade: true, onDelete: 'CASCADE' })
   likes: LikeComment[];
 
   @Column()

@@ -25,7 +25,9 @@ export class PostsRepo {
       id,
       blog: { banInfo: { isBanned: false } },
     });
-    post.likes = cutLikesByBannedUsers(post.likes);
+    if (post) {
+      post.likes = cutLikesByBannedUsers(post.likes);
+    }
     return post;
   }
 
