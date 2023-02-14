@@ -40,7 +40,8 @@ export class CommentsQueryRepo {
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: total,
-      items: comments ?? [],
+      // items: comments ?? [],
+      items: comments ? comments : [],
     };
   }
 }

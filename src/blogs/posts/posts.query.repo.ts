@@ -35,7 +35,7 @@ export class PostsQueryRepo {
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: total,
-      items: posts ?? [],
+      items: posts ? posts : [],
     };
   }
 }
