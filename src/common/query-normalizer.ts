@@ -1,7 +1,7 @@
 import { QueryUserModel } from '../users/models/QueryUserModel';
 import { QueryBlogModel } from '../blogs/models/QueryBlogModel';
-import { QueryPostModel } from '../posts/models/QueryPostModel';
-import { QueryCommentModel } from '../posts/comments/models/QueryCommentModel';
+import { QueryPostModel } from '../blogs/posts/models/QueryPostModel';
+import { QueryCommentModel } from '../blogs/posts/comments/models/QueryCommentModel';
 import { BannedUserInBlogQueryModel } from '../blogs/models/BannedUserInBlogQueryModel';
 
 export class QueryNormalizer {

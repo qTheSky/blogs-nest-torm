@@ -1,9 +1,9 @@
-import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ParseObjectIdPipe implements PipeTransform<string, Types.ObjectId> {
-  transform(value: string, metadata: ArgumentMetadata) {
-    return new Types.ObjectId(value);
-  }
+// implements PipeTransform<string, Types.ObjectId>
+export class ParseObjectIdPipe {
+  // transform(value: string, metadata: ArgumentMetadata) {
+  //   return new Types.ObjectId(value);
+  // }
 }

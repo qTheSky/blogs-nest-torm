@@ -21,11 +21,18 @@ export const getCreateModels = <M>(
     'newest',
   ];
   for (let i = 0; i < count; i++) {
-    modelsArray.push({
-      ...createModel,
-      [uniquePropertyName]: uniqueArray[i],
-      [secondUniqueProperty]: secondUniqueProperties[i],
-    });
+    if (secondUniqueProperty) {
+      modelsArray.push({
+        ...createModel,
+        [uniquePropertyName]: uniqueArray[i],
+        [secondUniqueProperty]: secondUniqueProperties[i],
+      });
+    } else {
+      modelsArray.push({
+        ...createModel,
+        [uniquePropertyName]: uniqueArray[i],
+      });
+    }
   }
   return modelsArray;
 };

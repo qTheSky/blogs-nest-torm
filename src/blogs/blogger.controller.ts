@@ -19,54 +19,52 @@ import { BlogViewModel } from './models/BlogViewModel';
 import { CreateBlogCommand } from './application/use-cases/create-blog.use-case';
 import { ViewModelMapper } from '../common/view-model-mapper';
 import { CommandBus } from '@nestjs/cqrs';
-import { ParseObjectIdPipe } from '../common/pipes/parse-object-id-pipe';
-import { Types } from 'mongoose';
 import { DeleteBlogCommand } from './application/use-cases/delete-blog.use-case';
 import { UpdateBlogModel } from './models/UpdateBlogModel';
 import { UpdateBlogCommand } from './application/use-cases/update-blog.use-case';
 import { PaginatorResponseType } from '../common/paginator-response-type';
-import { BlogsQueryRepository } from './blogs.query.repository';
 import { QueryBlogModel } from './models/QueryBlogModel';
 import { QueryNormalizer } from '../common/query-normalizer';
-import { CreatePostByBlogIdInParamsModel } from '../posts/models/CreatePostByBlogIdInParamsModel';
-import { PostViewModel } from '../posts/models/PostViewModel';
-import { CreatePostCommand } from '../posts/use-cases/create-post.use-case';
-import { DeletePostCommand } from '../posts/use-cases/delete-post.use-case';
-import { UpdatePostCommand } from '../posts/use-cases/update-post.use-case';
-import { UpdatePostModel } from '../posts/models/UpdatePostModel';
+import { CreatePostModel } from './posts/models/CreatePostModel';
+import { PostViewModel } from './posts/models/PostViewModel';
+import { CreatePostCommand } from './posts/use-cases/create-post.use-case';
+import { DeletePostCommand } from './posts/use-cases/delete-post.use-case';
+import { UpdatePostCommand } from './posts/use-cases/update-post.use-case';
+import { UpdatePostModel } from './posts/models/UpdatePostModel';
 import { BanUserForBlogModel } from './models/BanUserForBlogModel';
 import { BanUserForBlogCommand } from './application/use-cases/ban-user-for-blog.use-case';
-import { CommentForBloggerViewModel } from '../posts/comments/models/CommentViewModel';
-import { QueryCommentModel } from '../posts/comments/models/QueryCommentModel';
-import { CommentsQueryRepository } from '../posts/comments/comments.query.repository';
+import { CommentForBloggerViewModel } from './posts/comments/models/CommentViewModel';
+import { QueryCommentModel } from './posts/comments/models/QueryCommentModel';
 import { BannedUserInBlogQueryModel } from './models/BannedUserInBlogQueryModel';
 import { BannedUserInBlogViewModel } from './models/BannedUserInBlogViewModel';
-import { BannedUsersInBlogQueryRepository } from './banned-users-in-blog.query.repository';
-import { BlogsRepository } from './blogs.repository';
 import { Blog } from './entities/blog.entity';
 import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
+import { BlogsQueryRepo } from './blogs.query.repo';
+import { BlogsRepo } from './blogs.repo';
+import { BannedUsersInBlogQueryRepo } from './banned-users-in-blog.query.repo';
+import { CommentsQueryRepo } from './posts/comments/comments.query.repo';
 
 @Controller('blogger')
 export class BloggerController {
   constructor(
     private viewModelMapper: ViewModelMapper,
+    private blogsQueryRepo: BlogsQueryRepo,
     private commandBus: CommandBus,
-    private blogsQueryRepository: BlogsQueryRepository,
-    private commentsQueryRepository: CommentsQueryRepository,
+    private commentsQueryRepo: CommentsQueryRepo,
     private queryNormalizer: QueryNormalizer,
-    private bannedUsersInBlogQueryRepository: BannedUsersInBlogQueryRepository,
-    private blogsRepository: BlogsRepository,
+    private bannedUsersInBlogQueryRepo: BannedUsersInBlogQueryRepo,
+    private blogsRepo: BlogsRepo,
   ) {}
 
   @Get('/blogs/comments')
   @UseGuards(JwtAuthGuard)
   async getAllCommentsForPostsOfBlogger(
-    @CurrentUserId() currentUserId,
+    @CurrentUserId() currentUserId: number,
     @Query() query: QueryCommentModel,
   ): Promise<PaginatorResponseType<CommentForBloggerViewModel[]>> {
     const normalizedCommentsQuery = this.queryNormalizer.normalizeCommentsQuery(query);
-    const commentsWithPaging = await this.commentsQueryRepository.findComments(normalizedCommentsQuery, {
-      forBloggerId: currentUserId,
+    const commentsWithPaging = await this.commentsQueryRepo.findComments(normalizedCommentsQuery, {
+      commentsOnlyForBlogId: currentUserId,
     });
     const commentsViewModels = await this.viewModelMapper.getCommentsForBloggerViewModels(
       commentsWithPaging.items,
@@ -110,33 +108,31 @@ export class BloggerController {
     return this.viewModelMapper.getBlogViewModel(createdBlog);
   }
 
-  @Get('/blogs')
+  @Get('blogs')
   @UseGuards(JwtAuthGuard)
   async getOwnBlogs(
     @Query() query: QueryBlogModel,
-    @CurrentUserId() currentUserId, // : Promise<PaginatorResponseType<BlogViewModel[]>>
-  ) {
-    // const normalizedBlogQuery = this.queryNormalizer.normalizeBlogsQuery(query);
-    // const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizedBlogQuery, {
-    //   blogsOfSpecifiedUserId: currentUserId,
-    // });
-    // return {
-    //   ...foundBlogsWithPagination,
-    //   items: foundBlogsWithPagination.items.map(this.viewModelMapper.getBlogViewModel),
-    // };
+    @CurrentUserId() currentUserId: number,
+  ): Promise<PaginatorResponseType<BlogViewModel[]>> {
+    const normalizedBlogQuery = this.queryNormalizer.normalizeBlogsQuery(query);
+    const foundBlogsWithPagination = await this.blogsQueryRepo.findBlogs(normalizedBlogQuery, {
+      blogsOfSpecifiedUserId: currentUserId,
+    });
+    return {
+      ...foundBlogsWithPagination,
+      items: foundBlogsWithPagination.items.map(this.viewModelMapper.getBlogViewModel),
+    };
   }
 
   // POSTS FOR BLOG
-  @Post('/blogs/:id/posts')
+  @Post('/blogs/:blogId/posts')
   @UseGuards(JwtAuthGuard)
   async createPostForBlog(
-    @Param('id', ParseObjectIdPipe) blogId: Types.ObjectId,
-    @Body() createPostModel: CreatePostByBlogIdInParamsModel,
-    @CurrentUserId() currentUserId,
+    @Param('blogId', ParseNumberPipe) blogId: number,
+    @Body() createPostModel: CreatePostModel,
+    @CurrentUserId() currentUserId: number,
   ): Promise<PostViewModel> {
-    const createdPost = await this.commandBus.execute(
-      new CreatePostCommand(currentUserId, { ...createPostModel, blogId }),
-    );
+    const createdPost = await this.commandBus.execute(new CreatePostCommand(blogId, currentUserId, createPostModel));
     return this.viewModelMapper.getPostViewModel(createdPost, null);
   }
 
@@ -145,8 +141,8 @@ export class BloggerController {
   @HttpCode(204)
   async updatePost(
     @CurrentUserId() currentUserId,
-    @Param('blogId', ParseObjectIdPipe) blogId: Types.ObjectId,
-    @Param('postId', ParseObjectIdPipe) postId: Types.ObjectId,
+    @Param('blogId', ParseNumberPipe) blogId: number,
+    @Param('postId', ParseNumberPipe) postId: number,
     @Body() updatePostModel: UpdatePostModel,
   ): Promise<void> {
     await this.commandBus.execute<UpdatePostCommand, void>(
@@ -159,8 +155,8 @@ export class BloggerController {
   @HttpCode(204)
   async deletePost(
     @CurrentUserId() currentUserId,
-    @Param('blogId', ParseObjectIdPipe) blogId: Types.ObjectId,
-    @Param('postId', ParseObjectIdPipe) postId: Types.ObjectId,
+    @Param('blogId', ParseNumberPipe) blogId: number,
+    @Param('postId', ParseNumberPipe) postId: number,
   ): Promise<void> {
     await this.commandBus.execute<DeletePostCommand, void>(new DeletePostCommand(blogId, postId, currentUserId));
   }
@@ -172,9 +168,9 @@ export class BloggerController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(204)
   async banUserForBlog(
-    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+    @Param('userId', ParseNumberPipe) userId: number,
     @Body() banUserForBlogModel: BanUserForBlogModel,
-    @CurrentUserId() currentUserId,
+    @CurrentUserId() currentUserId: number,
   ): Promise<void> {
     await this.commandBus.execute<BanUserForBlogCommand, void>(
       new BanUserForBlogCommand(currentUserId, banUserForBlogModel, userId),
@@ -184,15 +180,15 @@ export class BloggerController {
   @Get('/users/blog/:blogId')
   @UseGuards(JwtAuthGuard)
   async findBannedUsersOfSpecifiedBlog(
-    @Param('blogId', ParseObjectIdPipe) blogId: Types.ObjectId,
+    @Param('blogId', ParseNumberPipe) blogId: number,
     @Query() query: BannedUserInBlogQueryModel,
-    @CurrentUserId() currentUserId,
+    @CurrentUserId() currentUserId: number,
   ): Promise<PaginatorResponseType<BannedUserInBlogViewModel[]>> {
-    const blog = await this.blogsRepository.get(blogId);
+    const blog = await this.blogsRepo.get(blogId);
     if (!blog) throw new NotFoundException('Blog doesnt exist');
-    if (!blog.userId.equals(currentUserId)) throw new ForbiddenException();
+    if (blog.userId !== currentUserId) throw new ForbiddenException();
     const normalizedBannedUsersInBlogQuery = this.queryNormalizer.normalizeBannedUsersInBlogQuery(query);
-    return this.bannedUsersInBlogQueryRepository.findUsers(normalizedBannedUsersInBlogQuery, blog._id);
+    return this.bannedUsersInBlogQueryRepo.findUsers(normalizedBannedUsersInBlogQuery, blog.id);
   }
 
   // USERS

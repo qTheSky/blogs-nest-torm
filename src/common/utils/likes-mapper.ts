@@ -1,5 +1,5 @@
-import { LikeComment } from '../../posts/comments/likes/likeComment.schema';
-import { LikePost } from '../../posts/likes/likePost.schema';
+import { LikePost } from '../../blogs/posts/likes/LikePost.entity';
+import { LikeComment } from '../../blogs/posts/comments/likes/likeComment.entity';
 
 export const likesMapper = (likes: LikePost[] | LikeComment[]): { likesCount: number; dislikesCount: number } => {
   let likesCount = 0;

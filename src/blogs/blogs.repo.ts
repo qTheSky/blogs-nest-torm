@@ -19,7 +19,7 @@ export class BlogsRepo {
   }
 
   async findById(id: number): Promise<Blog | null> {
-    return this.repo.findOneBy({ id });
+    return this.repo.findOneBy({ id, banInfo: { isBanned: false } });
   }
 
   async get(id: number): Promise<Blog | null> {

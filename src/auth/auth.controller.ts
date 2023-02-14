@@ -26,7 +26,6 @@ import { LoginCommand } from './application/use-cases/login.use-case';
 import { AuthUserDataModel } from './models/AuthUserDataModel';
 import { GetAuthUserDataCommand } from './application/use-cases/get-auth-user-data.use-case';
 import { User } from '../users/entities/user.entity';
-import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +33,7 @@ export class AuthController {
 
   //todo make two routes for password recovery via email and confirm password recovery
   @Post('/login')
-  @Throttle(5, 10)
+  // @Throttle(5, 10)
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   async login(@Req() req, @Res({ passthrough: true }) res) {
@@ -45,7 +44,7 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false, //todo => if developing secure false otherwise true
+      secure: true, //todo => if developing secure false otherwise true
       maxAge: 180 * 24 * 60 * 60 * 1000,
     });
     return { accessToken };
@@ -61,7 +60,7 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false, //todo => if developing secure false otherwise true
+      secure: true, //todo => if developing secure false otherwise true
       maxAge: 180 * 24 * 60 * 60 * 1000,
     });
 
@@ -69,14 +68,14 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
-  @Throttle(5, 10)
+  // @Throttle(5, 10)
   @HttpCode(204)
   async registrationConfirmation(@Body() confirmationCodeModel: ConfirmationCodeModel): Promise<void> {
     await this.commandBus.execute<ConfirmEmailCommand, boolean>(new ConfirmEmailCommand(confirmationCodeModel.code));
   }
 
   @Post('registration')
-  @Throttle(5, 10)
+  // @Throttle(5, 10)
   @HttpCode(204)
   async registration(@Body() createUserModel: CreateUserModel): Promise<void> {
     const isUserCreated = await this.commandBus.execute<RegistrationCommand, User | null>(
@@ -87,7 +86,7 @@ export class AuthController {
   }
 
   @Post('/registration-email-resending')
-  @Throttle(5, 10)
+  // @Throttle(5, 10)
   @HttpCode(204)
   async resendEmailConfirmationCode(@Body() emailResendModel: EmailResendModel): Promise<void> {
     await this.commandBus.execute<UpdateEmailConfirmationCodeCommand, void>(

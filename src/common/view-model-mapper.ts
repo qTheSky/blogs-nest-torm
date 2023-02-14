@@ -1,31 +1,32 @@
 import { UserViewModel } from '../users/models/UserViewModel';
 import { BlogForSAViewModel, BlogViewModel } from '../blogs/models/BlogViewModel';
-import { PostViewModel } from '../posts/models/PostViewModel';
-import { Post } from '../posts/post.schema';
-import { Comment } from '../posts/comments/comment.schema';
-import { CommentForBloggerViewModel, CommentViewModel } from '../posts/comments/models/CommentViewModel';
-import { Types } from 'mongoose';
-import { LikeComment } from '../posts/comments/likes/likeComment.schema';
-import { CommentsService } from '../posts/comments/comments.service';
+import { PostViewModel } from '../blogs/posts/models/PostViewModel';
+import { CommentForBloggerViewModel, CommentViewModel } from '../blogs/posts/comments/models/CommentViewModel';
 import { likesMapper } from './utils/likes-mapper';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { LikePost, LikePostDocument } from '../posts/likes/likePost.schema';
-import { PostsService } from '../posts/posts.service';
+import { Injectable } from '@nestjs/common';
+import { PostsService } from '../blogs/posts/posts.service';
 import { LikesInfoViewModel, NewestLikes } from './like.types';
 import { SessionViewModel } from '../security/models/SessionViewModel';
-import { BannedUserInBlog } from '../blogs/banned-user-in-blog.schema';
 import { BannedUserInBlogViewModel } from '../blogs/models/BannedUserInBlogViewModel';
-import { PostsRepository } from '../posts/posts.repository';
 import { User } from '../users/entities/user.entity';
 import { Session } from '../security/entities/session.entity';
 import { Blog } from '../blogs/entities/blog.entity';
+import { BannedUserInBlog } from '../blogs/entities/banned-user-in-blog.entity';
+import { Post } from '../blogs/posts/entities/post.entity';
+import { LikePost } from '../blogs/posts/likes/LikePost.entity';
+import { LikesPostsRepo } from '../blogs/posts/likes/likesPosts.repo';
+import { PostsRepo } from '../blogs/posts/posts.repo';
+import { Comment } from '../blogs/posts/comments/entities/comment.entity';
+import { LikesCommentsRepo } from '../blogs/posts/comments/likes/likes-comments-repo';
+import { LikeComment } from '../blogs/posts/comments/likes/likeComment.entity';
 
 @Injectable()
 export class ViewModelMapper {
   constructor(
-    private commentsService: CommentsService,
+    private postsRepo: PostsRepo,
     private postsService: PostsService,
-    private postsRepository: PostsRepository,
+    private likesPostsRepo: LikesPostsRepo,
+    private likesCommentsRepo: LikesCommentsRepo,
   ) {}
 
   getUserViewModel(user: User): UserViewModel {
@@ -44,15 +45,15 @@ export class ViewModelMapper {
 
   getBlogForSAViewModel(blog: Blog): BlogForSAViewModel {
     return {
-      // id: blog.id,
-      // name: blog.name,
-      // description: blog.description,
-      // createdAt: blog.createdAt.toISOString(),
-      // websiteUrl: blog.websiteUrl,
-      // blogOwnerInfo: { userId: blog.userId, userLogin: blog.userLogin },
-      // banInfo: { isBanned: blog.banInfo.isBanned, banDate: blog.banInfo.banDate?.toISOString() || null },
-      // isMembership: false,
-    } as BlogForSAViewModel; //todo remove as
+      id: blog.id.toString(),
+      name: blog.name,
+      description: blog.description,
+      createdAt: blog.createdAt.toISOString(),
+      websiteUrl: blog.websiteUrl,
+      blogOwnerInfo: { userId: blog.userId.toString(), userLogin: blog.user.login },
+      banInfo: { isBanned: blog.banInfo.isBanned, banDate: blog.banInfo.banDate?.toISOString() || null },
+      isMembership: false,
+    };
   }
 
   getBlogViewModel(blog: Blog): BlogViewModel {
@@ -65,14 +66,12 @@ export class ViewModelMapper {
       isMembership: true,
     };
   }
-
-  async getPostViewModel(post: Post, userId: Types.ObjectId | null): Promise<PostViewModel> {
-    let like: LikePostDocument | null = null;
-    if (userId) like = await this.postsService.findLikeOfSpecifiedUser(userId, post._id);
+  async getPostViewModel(post: Post, userIdForLikeStatus: number | null): Promise<PostViewModel> {
+    let like: LikePost | null = null;
+    if (userIdForLikeStatus) like = await this.likesPostsRepo.findLikeOfSpecifiedUser(userIdForLikeStatus, post.id);
     const myStatus = like?.status || 'None';
 
-    const allLikesForPost = await this.postsService.findLikesForPost(post._id);
-    const { likesCount, dislikesCount } = likesMapper(allLikesForPost);
+    const { likesCount, dislikesCount } = likesMapper(post.likes);
 
     const getNewestLikes = (allLikesForPost: LikePost[]): NewestLikes[] => {
       const newestLikes: NewestLikes[] = [];
@@ -81,8 +80,8 @@ export class ViewModelMapper {
         if (allLikesForPost[i].status === 'Like') {
           newestLikes.push({
             addedAt: allLikesForPost[i].addedAt,
-            userId: allLikesForPost[i].userId,
-            login: allLikesForPost[i].userLogin,
+            userId: allLikesForPost[i].userId.toString(),
+            login: allLikesForPost[i].user.login,
           });
         }
       }
@@ -90,82 +89,76 @@ export class ViewModelMapper {
     };
 
     return {
-      id: post._id,
+      id: post.id.toString(),
       shortDescription: post.shortDescription,
       title: post.title,
-      blogName: post.blogName,
+      blogName: post.blog.name,
       createdAt: post.createdAt.toISOString(),
-      blogId: post.blogId,
+      blogId: post.blogId.toString(),
       content: post.content,
       extendedLikesInfo: {
         likesCount,
         dislikesCount,
         myStatus,
-        newestLikes: getNewestLikes(allLikesForPost),
+        newestLikes: getNewestLikes(post.likes),
       },
     };
   }
 
-  async getPostsViewModels(posts: Post[], userId: Types.ObjectId | null): Promise<Awaited<PostViewModel>[]> {
+  async getPostsViewModels(posts: Post[], userId: number | null): Promise<Awaited<PostViewModel>[]> {
     return await Promise.all(posts.map((post) => this.getPostViewModel(post, userId)));
   }
 
-  private async getCommentLikesInfo(commentId: Types.ObjectId, userId: Types.ObjectId): Promise<LikesInfoViewModel> {
+  private async getCommentLikesInfo(comment: Comment, userId: number): Promise<LikesInfoViewModel> {
     let like: LikeComment | null = null;
-    if (userId) like = await this.commentsService.findLikeOfSpecifiedUser(commentId, userId);
+    if (userId) like = await this.likesCommentsRepo.findLikeOfSpecifiedUser(comment.id, userId);
     const myStatus = like?.status || 'None';
 
-    const allLikesForComment = await this.commentsService.findLikesForComment(commentId);
-    const { likesCount, dislikesCount } = likesMapper(allLikesForComment);
+    const { likesCount, dislikesCount } = likesMapper(comment.likes);
 
     const likesInfo = { likesCount, dislikesCount, myStatus };
     return likesInfo;
   }
 
-  async getCommentViewModel(comment: Comment, userId: Types.ObjectId | null): Promise<CommentViewModel> {
-    const likesInfo = await this.getCommentLikesInfo(comment._id, userId);
+  async getCommentViewModel(comment: Comment, userIdForLikeStatus: number | null): Promise<CommentViewModel> {
+    const likesInfo = await this.getCommentLikesInfo(comment, userIdForLikeStatus);
     return {
-      id: comment._id,
+      id: comment.id.toString(),
       createdAt: comment.createdAt.toISOString(),
       content: comment.content,
       commentatorInfo: {
-        userId: comment.userId,
-        userLogin: comment.userLogin,
+        userId: comment.userId.toString(),
+        userLogin: comment.user.login,
       },
       likesInfo,
     };
   }
 
-  async getCommentsViewModels(
-    comments: Comment[],
-    userId: Types.ObjectId | null,
-  ): Promise<Awaited<CommentViewModel>[]> {
+  async getCommentsViewModels(comments: Comment[], userId: number | null): Promise<Awaited<CommentViewModel>[]> {
     return await Promise.all(comments.map((comment) => this.getCommentViewModel(comment, userId)));
   }
 
-  async getCommentForBloggerModel(comment: Comment, userId: Types.ObjectId): Promise<CommentForBloggerViewModel> {
-    const post = await this.postsRepository.findById(comment.postId);
-    if (!post) throw new NotFoundException();
-    const likesInfo = await this.getCommentLikesInfo(comment._id, userId);
-
+  async getCommentForBloggerModel(comment: Comment, userId: number): Promise<CommentForBloggerViewModel> {
+    const likesInfo = await this.getCommentLikesInfo(comment, userId);
+    const post = await this.postsRepo.get(comment.id);
     return {
-      id: comment._id,
+      id: comment.id.toString(),
       content: comment.content,
-      commentatorInfo: { userId: comment.userId, userLogin: comment.userLogin },
+      commentatorInfo: { userId: comment.userId.toString(), userLogin: comment.user.login },
       createdAt: comment.createdAt.toISOString(),
       likesInfo,
       postInfo: {
-        id: post._id,
+        id: post.id.toString(),
         title: post.title,
-        blogName: post.blogName,
-        blogId: post.blogId,
+        blogName: post.blog.name,
+        blogId: post.blogId.toString(),
       },
     };
   }
 
   async getCommentsForBloggerViewModels(
     comments: Comment[],
-    bloggerId: Types.ObjectId,
+    bloggerId: number,
   ): Promise<Awaited<CommentForBloggerViewModel>[]> {
     return await Promise.all(comments.map((comment) => this.getCommentForBloggerModel(comment, bloggerId)));
   }
@@ -181,12 +174,12 @@ export class ViewModelMapper {
 
   getBannedUserInBlogViewModel(bannedUserInBlog: BannedUserInBlog): BannedUserInBlogViewModel {
     return {
-      id: bannedUserInBlog.userId,
+      id: bannedUserInBlog.userId.toString(),
       login: bannedUserInBlog.login,
       banInfo: {
         isBanned: true,
         banReason: bannedUserInBlog.banReason,
-        banDate: bannedUserInBlog.banDate.toISOString(),
+        banDate: bannedUserInBlog.createdAt.toISOString(),
       },
     };
   }

@@ -12,15 +12,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { ParseObjectIdPipe } from '../common/pipes/parse-object-id-pipe';
-import { Types } from 'mongoose';
 import { CommandBus } from '@nestjs/cqrs';
-import { BindBlogWithUserCommand } from './use-cases/bind-blog-with-user.use-case';
 import { PaginatorResponseType } from '../common/paginator-response-type';
 import { QueryBlogModel } from '../blogs/models/QueryBlogModel';
 import { QueryNormalizer } from '../common/query-normalizer';
 import { ViewModelMapper } from '../common/view-model-mapper';
-import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 import { CreateUserModel } from '../users/models/CreateUserModel';
 import { UserViewModel } from '../users/models/UserViewModel';
 import { RegistrationCommand } from '../auth/application/use-cases/registration-use-case';
@@ -32,6 +28,8 @@ import { BanBlogInputModel } from './models/BanBlogInputModel';
 import { BanBlogCommand } from './use-cases/ban-blog.use-case';
 import { UsersQueryRepo } from '../users/users.query.repo';
 import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
+import { BlogForSAViewModel } from '../blogs/models/BlogViewModel';
+import { BlogsQueryRepo } from '../blogs/blogs.query.repo';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
@@ -40,15 +38,15 @@ export class SuperAdminController {
     private commandBus: CommandBus,
     private queryNormalizer: QueryNormalizer,
     private viewModelConverter: ViewModelMapper,
-    private blogsQueryRepository: BlogsQueryRepository,
     private usersQueryRepo: UsersQueryRepo,
+    private blogsQueryRepo: BlogsQueryRepo,
   ) {}
 
   // =====blogs========
   @Put('/blogs/:blogId/ban')
   @HttpCode(204)
   async banBlog(
-    @Param('blogId', ParseObjectIdPipe) blogId: Types.ObjectId,
+    @Param('blogId', ParseNumberPipe) blogId: number,
     @Body() banBlogModel: BanBlogInputModel,
   ): Promise<void> {
     await this.commandBus.execute<BanBlogCommand, void>(new BanBlogCommand(blogId, banBlogModel.isBanned));
@@ -56,25 +54,22 @@ export class SuperAdminController {
 
   @Put('/blogs/:blogId/bind-with-user/:userId')
   @HttpCode(204)
-  async bindBlogWithUser(
-    @Param('blogId', ParseObjectIdPipe) blogId: Types.ObjectId,
-    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
-  ): Promise<void> {
-    await this.commandBus.execute<BindBlogWithUserCommand, void>(new BindBlogWithUserCommand(blogId, userId));
+  async bindBlogWithUser(): // @Param('blogId', ParseObjectIdPipe) blogId: number,
+  // @Param('userId', ParseObjectIdPipe) userId: number,
+  Promise<void> {
+    // await this.commandBus.execute<BindBlogWithUserCommand, void>(new BindBlogWithUserCommand(blogId, userId));
   }
 
-  @Get('/blogs')
-  async findBlogs(
-    @Query() query: QueryBlogModel, // : Promise<PaginatorResponseType<BlogForSAViewModel[]>>
-  ) {
-    // const normalizeBlogsQuery = this.queryNormalizer.normalizeBlogsQuery(query);
-    // const foundBlogsWithPagination = await this.blogsQueryRepository.findBlogs(normalizeBlogsQuery, {
-    //   isAdminRequesting: true,
-    // });
-    // return {
-    //   ...foundBlogsWithPagination,
-    //   items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogForSAViewModel),
-    // };
+  @Get('blogs')
+  async findBlogs(@Query() query: QueryBlogModel): Promise<PaginatorResponseType<BlogForSAViewModel[]>> {
+    const normalizeBlogsQuery = this.queryNormalizer.normalizeBlogsQuery(query);
+    const foundBlogsWithPagination = await this.blogsQueryRepo.findBlogs(normalizeBlogsQuery, {
+      isAdminRequesting: true,
+    });
+    return {
+      ...foundBlogsWithPagination,
+      items: foundBlogsWithPagination.items.map(this.viewModelConverter.getBlogForSAViewModel),
+    };
   }
 
   // =====blogs========

@@ -1,20 +1,11 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users/users.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { _User, UserSchema } from './users/user.schema';
 import { ViewModelMapper } from './common/view-model-mapper';
 import { QueryNormalizer } from './common/query-normalizer';
 import { BlogsController } from './blogs/blogs.controller';
-import { BlogsRepository } from './blogs/blogs.repository';
-import { _Blog, BlogSchema } from './blogs/blog.schema';
-import { BlogsQueryRepository } from './blogs/blogs.query.repository';
-import { PostsRepository } from './posts/posts.repository';
-import { PostsQueryRepository } from './posts/posts.query.repository';
-import { Post, PostSchema } from './posts/post.schema';
-import { PostsController } from './posts/posts.controller';
+import { PostsController } from './blogs/posts/posts.controller';
 import { TestingController } from './testing/testing.controller';
-import { PostsService } from './posts/posts.service';
-import { IsBlogExistConstraint } from './posts/models/CreatePostModel';
+import { PostsService } from './blogs/posts/posts.service';
 import { IsEmailOrLoginUniqueConstraint } from './users/models/CreateUserModel';
 import { EmailsManager } from './common/managers/emails-manager';
 import { EmailAdapter } from './common/adapters/email.adapter';
@@ -22,15 +13,8 @@ import { AuthController } from './auth/auth.controller';
 import { IsConfirmationCodeValidConstraint } from './auth/models/ConfirmationCodeModel';
 import { CheckIsEmailConfirmedConstraint } from './auth/models/EmailResendModel';
 import { JwtModule } from '@nestjs/jwt';
-import { Comment, CommentSchema } from './posts/comments/comment.schema';
-import { CommentsService } from './posts/comments/comments.service';
-import { CommentsRepository } from './posts/comments/comments.repository';
-import { CommentsQueryRepository } from './posts/comments/comments.query.repository';
-import { CommentsController } from './posts/comments/comments.controller';
-import { LikesCommentsRepository } from './posts/comments/likes/likesComments.repository';
-import { LikeComment, LikeCommentSchema } from './posts/comments/likes/likeComment.schema';
-import { LikesPostsRepository } from './posts/likes/likesPosts.repository';
-import { LikePost, LikePostSchema } from './posts/likes/likePost.schema';
+import { CommentsService } from './blogs/posts/comments/comments.service';
+import { CommentsController } from './blogs/posts/comments/comments.controller';
 import { SessionsService } from './security/application/sessions.service';
 import { SessionsController } from './security/sessions.controller';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -50,9 +34,9 @@ import { RefreshTokenUseCase } from './auth/application/use-cases/refresh-token.
 import { BlogsService } from './blogs/application/blogs.service';
 import { CreateBlogUseCase } from './blogs/application/use-cases/create-blog.use-case';
 import { BloggerController } from './blogs/blogger.controller';
-import { CreatePostUseCase } from './posts/use-cases/create-post.use-case';
-import { DeletePostUseCase } from './posts/use-cases/delete-post.use-case';
-import { UpdatePostUseCase } from './posts/use-cases/update-post.use-case';
+import { CreatePostUseCase } from './blogs/posts/use-cases/create-post.use-case';
+import { DeletePostUseCase } from './blogs/posts/use-cases/delete-post.use-case';
+import { UpdatePostUseCase } from './blogs/posts/use-cases/update-post.use-case';
 import { SuperAdminController } from './super-admin/super-admin.controller';
 import { BindBlogWithUserUseCase } from './super-admin/use-cases/bind-blog-with-user.use-case';
 import { DeleteUserUseCase } from './super-admin/use-cases/delete-user.use-case';
@@ -62,17 +46,13 @@ import { DeleteBlogUseCase } from './blogs/application/use-cases/delete-blog.use
 import { LoginUseCase } from './auth/application/use-cases/login.use-case';
 import { GetAuthUserDataUseCase } from './auth/application/use-cases/get-auth-user-data.use-case';
 import { BanUserForBlogUseCase } from './blogs/application/use-cases/ban-user-for-blog.use-case';
-import { CreateCommentUseCase } from './posts/comments/use-cases/create-comment.use-case';
-import { UpdateCommentUseCase } from './posts/comments/use-cases/update-comment.use-case';
+import { CreateCommentUseCase } from './blogs/posts/comments/use-cases/create-comment.use-case';
+import { UpdateCommentUseCase } from './blogs/posts/comments/use-cases/update-comment.use-case';
 import { BanBlogUseCase } from './super-admin/use-cases/ban-blog.use-case';
-import { BannedUsersInBlogsRepository } from './blogs/banned-users-in-blogs.repository';
-import { BannedUsersInBlogQueryRepository } from './blogs/banned-users-in-blog.query.repository';
-import { BannedUserInBlog, BannedUserInBlogSchema } from './blogs/banned-user-in-blog.schema';
-import { UsersRepository } from './users/users.repository';
 import { UpdateEmailConfirmationCodeUseCase } from './auth/application/use-cases/update-email-confirmation-code.use-case';
-import { DeleteCommentUseCase } from './posts/comments/use-cases/delete-comment.use-case';
-import { PutLikeToCommentUseCase } from './posts/comments/use-cases/put-like-to-comment.use-case';
-import { PutLikeToPostUseCase } from './posts/use-cases/put-like-to-post.use-case';
+import { DeleteCommentUseCase } from './blogs/posts/comments/use-cases/delete-comment.use-case';
+import { PutLikeToCommentUseCase } from './blogs/posts/comments/use-cases/put-like-to-comment.use-case';
+import { PutLikeToPostUseCase } from './blogs/posts/use-cases/put-like-to-post.use-case';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { UserEmailConfirmation } from './users/entities/userEmailConfirmation.entity';
@@ -88,6 +68,20 @@ import { UsersQueryRepo } from './users/users.query.repo';
 import { BlogsRepo } from './blogs/blogs.repo';
 import { Blog } from './blogs/entities/blog.entity';
 import { BlogBanInfo } from './blogs/entities/blog-ban-info.entity';
+import { Post } from './blogs/posts/entities/post.entity';
+import { PostsRepo } from './blogs/posts/posts.repo';
+import { BlogsQueryRepo } from './blogs/blogs.query.repo';
+import { BannedUserInBlog } from './blogs/entities/banned-user-in-blog.entity';
+import { BannedUsersInBlogRepo } from './blogs/banned-users-in-blog.repo';
+import { BannedUsersInBlogQueryRepo } from './blogs/banned-users-in-blog.query.repo';
+import { LikesPostsRepo } from './blogs/posts/likes/likesPosts.repo';
+import { LikePost } from './blogs/posts/likes/LikePost.entity';
+import { PostsQueryRepo } from './blogs/posts/posts.query.repo';
+import { CommentsRepo } from './blogs/posts/comments/comments,repo';
+import { LikesCommentsRepo } from './blogs/posts/comments/likes/likes-comments-repo';
+import { Comment } from './blogs/posts/comments/entities/comment.entity';
+import { LikeComment } from './blogs/posts/comments/likes/likeComment.entity';
+import { CommentsQueryRepo } from './blogs/posts/comments/comments.query.repo';
 
 //USE CASES
 const authUseCases = [
@@ -116,27 +110,25 @@ const useCases = [
 //USE CASES
 
 const adapters = [
-  BlogsRepository,
-  BlogsQueryRepository,
-  PostsRepository,
-  PostsQueryRepository,
   EmailAdapter,
   EmailsManager,
-  CommentsQueryRepository,
-  LikesCommentsRepository,
-  LikesPostsRepository,
-  CommentsRepository,
-  BannedUsersInBlogsRepository,
-  BannedUsersInBlogQueryRepository,
   UsersRepo,
   SessionsRepo,
   RefreshTokenBlackListRepo,
   UsersQueryRepo,
   BlogsRepo,
+  PostsRepo,
+  BlogsQueryRepo,
+  BannedUsersInBlogRepo,
+  BannedUsersInBlogQueryRepo,
+  LikesPostsRepo,
+  PostsQueryRepo,
+  CommentsRepo,
+  LikesCommentsRepo,
+  CommentsQueryRepo,
 ];
 
 const constraints = [
-  IsBlogExistConstraint,
   IsEmailOrLoginUniqueConstraint,
   IsConfirmationCodeValidConstraint,
   CheckIsEmailConfirmedConstraint,
@@ -146,7 +138,7 @@ const services = [BlogsService, PostsService, CommentsService, SessionsService, 
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 //CLOUD
-export const _typeOrmOptions: TypeOrmModuleOptions = {
+export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'snuffleupagus.db.elephantsql.com',
   port: 5432,
@@ -158,7 +150,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
 };
 //CLOUD
 //LOCAL
-export const typeOrmOptions: TypeOrmModuleOptions = {
+export const _typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -167,6 +159,7 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
   database: 'Blogs',
   autoLoadEntities: true,
   synchronize: true,
+  // logging: true,
 };
 
 //LOCAL
@@ -175,18 +168,21 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
   imports: [
     CqrsModule,
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([User, UserEmailConfirmation, UserBanInfo, Session, RefreshTokenBL, Blog, BlogBanInfo]),
-    TypeOrmModule.forRoot(typeOrmOptions),
-    MongooseModule.forRoot(process.env.MONGO_URI),
-    MongooseModule.forFeature([
-      { name: _User.name, schema: UserSchema },
-      { name: _Blog.name, schema: BlogSchema },
-      { name: Post.name, schema: PostSchema },
-      { name: Comment.name, schema: CommentSchema },
-      { name: LikePost.name, schema: LikePostSchema },
-      { name: LikeComment.name, schema: LikeCommentSchema },
-      { name: BannedUserInBlog.name, schema: BannedUserInBlogSchema },
+    TypeOrmModule.forFeature([
+      User,
+      UserEmailConfirmation,
+      UserBanInfo,
+      Session,
+      RefreshTokenBL,
+      Blog,
+      BlogBanInfo,
+      Post,
+      BannedUserInBlog,
+      LikePost,
+      Comment,
+      LikeComment,
     ]),
+    TypeOrmModule.forRoot(typeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),
     PassportModule,
     JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: process.env.ACCESS_TOKEN_TIME } }),
@@ -202,7 +198,6 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
     SuperAdminController,
   ],
   providers: [
-    { provide: UsersRepository, useClass: UsersRepository },
     ...useCases,
     ...constraints,
     ...adapters,

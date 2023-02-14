@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 export interface BlogViewModel {
   id: string;
   name: string;
@@ -11,7 +9,7 @@ export interface BlogViewModel {
 
 export interface BlogForSAViewModel extends BlogViewModel {
   blogOwnerInfo: {
-    userId: Types.ObjectId;
+    userId: string;
     userLogin: string;
   };
   banInfo: { isBanned: boolean; banDate: string | null };

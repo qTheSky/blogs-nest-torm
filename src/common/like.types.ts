@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { IsIn } from 'class-validator';
 
 const allowLikeStatuses: LikeStatuses[] = ['Like', 'Dislike', 'None'];
@@ -10,7 +9,7 @@ export type LikesInfoViewModel = {
 };
 export type NewestLikes = {
   addedAt: Date;
-  userId: Types.ObjectId;
+  userId: string;
   login: string;
 };
 
