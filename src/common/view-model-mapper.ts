@@ -75,13 +75,13 @@ export class ViewModelMapper {
 
     const getNewestLikes = (allLikesForPost: LikePost[]): NewestLikes[] => {
       const newestLikes: NewestLikes[] = [];
-      for (let i = 0; i < allLikesForPost.length; i++) {
+      for (const like of allLikesForPost) {
         if (newestLikes.length === 3) return newestLikes;
-        if (allLikesForPost[i].status === 'Like') {
+        if (like.status === 'Like') {
           newestLikes.push({
-            addedAt: allLikesForPost[i].addedAt,
-            userId: allLikesForPost[i].userId.toString(),
-            login: allLikesForPost[i].user.login,
+            addedAt: like.addedAt,
+            userId: like.userId.toString(),
+            login: like.user.login,
           });
         }
       }

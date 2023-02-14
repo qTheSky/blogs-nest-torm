@@ -78,7 +78,7 @@ export class PostsController {
 
   @Get()
   @UseGuards(IfAuthGuard)
-  async findAllPosts(@Query() query: QueryPostModel, @GetCurrentUserIdOrNull() currentUserId) {
+  async findAllPosts(@Query() query: QueryPostModel, @GetCurrentUserIdOrNull() currentUserId: number | null) {
     const normalizedPostsQuery = this.queryNormalizer.normalizePostsQuery(query);
     const response = await this.postsQueryRepo.findPosts(normalizedPostsQuery);
     const postsViewModels = await this.viewModelMapper.getPostsViewModels(response.items, currentUserId);

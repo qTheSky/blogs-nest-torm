@@ -49,7 +49,7 @@ export class BlogsController {
   async findPostsOfBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
     @Query() query: QueryPostModel,
-    @GetCurrentUserIdOrNull() currentUserId: number,
+    @GetCurrentUserIdOrNull() currentUserId: number | null,
   ): Promise<PaginatorResponseType<PostViewModel[]>> {
     const blog = await this.blogsRepo.get(blogId);
     if (!blog) throw new NotFoundException('Blog doesnt exist');
