@@ -27,6 +27,8 @@ END;
 $$ LANGUAGE plpgsql;
 SELECT truncate_tables('postgres');
 SELECT truncate_tables('fqidihfj');
+SELECT truncate_tables('qTheSky'); 
+SELECT truncate_tables('neondb'); 
         `);
       return;
     } catch (e) {
