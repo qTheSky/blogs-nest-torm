@@ -22,25 +22,26 @@ export class CommentsQueryRepo {
       filter.post = { blog: { userId: querySettings.commentsOnlyForBlogOfUserId } };
     }
 
-    const [foundComments, total] = await this.repo.findAndCount({
+    const [foundComments, totalCount] = await this.repo.findAndCount({
       where: filter,
+      order: { [query.sortBy]: query.sortDirection.toUpperCase() },
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
     });
+
     let comments;
     if (foundComments.length > 0) {
-      comments = foundComments.map((p) => ({
-        ...p,
-        likes: cutLikesByBannedUsers<LikeComment>(p.likes),
+      comments = foundComments.map((c) => ({
+        ...c,
+        likes: cutLikesByBannedUsers<LikeComment>(c.likes),
       }));
     }
 
     return {
-      pagesCount: Math.ceil(total / query.pageSize),
+      pagesCount: Math.ceil(totalCount / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: total,
-      // items: comments ?? [],
+      totalCount,
       items: comments ? comments : [],
     };
   }
