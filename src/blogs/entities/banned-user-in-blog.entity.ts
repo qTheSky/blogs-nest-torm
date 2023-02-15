@@ -12,7 +12,7 @@ export class BannedUserInBlog {
 
   @Column()
   userId: number;
-  @Column()
+  @Column({ collation: 'C' })
   login: string;
   @Column()
   createdAt: Date; // ban date

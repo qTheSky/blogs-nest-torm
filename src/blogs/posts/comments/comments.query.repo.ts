@@ -11,15 +11,15 @@ export class CommentsQueryRepo {
 
   async findComments(
     query: NormalizedCommentsQuery,
-    querySettings: { forPostId?: number; commentsOnlyForBlogId?: number },
+    querySettings: { forPostId?: number; commentsOnlyForBlogOfUserId?: number },
   ): Promise<PaginatorResponseType<Comment[]>> {
     const filter: FindOptionsWhere<Comment> = { user: { banInfo: { isBanned: false } } };
 
     if (querySettings.forPostId) {
       filter.postId = querySettings.forPostId;
     }
-    if (querySettings.commentsOnlyForBlogId) {
-      filter.post = { blog: { userId: querySettings.commentsOnlyForBlogId } };
+    if (querySettings.commentsOnlyForBlogOfUserId) {
+      filter.post = { blog: { userId: querySettings.commentsOnlyForBlogOfUserId } };
     }
 
     const [foundComments, total] = await this.repo.findAndCount({

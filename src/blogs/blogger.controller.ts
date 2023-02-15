@@ -64,7 +64,7 @@ export class BloggerController {
   ): Promise<PaginatorResponseType<CommentForBloggerViewModel[]>> {
     const normalizedCommentsQuery = this.queryNormalizer.normalizeCommentsQuery(query);
     const commentsWithPaging = await this.commentsQueryRepo.findComments(normalizedCommentsQuery, {
-      commentsOnlyForBlogId: currentUserId,
+      commentsOnlyForBlogOfUserId: currentUserId,
     });
     const commentsViewModels = await this.viewModelMapper.getCommentsForBloggerViewModels(
       commentsWithPaging.items,
