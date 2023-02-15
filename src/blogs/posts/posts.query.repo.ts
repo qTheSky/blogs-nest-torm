@@ -14,10 +14,9 @@ export class PostsQueryRepo {
   async findPosts(query: NormalizedPostsQuery, blogId?: number): Promise<PaginatorResponseType<Post[]>> {
     const where: FindOptionsWhere<Post> = { blog: { banInfo: { isBanned: false } } };
     let order: FindOptionsOrder<Post> = { [query.sortBy]: query.sortDirection };
-    if (query.sortDirection === 'blogName') {
+    if (query.sortBy === 'blogName') {
       order = { blog: { name: query.sortDirection as 'asc' | 'desc' } };
     }
-
     if (blogId) {
       where.blogId = blogId;
     }
