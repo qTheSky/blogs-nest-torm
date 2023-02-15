@@ -8,13 +8,13 @@ import { LikeStatuses } from '../../../../common/like.types';
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Post, (p) => p.comments, { eager: true })
+  @ManyToOne(() => Post, (p) => p.comments, { eager: true, onDelete: 'CASCADE' })
   post: Post;
   @Column()
   postId: number;
-  @ManyToOne(() => User, { eager: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
   user: User;
-  @Column({ nullable: true })
+  @Column()
   userId: number;
   @OneToMany(() => LikeComment, (l) => l.comment, { eager: true, cascade: true, onDelete: 'CASCADE' })
   likes: LikeComment[];

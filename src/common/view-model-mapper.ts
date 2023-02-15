@@ -140,7 +140,7 @@ export class ViewModelMapper {
 
   async getCommentForBloggerModel(comment: Comment, userId: number): Promise<CommentForBloggerViewModel> {
     const likesInfo = await this.getCommentLikesInfo(comment, userId);
-    const post = await this.postsRepo.get(comment.id);
+    // const post = await this.postsRepo.get(comment.id);
     return {
       id: comment.id.toString(),
       content: comment.content,
@@ -148,10 +148,10 @@ export class ViewModelMapper {
       createdAt: comment.createdAt.toISOString(),
       likesInfo,
       postInfo: {
-        id: post.id.toString(),
-        title: post.title,
-        blogName: post.blog.name,
-        blogId: post.blogId.toString(),
+        id: comment.post.id.toString(),
+        title: comment.post.title,
+        blogName: comment.post.blog.name,
+        blogId: comment.post.blogId.toString(),
       },
     };
   }

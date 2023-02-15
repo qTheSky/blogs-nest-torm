@@ -4,8 +4,8 @@ import { Post } from '../entities/post.entity';
 
 @Entity()
 export class LikePost extends Like {
+  @ManyToOne(() => Post, (p) => p.likes, { onDelete: 'CASCADE' })
+  post: Post;
   @Column()
   postId: number;
-  @ManyToOne(() => Post, (p) => p.likes)
-  post: Post;
 }
