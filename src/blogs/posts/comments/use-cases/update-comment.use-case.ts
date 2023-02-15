@@ -12,7 +12,7 @@ export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentComman
   async execute(command: UpdateCommentCommand): Promise<void> {
     const comment = await this.commentsRepo.findCommentById(command.commentId);
     if (!comment) throw new NotFoundException('Comment doesnt exist');
-    if (comment.userId !== command.commentId) {
+    if (comment.userId !== command.currentUserId) {
       throw new ForbiddenException("You can't update a comment that isn't yours");
     }
     comment.content = command.updateCommentModel.content;
