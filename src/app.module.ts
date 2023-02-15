@@ -138,7 +138,8 @@ const services = [BlogsService, PostsService, CommentsService, SessionsService, 
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 //CLOUD
-export const typeOrmOptions: TypeOrmModuleOptions = {
+//elephant
+export const __typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'snuffleupagus.db.elephantsql.com',
   port: 5432,
@@ -148,6 +149,20 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
   autoLoadEntities: true,
   synchronize: true,
 };
+//elephant
+//neon
+export const typeOrmOptions: TypeOrmModuleOptions = {
+  type: 'postgres',
+  host: 'ep-curly-unit-690125.eu-central-1.aws.neon.tech',
+  port: 5432,
+  username: 'qTheSky',
+  password: 'uK2OTMdLmeV3',
+  database: 'neondb',
+  autoLoadEntities: true,
+  synchronize: true,
+  ssl: true,
+};
+//neon
 //CLOUD
 //LOCAL
 export const _typeOrmOptions: TypeOrmModuleOptions = {

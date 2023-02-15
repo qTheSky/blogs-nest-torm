@@ -13,17 +13,17 @@ export class CommentsQueryRepo {
     query: NormalizedCommentsQuery,
     settings: { forPostId?: number; commentsOnlyForBlogsOfUserId?: number },
   ): Promise<PaginatorResponseType<Comment[]>> {
-    const filter: FindOptionsWhere<Comment> = { user: { banInfo: { isBanned: false } } };
+    const where: FindOptionsWhere<Comment> = { user: { banInfo: { isBanned: false } } };
 
     if (settings.forPostId) {
-      filter.postId = settings.forPostId;
+      where.postId = settings.forPostId;
     }
     if (settings.commentsOnlyForBlogsOfUserId) {
-      filter.post = { blog: { userId: settings.commentsOnlyForBlogsOfUserId } };
+      where.post = { blog: { userId: settings.commentsOnlyForBlogsOfUserId } };
     }
 
     const [foundComments, totalCount] = await this.repo.findAndCount({
-      where: filter,
+      where,
       order: { [query.sortBy]: query.sortDirection.toUpperCase() },
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
