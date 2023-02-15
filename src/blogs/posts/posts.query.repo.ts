@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { NormalizedPostsQuery } from '../../common/query-normalizer';
 import { PaginatorResponseType } from '../../common/paginator-response-type';
 import { cutLikesByBannedUsers } from './utils/cut-likes-by-banned-users';
@@ -11,9 +11,12 @@ import { LikePost } from './likes/LikePost.entity';
 export class PostsQueryRepo {
   constructor(@InjectRepository(Post) private readonly repo: Repository<Post>) {}
 
-  //deprecated
-  async _findPosts(query: NormalizedPostsQuery, blogId?: number): Promise<PaginatorResponseType<Post[]>> {
+  async findPosts(query: NormalizedPostsQuery, blogId?: number): Promise<PaginatorResponseType<Post[]>> {
     const where: FindOptionsWhere<Post> = { blog: { banInfo: { isBanned: false } } };
+    let order: FindOptionsOrder<Post> = { [query.sortBy]: query.sortDirection };
+    if (query.sortDirection === 'blogName') {
+      order = { blog: { name: query.sortDirection as 'asc' | 'desc' } };
+    }
 
     if (blogId) {
       where.blogId = blogId;
@@ -21,7 +24,7 @@ export class PostsQueryRepo {
 
     const [foundPosts, totalCount] = await this.repo.findAndCount({
       where,
-      order: { [query.sortBy]: query.sortDirection },
+      order,
       skip: (query.pageNumber - 1) * query.pageSize,
       take: query.pageSize,
     });
@@ -38,7 +41,7 @@ export class PostsQueryRepo {
     };
   }
   //deprecated
-  async findPosts(query: NormalizedPostsQuery, blogId?: number): Promise<PaginatorResponseType<Post[]>> {
+  async _findPosts(query: NormalizedPostsQuery, blogId?: number): Promise<PaginatorResponseType<Post[]>> {
     let sort = `post.${query.sortBy}`;
     if (query.sortBy === 'blogName') {
       sort = `blog.name`;
@@ -75,4 +78,5 @@ export class PostsQueryRepo {
       items: posts ? posts : [],
     };
   }
+  //deprecated
 }
