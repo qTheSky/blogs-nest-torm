@@ -92,7 +92,10 @@ describe('posts', () => {
         });
     });
     it('should delete post', async () => {
-      await request(app.getHttpServer()).delete(`/blogger/${blog.id}/posts/${post.id}`).expect(204);
+      await request(app.getHttpServer())
+        .delete(`/blogger/blogs/${blog.id}/posts/${post.id}`)
+        .set('Authorization', `bearer ${accessToken}`)
+        .expect(204);
       await request(app.getHttpServer()).get(`/posts/${post.id}`).expect(404);
     });
   });
@@ -105,6 +108,7 @@ describe('posts', () => {
       await cleanDb(app);
       const { token, user } = await createUserAndGetAccessToken(app);
       accessToken = token;
+      user1 = user;
       await request(app.getHttpServer())
         .post('/blogger/blogs')
         .set('Authorization', `bearer ${accessToken}`)
@@ -125,23 +129,24 @@ describe('posts', () => {
 
     it('should like post', async () => {
       //send 3 likes and 1 dislike
+      expect(post).toBeDefined();
       await request(app.getHttpServer())
-        .put(`posts/${post.id}/like-status`)
+        .put(`/posts/${post.id}/like-status`)
         .set('Authorization', `bearer ${accessToken}`)
         .send({ likeStatus: 'Like' } as LikeModel)
         .expect(204);
       await request(app.getHttpServer())
-        .put(`posts/${post.id}/like-status`)
+        .put(`/posts/${post.id}/like-status`)
         .set('Authorization', `bearer ${accessToken}`)
         .send({ likeStatus: 'Like' } as LikeModel)
         .expect(204);
       await request(app.getHttpServer())
-        .put(`posts/${post.id}/like-status`)
+        .put(`/posts/${post.id}/like-status`)
         .set('Authorization', `bearer ${accessToken}`)
         .send({ likeStatus: 'Dislike' } as LikeModel)
         .expect(204);
       await request(app.getHttpServer())
-        .put(`posts/${post.id}/like-status`)
+        .put(`/posts/${post.id}/like-status`)
         .set('Authorization', `bearer ${accessToken}`)
         .send({ likeStatus: 'Like' } as LikeModel)
         .expect(204);

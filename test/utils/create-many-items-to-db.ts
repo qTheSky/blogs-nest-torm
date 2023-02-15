@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { superAdminBasicAuth } from '../constants';
+import { superAdminBasicHeader } from '../constants';
 import * as request from 'supertest';
 
 export const createManyItemsToDb = async <M extends object>(
@@ -9,7 +9,7 @@ export const createManyItemsToDb = async <M extends object>(
   createModels: M[],
   accessToken?: string,
 ) => {
-  const authHeader = accessToken ? `Bearer ${accessToken}` : superAdminBasicAuth;
+  const authHeader = accessToken ? `Bearer ${accessToken}` : superAdminBasicHeader;
   for (let i = 0; i < howManyItems; i++) {
     await request(app.getHttpServer())
       .post(endPoint)

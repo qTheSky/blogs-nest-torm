@@ -1,1 +1,1 @@
-export const superAdminBasicAuth = 'Basic YWRtaW46cXdlcnR5';
+export const superAdminBasicHeader = 'Basic YWRtaW46cXdlcnR5';

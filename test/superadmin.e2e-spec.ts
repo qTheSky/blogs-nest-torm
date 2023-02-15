@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { CreateUserModel } from '../src/users/models/CreateUserModel';
 import { UserViewModel } from '../src/users/models/UserViewModel';
 import { newUser } from './models-for-tests/positive/create/User';
-import { superAdminBasicAuth } from './constants';
+import { superAdminBasicHeader } from './constants';
 import { cleanDb } from './utils/cleanDb';
 import { createCommonUser } from './utils/create-user-and-get-token/create-common-user';
 import { BanUserModel } from '../src/super-admin/models/BanUserModel';
@@ -37,7 +37,7 @@ describe('/sa/users', () => {
       return request(app.getHttpServer())
         .post('/sa/users')
         .send(newUser as CreateUserModel)
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(201)
         .then(({ body }) => {
           expect(body).toEqual({
@@ -54,7 +54,7 @@ describe('/sa/users', () => {
       return request(app.getHttpServer())
         .post('/sa/users')
         .send(newUser as CreateUserModel)
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(400);
     });
   });
@@ -66,11 +66,11 @@ describe('/sa/users', () => {
       const user = await createCommonUser(app);
       await request(app.getHttpServer())
         .delete('/sa/users/' + user.id)
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(204);
       await request(app.getHttpServer())
         .delete('/sa/users/' + user.id)
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(404);
     });
   });
@@ -84,7 +84,7 @@ describe('/sa/users', () => {
       return request(app.getHttpServer())
         .put(`/sa/users/${bannedUser.id}/ban`)
         .send({ banReason: 'BAN REASON !!!!!!!!!!!!!', isBanned: true } as BanUserModel)
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(204);
     });
     it('banned user cant log in', async () => {
@@ -97,7 +97,7 @@ describe('/sa/users', () => {
       return request(app.getHttpServer())
         .put(`/sa/users/${bannedUser.id}/ban`)
         .send({ banReason: 'BAN REASON !!!!!!!!!!!!!', isBanned: false } as BanUserModel)
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(204);
     });
     it('unbanned user can log in', async () => {
@@ -137,7 +137,7 @@ describe('/sa/users', () => {
             'pageSize=3&' +
             'sortDirection=asc',
         )
-        .set('Authorization', superAdminBasicAuth)
+        .set('Authorization', superAdminBasicHeader)
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toBe(1);
@@ -195,7 +195,8 @@ describe('/sa/blogs', () => {
 
       //admin ban blog and blog and post shouldn't be available
       await request(app.getHttpServer())
-        .put(`/blogs/${blog.id}/ban`)
+        .put(`/sa/blogs/${blog.id}/ban`)
+        .set('authorization', superAdminBasicHeader)
         .send({ isBanned: true } as BanBlogInputModel)
         .expect(204);
 

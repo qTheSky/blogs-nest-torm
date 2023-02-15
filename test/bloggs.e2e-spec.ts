@@ -13,6 +13,9 @@ import { createManyItemsToDb } from './utils/create-many-items-to-db';
 import { PaginatorWithItems } from '../src/common/paginator-response-type';
 import { BanUserForBlogModel } from '../src/blogs/models/BanUserForBlogModel';
 import { createTwoUsersAndGetTokens } from './utils/create-user-and-get-token/create-two-users';
+import { newPost } from './models-for-tests/positive/create/Post';
+import { PostViewModel } from '../src/blogs/posts/models/PostViewModel';
+import { newComment } from './models-for-tests/positive/create/Comment';
 
 jest.setTimeout(15000);
 describe('/blogger controller', () => {
@@ -43,7 +46,7 @@ describe('/blogger controller', () => {
             description: newBlog.description,
             websiteUrl: newBlog.websiteUrl,
             createdAt: expect.any(String),
-            isMembership: true,
+            isMembership: false,
           } as BlogViewModel);
         });
     });
@@ -60,7 +63,7 @@ describe('/blogger controller', () => {
         .then(({ body }) => {
           expect(body).toEqual({
             id: blog.id,
-            isMembership: true,
+            isMembership: false,
             websiteUrl: updateBlogModel.websiteUrl,
             createdAt: expect.any(String),
             description: updateBlogModel.description,
@@ -123,15 +126,18 @@ describe('/blogger controller', () => {
     let bannedUser;
     let blogOwnerAccessToken;
     let bannedUserAccessToken;
+    let blog: BlogViewModel;
+    let post: PostViewModel;
     beforeAll(async () => {
       await cleanDb(app);
       const { user1, user2 } = await createTwoUsersAndGetTokens(app);
       blogOwner = user1.user;
       blogOwnerAccessToken = user1.token;
       bannedUser = user2.user;
+      bannedUserAccessToken = user2.token;
     });
-    let blog: BlogViewModel;
     it('should ban user in blog', async () => {
+      //create blog
       await request(app.getHttpServer())
         .post(`/blogger/blogs`)
         .send(newBlog)
@@ -140,13 +146,31 @@ describe('/blogger controller', () => {
         .then(({ body }) => {
           blog = body;
         });
-
+      //create blog
+      //create post
+      await request(app.getHttpServer())
+        .post(`/blogger/blogs/${blog.id}/posts`)
+        .send(newPost)
+        .set('Authorization', `bearer ${blogOwnerAccessToken}`)
+        .expect(201)
+        .then(({ body }) => {
+          post = body;
+        });
+      //create post
+      //ban user
       await request(app.getHttpServer())
         .put(`/blogger/users/${bannedUser.id}/ban`)
         .send({ banReason: 'stringstringstrings21t', isBanned: true, blogId: blog.id } as BanUserForBlogModel)
         .set('Authorization', `bearer ${blogOwnerAccessToken}`)
         .expect(204);
-      //todo try to make comment by banned user
+      //ban user
+      //try to make commend by banned user
+      await request(app.getHttpServer())
+        .post(`/posts/${post.id}/comments`)
+        .send(newComment)
+        .set('Authorization', `bearer ${bannedUserAccessToken}`)
+        .expect(403);
+      //try to make commend by banned user
     });
   });
 });

@@ -17,7 +17,6 @@ export class PutLikeToPostUseCase implements ICommandHandler<PutLikeToPostComman
     if (!post) throw new NotFoundException('Post doesnt exist');
     const user = await this.usersRepo.findUserById(command.currentUserId);
     const like = await this.likesPostsRepo.findLikeOfSpecifiedUser(user.id, post.id);
-    console.log(like);
     if (!like) {
       await this.likesPostsRepo.create(user, post, command.likeStatus);
       return;
