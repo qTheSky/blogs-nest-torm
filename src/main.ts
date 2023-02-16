@@ -10,10 +10,7 @@ import cookieParser from 'cookie-parser'; // deploy
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
+    origin: 'http://localhost:4200',
     credentials: true,
   });
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
