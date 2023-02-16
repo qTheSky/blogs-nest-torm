@@ -12,6 +12,7 @@ async function bootstrap() {
   app.enableCors({
     credentials: true,
     origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:4200'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   });
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalInterceptors(new TrimStrings());
@@ -37,4 +38,5 @@ async function bootstrap() {
   app.use(cookieParser());
   await app.listen(3000);
 }
+
 bootstrap();
