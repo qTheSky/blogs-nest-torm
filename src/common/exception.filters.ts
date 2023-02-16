@@ -8,6 +8,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
+
     if (status === 400) {
       const errorResponse = {
         errorsMessages: [],
@@ -19,6 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       response.status(status).json(errorResponse);
     } else {
       response.status(status).json({
+        message: (exception.getResponse() as { message: string }).message,
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
