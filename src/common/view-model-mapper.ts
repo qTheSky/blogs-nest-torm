@@ -68,6 +68,7 @@ export class ViewModelMapper {
       isMembership: blog.isMembership,
     };
   }
+
   async getPostViewModel(post: Post, userIdForLikeStatus: number | null): Promise<PostViewModel> {
     let like: LikePost | null = null;
     if (userIdForLikeStatus) like = await this.likesPostsRepo.findLikeOfSpecifiedUser(userIdForLikeStatus, post.id);
@@ -193,7 +194,7 @@ export class ViewModelMapper {
       correctAnswers: question.correctAnswers,
       published: question.published,
       createdAt: question.createdAt.toISOString(),
-      updatedAt: question.updatedAt.toISOString(),
+      updatedAt: question.updatedAt ? question.updatedAt.toISOString() : null,
     };
   }
 }
