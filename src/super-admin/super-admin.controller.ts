@@ -30,6 +30,17 @@ import { UsersQueryRepo } from '../users/users.query.repo';
 import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 import { BlogForSAViewModel } from '../blogs/models/BlogViewModel';
 import { BlogsQueryRepo } from '../blogs/blogs.query.repo';
+import { QuizQuestionViewModel } from './models/quiz/QuizQuestionViewModel';
+import { CreateQuizQuestionModel } from './models/quiz/CreateQuizQuestionModel';
+import { CreateQuestionCommand } from './use-cases/quiz/create-question.use-case';
+import { QuizQuestion } from './quiz/QuizQuestion.entity';
+import { UpdateQuestionCommand } from './use-cases/quiz/update-question.use-case';
+import { UpdateQuizQuestionModel } from './models/quiz/UpdateQuizQuestionModel';
+import { PublishQuestionModel } from './models/quiz/PublishQuestionModel';
+import { PublishQuestionCommand } from './use-cases/quiz/publish-question.use-case';
+import { DeleteQuestionCommand } from './use-cases/quiz/delete-question.use-case';
+import { QuizQuestionsQueryRepo } from './quiz.questions.query.repo';
+import { QueryQuizModel } from './models/quiz/QueryQuizModel';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
@@ -40,6 +51,7 @@ export class SuperAdminController {
     private viewModelConverter: ViewModelMapper,
     private usersQueryRepo: UsersQueryRepo,
     private blogsQueryRepo: BlogsQueryRepo,
+    private quizQuestionsQueryRepo: QuizQuestionsQueryRepo,
   ) {}
 
   // =====blogs========
@@ -50,14 +62,6 @@ export class SuperAdminController {
     @Body() banBlogModel: BanBlogInputModel,
   ): Promise<void> {
     await this.commandBus.execute<BanBlogCommand, void>(new BanBlogCommand(blogId, banBlogModel.isBanned));
-  }
-
-  @Put('/blogs/:blogId/bind-with-user/:userId')
-  @HttpCode(204)
-  async bindBlogWithUser(): // @Param('blogId', ParseObjectIdPipe) blogId: number,
-  // @Param('userId', ParseObjectIdPipe) userId: number,
-  Promise<void> {
-    // await this.commandBus.execute<BindBlogWithUserCommand, void>(new BindBlogWithUserCommand(blogId, userId));
   }
 
   @Get('blogs')
@@ -74,8 +78,48 @@ export class SuperAdminController {
 
   // =====blogs========
 
-  // =======users=========
+  // =======quiz======
+  @Get('quiz/questions')
+  async findQuestions(@Query() query: QueryQuizModel): Promise<PaginatorResponseType<QuizQuestionViewModel[]>> {
+    const normalizedQuizQuestionsQuery = this.queryNormalizer.normalizeQuizQuestionsQuery(query);
+    return this.quizQuestionsQueryRepo.findQuestions(normalizedQuizQuestionsQuery);
+  }
 
+  @Post('quiz/questions')
+  async createQuestion(@Body() createQuizQuestionModel: CreateQuizQuestionModel): Promise<QuizQuestionViewModel> {
+    const newQuestion = await this.commandBus.execute<CreateQuestionCommand, QuizQuestion>(
+      new CreateQuestionCommand(createQuizQuestionModel),
+    );
+    return this.viewModelConverter.getQuizQuestionViewModel(newQuestion);
+  }
+
+  @Delete('quiz/questions/:questionId')
+  @HttpCode(204)
+  async deleteQuestion(@Param('questionId', ParseNumberPipe) questionId: number): Promise<void> {
+    await this.commandBus.execute(new DeleteQuestionCommand(questionId));
+  }
+
+  @Put('quiz/questions/:questionId')
+  @HttpCode(204)
+  async updateQuestion(
+    @Param('questionId', ParseNumberPipe) questionId: number,
+    @Body() dto: UpdateQuizQuestionModel,
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdateQuestionCommand(questionId, dto));
+  }
+
+  @Put('quiz/questions/:questionId/publish')
+  @HttpCode(204)
+  async publishQuestion(
+    @Param('questionId', ParseNumberPipe) questionId: number,
+    @Body() dto: PublishQuestionModel,
+  ): Promise<void> {
+    await this.commandBus.execute(new PublishQuestionCommand(questionId, dto));
+  }
+
+  // =======quiz======
+
+  // =======users=========
   @Put('/users/:id/ban')
   @HttpCode(204)
   async banUser(@Param('id', ParseIntPipe) id: number, @Body() banUserModel: BanUserModel): Promise<void> {

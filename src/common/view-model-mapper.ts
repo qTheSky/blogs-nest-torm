@@ -19,6 +19,8 @@ import { PostsRepo } from '../blogs/posts/posts.repo';
 import { Comment } from '../blogs/posts/comments/entities/comment.entity';
 import { LikesCommentsRepo } from '../blogs/posts/comments/likes/likes-comments-repo';
 import { LikeComment } from '../blogs/posts/comments/likes/likeComment.entity';
+import { QuizQuestionViewModel } from '../super-admin/models/quiz/QuizQuestionViewModel';
+import { QuizQuestion } from '../super-admin/quiz/QuizQuestion.entity';
 
 @Injectable()
 export class ViewModelMapper {
@@ -181,6 +183,17 @@ export class ViewModelMapper {
         banReason: bannedUserInBlog.banReason,
         banDate: bannedUserInBlog.createdAt.toISOString(),
       },
+    };
+  }
+
+  getQuizQuestionViewModel(question: QuizQuestion): QuizQuestionViewModel {
+    return {
+      id: question.id.toString(),
+      body: question.body,
+      correctAnswers: question.correctAnswers,
+      published: question.published,
+      createdAt: question.createdAt.toISOString(),
+      updatedAt: question.updatedAt.toISOString(),
     };
   }
 }

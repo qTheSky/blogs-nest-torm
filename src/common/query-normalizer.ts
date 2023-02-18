@@ -3,6 +3,7 @@ import { QueryBlogModel } from '../blogs/models/QueryBlogModel';
 import { QueryPostModel } from '../blogs/posts/models/QueryPostModel';
 import { QueryCommentModel } from '../blogs/posts/comments/models/QueryCommentModel';
 import { BannedUserInBlogQueryModel } from '../blogs/models/BannedUserInBlogQueryModel';
+import { QueryQuizModel } from '../super-admin/models/quiz/QueryQuizModel';
 
 export class QueryNormalizer {
   normalizeUsersQuery(query: QueryUserModel): NormalizedUsersQuery {
@@ -54,6 +55,17 @@ export class QueryNormalizer {
       searchLoginTerm: query.searchLoginTerm || '',
     };
   }
+
+  normalizeQuizQuestionsQuery(query: QueryQuizModel): NormalizedQuizQuestionsQuery {
+    return {
+      pageNumber: query.pageNumber ? +query.pageNumber : 1,
+      pageSize: query.pageSize ? +query.pageSize : 10,
+      bodySearchTerm: query.bodySearchTerm,
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
+      publishedStatus: query.publishedStatus || 'all',
+    };
+  }
 }
 
 export type NormalizedUsersQuery = {
@@ -93,4 +105,12 @@ export type NormalizedBannedUsersInBlogQuery = {
   sortBy: string;
   sortDirection: string;
   searchLoginTerm: string;
+};
+export type NormalizedQuizQuestionsQuery = {
+  bodySearchTerm: string;
+  publishedStatus: string; // all published notPublished
+  pageNumber: number;
+  pageSize: number;
+  sortBy: string;
+  sortDirection: string;
 };

@@ -82,6 +82,13 @@ import { LikesCommentsRepo } from './blogs/posts/comments/likes/likes-comments-r
 import { Comment } from './blogs/posts/comments/entities/comment.entity';
 import { LikeComment } from './blogs/posts/comments/likes/likeComment.entity';
 import { CommentsQueryRepo } from './blogs/posts/comments/comments.query.repo';
+import { CreateQuestionUseCase } from './super-admin/use-cases/quiz/create-question.use-case';
+import { UpdateQuestionUseCase } from './super-admin/use-cases/quiz/update-question.use-case';
+import { PublishQuestionUseCase } from './super-admin/use-cases/quiz/publish-question.use-case';
+import { DeleteQuestionUseCase } from './super-admin/use-cases/quiz/delete-question.use-case';
+import { QuizQuestionsRepo } from './super-admin/quiz.questions.repo';
+import { QuizQuestionsQueryRepo } from './super-admin/quiz.questions.query.repo';
+import { QuizQuestion } from './super-admin/quiz/QuizQuestion.entity';
 
 //USE CASES
 const authUseCases = [
@@ -98,8 +105,10 @@ const blogsUseCases = [DeleteBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, 
 const postsUseCases = [CreatePostUseCase, DeletePostUseCase, UpdatePostUseCase, PutLikeToPostUseCase];
 const commentsUseCases = [CreateCommentUseCase, UpdateCommentUseCase, DeleteCommentUseCase, PutLikeToCommentUseCase];
 const saUseCases = [BindBlogWithUserUseCase, DeleteUserUseCase, BanUserUseCase, BanBlogUseCase];
+const saQuizUseCases = [CreateQuestionUseCase, UpdateQuestionUseCase, PublishQuestionUseCase, DeleteQuestionUseCase];
 const sessionsUseCases = [DeleteSessionByDeviceIdUseCase, DeleteSessionsExceptCurrentUseCase];
 const useCases = [
+  ...saQuizUseCases,
   ...commentsUseCases,
   ...authUseCases,
   ...blogsUseCases,
@@ -126,6 +135,8 @@ const adapters = [
   CommentsRepo,
   LikesCommentsRepo,
   CommentsQueryRepo,
+  QuizQuestionsRepo,
+  QuizQuestionsQueryRepo,
 ];
 
 const constraints = [
@@ -176,6 +187,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
   synchronize: true,
   // logging: true,
 };
+
 //LOCAL
 
 @Module({
@@ -195,6 +207,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
       LikePost,
       Comment,
       LikeComment,
+      QuizQuestion,
     ]),
     TypeOrmModule.forRoot(typeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),

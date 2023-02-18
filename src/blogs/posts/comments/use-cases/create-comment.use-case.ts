@@ -26,7 +26,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
     const post = await this.postsRepo.get(command.postId);
     if (!post) throw new NotFoundException('Post doesnt exist');
     const blog = await this.blogsRepo.get(post.blogId);
-    if (!blog) throw new InternalServerErrorException();
+    if (!blog) throw new InternalServerErrorException('Blog doesnt exist');
     const user = await this.usersRepo.findUserById(command.userId);
     const bannedUser = await this.bannedUsersInBlogRepo.findBannedUser(blog.id, user.id);
     if (bannedUser) throw new ForbiddenException('You are banned in this blog');

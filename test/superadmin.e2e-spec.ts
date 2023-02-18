@@ -11,7 +11,7 @@ import { BanUserModel } from '../src/super-admin/models/BanUserModel';
 import { AuthCredentialsModel } from '../src/auth/models/AuthCredentialsModel';
 import { getCreateModels } from './utils/get-create-models';
 import { createManyItemsToDb } from './utils/create-many-items-to-db';
-import { PaginatorWithItems } from '../src/common/paginator-response-type';
+import { PaginatorResponseType, PaginatorWithItems } from '../src/common/paginator-response-type';
 import { BlogViewModel } from '../src/blogs/models/BlogViewModel';
 import { createUserAndGetAccessToken } from './utils/create-user-and-get-token/create-user-and-get-token';
 import { BanBlogInputModel } from '../src/super-admin/models/BanBlogInputModel';
@@ -20,6 +20,10 @@ import { newBlog } from './models-for-tests/positive/create/Blog';
 import { CreateBlogModel } from '../src/blogs/models/CreateBlogModel';
 import { newPost } from './models-for-tests/positive/create/Post';
 import { CreatePostModel } from '../src/blogs/posts/models/CreatePostModel';
+import { CreateQuizQuestionModel } from '../src/super-admin/models/quiz/CreateQuizQuestionModel';
+import { QuizQuestionViewModel } from '../src/super-admin/models/quiz/QuizQuestionViewModel';
+import { UpdateQuizQuestionModel } from '../src/super-admin/models/quiz/UpdateQuizQuestionModel';
+import { PublishQuestionModel } from '../src/super-admin/models/quiz/PublishQuestionModel';
 
 jest.setTimeout(15000);
 
@@ -203,6 +207,95 @@ describe('/sa/blogs', () => {
       await request(app.getHttpServer()).get(`/blogs/${blog.id}`).expect(404);
       await request(app.getHttpServer()).get(`/posts/${post.id}`).expect(404);
       //admin ban blog and blog and post shouldn't be available
+    });
+  });
+});
+
+describe('/sa/quiz', () => {
+  let app: INestApplication;
+  beforeAll(async () => {
+    app = await getAppAndCleanDB();
+  });
+  let question: QuizQuestionViewModel;
+  describe('crud quiz', () => {
+    it('should create question', async () => {
+      await request(app.getHttpServer())
+        .post('/sa/quiz/questions')
+        .set('authorization', superAdminBasicHeader)
+        .send({
+          body: 'What is typescript',
+          correctAnswers: ['The best language', 'Better than javascript'],
+        } as CreateQuizQuestionModel)
+        .expect(201)
+        .then(({ body }) => {
+          question = body;
+          expect(body).toEqual({
+            id: expect.any(String),
+            body: 'What is typescript',
+            correctAnswers: ['The best language', 'Better than javascript'],
+            published: false,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          } as QuizQuestionViewModel);
+        });
+    });
+    it('should update question', async () => {
+      await request(app.getHttpServer())
+        .put(`/sa/quiz/questions/${question.id}`)
+        .set('authorization', superAdminBasicHeader)
+        .send({
+          body: 'What is love',
+          correctAnswers: ['baby', 'dont', 'hurtme'],
+        } as UpdateQuizQuestionModel)
+        .expect(204);
+    });
+    it('should publish question', async () => {
+      await request(app.getHttpServer())
+        .put(`/sa/quiz/questions/${question.id}/publish`)
+        .set('authorization', superAdminBasicHeader)
+        .send({ published: true } as PublishQuestionModel)
+        .expect(204);
+      await request(app.getHttpServer())
+        .get(`/sa/quiz/questions`)
+        .set('authorization', superAdminBasicHeader)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            page: 1,
+            pagesCount: 1,
+            totalCount: 1,
+            pageSize: 10,
+            items: [
+              {
+                updatedAt: expect.any(String),
+                createdAt: expect.any(String),
+                id: question.id,
+                published: true,
+                correctAnswers: ['baby', 'dont', 'hurtme'],
+                body: 'What is love',
+              } as QuizQuestionViewModel,
+            ],
+          } as PaginatorResponseType<QuizQuestionViewModel[]>);
+        });
+    });
+    it('should delete question', async () => {
+      await request(app.getHttpServer())
+        .delete(`/sa/quiz/questions/${question.id}`)
+        .set('authorization', superAdminBasicHeader)
+        .expect(204);
+      await request(app.getHttpServer())
+        .get(`/sa/quiz/questions`)
+        .set('authorization', superAdminBasicHeader)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            page: 1,
+            pagesCount: 0,
+            totalCount: 0,
+            pageSize: 10,
+            items: [],
+          } as PaginatorResponseType<QuizQuestionViewModel[]>);
+        });
     });
   });
 });
