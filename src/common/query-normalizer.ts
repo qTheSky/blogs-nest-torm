@@ -60,9 +60,9 @@ export class QueryNormalizer {
     return {
       pageNumber: query.pageNumber ? +query.pageNumber : 1,
       pageSize: query.pageSize ? +query.pageSize : 10,
-      bodySearchTerm: query.bodySearchTerm,
-      sortBy: query.sortBy,
-      sortDirection: query.sortDirection,
+      bodySearchTerm: query.bodySearchTerm || '',
+      sortBy: query.sortBy || 'createdAt',
+      sortDirection: query.sortDirection || 'desc',
       publishedStatus: query.publishedStatus || 'all',
     };
   }
