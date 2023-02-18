@@ -2,7 +2,7 @@ import { IsArray, IsString, Length } from 'class-validator';
 
 export class CreateQuizQuestionModel {
   @IsString()
-  @Length(0, 1000)
+  @Length(10, 500)
   body: string;
   @IsArray()
   @IsString({ each: true })

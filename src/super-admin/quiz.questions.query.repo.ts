@@ -5,7 +5,6 @@ import { FindOptionsOrder, FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { NormalizedQuizQuestionsQuery } from '../common/query-normalizer';
 import { PaginatorResponseType } from '../common/paginator-response-type';
 import { QuizQuestionViewModel } from './models/quiz/QuizQuestionViewModel';
-import { Post } from '../blogs/posts/entities/post.entity';
 import { ViewModelMapper } from '../common/view-model-mapper';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class QuizQuestionsQueryRepo {
 
   async findQuestions(query: NormalizedQuizQuestionsQuery): Promise<PaginatorResponseType<QuizQuestionViewModel[]>> {
     const where: FindOptionsWhere<QuizQuestion> = {};
-    const order: FindOptionsOrder<Post> = { [query.sortBy]: query.sortDirection };
+    const order: FindOptionsOrder<QuizQuestion> = { [query.sortBy]: query.sortDirection };
 
     if (query.bodySearchTerm) {
       where.body = ILike(`%${query.bodySearchTerm}%`);
