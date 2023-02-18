@@ -12,6 +12,7 @@ export class PublishQuestionUseCase implements ICommandHandler<PublishQuestionCo
   async execute(command: PublishQuestionCommand) {
     const question = await this.quizRepo.findById(command.questionId);
     question.published = command.dto.published;
+    question.updatedAt = new Date();
     await this.quizRepo.save(question);
   }
 }
