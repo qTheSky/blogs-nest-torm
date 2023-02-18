@@ -235,7 +235,7 @@ describe('/sa/quiz', () => {
             correctAnswers: ['The best language', 'Better than javascript'],
             published: false,
             createdAt: expect.any(String),
-            updatedAt: expect.any(String),
+            updatedAt: null,
           } as QuizQuestionViewModel);
         });
     });

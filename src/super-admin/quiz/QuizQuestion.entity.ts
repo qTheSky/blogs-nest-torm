@@ -13,7 +13,7 @@ export class QuizQuestion {
   published: boolean;
   @Column()
   createdAt: Date;
-  @Column()
+  @Column({ nullable: true })
   updatedAt: Date;
 
   public static create(body: string, correctAnswers: string[]): QuizQuestion {
@@ -24,7 +24,7 @@ export class QuizQuestion {
 
     question.published = false;
     question.createdAt = new Date();
-    question.updatedAt = new Date();
+    question.updatedAt = null;
     return question;
   }
 }
