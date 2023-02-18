@@ -7,7 +7,13 @@ export class QuizQuestion {
 
   @Column()
   body: string;
-  @Column('simple-array')
+  @Column({
+    type: 'simple-array',
+    transformer: {
+      to: (value: string[]) => JSON.stringify(value),
+      from: (value: string) => JSON.parse(value),
+    },
+  })
   correctAnswers: string[];
   @Column()
   published: boolean;
