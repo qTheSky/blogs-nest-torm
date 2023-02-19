@@ -46,6 +46,7 @@ export class AuthController {
       httpOnly: true,
       secure: true, //todo => if developing secure false otherwise true
       maxAge: 180 * 24 * 60 * 60 * 1000,
+      sameSite: 'none',
     });
     return { accessToken };
   }
@@ -62,6 +63,7 @@ export class AuthController {
       httpOnly: true,
       secure: true, //todo => if developing secure false otherwise true
       maxAge: 180 * 24 * 60 * 60 * 1000,
+      sameSite: 'none',
     });
 
     return { accessToken };
