@@ -143,17 +143,7 @@ describe('quiz e2e', () => {
         } as GamePairViewModel);
       });
   });
-  it('should return game by id for two users', async () => {
-    await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/${game.id}`)
-      .set('Authorization', `Bearer ${firstUserToken}`)
-      .expect(200);
-    await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/${game.id}`)
-      .set('Authorization', `Bearer ${firstUserToken}`)
-      .expect(200);
-  });
-  it('1 player should answer to all questions rightly', async () => {
+  it('1 player should answer to all questions correctly', async () => {
     for (let i = 0; i < 5; i++) {
       await request(app.getHttpServer())
         .post('/pair-game-quiz/pairs/my-current/answers')
@@ -162,7 +152,59 @@ describe('quiz e2e', () => {
         .expect(200);
     }
   });
-  it('2 player should answer to all questions rightly', async () => {
+  it('should return game by id for two users', async () => {
+    //get by second user
+    await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${game.id}`)
+      .set('Authorization', `Bearer ${secondUserToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          id: game.id,
+          status: 'Active',
+          startGameDate: expect.any(String),
+          finishGameDate: null,
+          pairCreatedDate: game.pairCreatedDate,
+          questions: expect.any(Array),
+          firstPlayerProgress: {
+            player: { id: firstUser.id, login: firstUser.login },
+            score: 5, //5 coz above first user answered to all questions
+            answers: expect.any(Array),
+          },
+          secondPlayerProgress: {
+            player: { id: secondUser.id, login: secondUser.login },
+            score: 0,
+            answers: expect.any(Array),
+          },
+        } as GamePairViewModel);
+      });
+    //get by second user
+    await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${game.id}`)
+      .set('Authorization', `Bearer ${firstUserToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          id: game.id,
+          status: 'Active',
+          startGameDate: expect.any(String),
+          finishGameDate: null,
+          pairCreatedDate: game.pairCreatedDate,
+          questions: expect.any(Array),
+          firstPlayerProgress: {
+            player: { id: firstUser.id, login: firstUser.login },
+            score: 5, //5 coz above first user answered to all questions
+            answers: expect.any(Array),
+          },
+          secondPlayerProgress: {
+            player: { id: secondUser.id, login: secondUser.login },
+            score: 0,
+            answers: expect.any(Array),
+          },
+        } as GamePairViewModel);
+      });
+  });
+  it('2 player should answer to all questions correctly', async () => {
     for (let i = 0; i < 5; i++) {
       await request(app.getHttpServer())
         .post('/pair-game-quiz/pairs/my-current/answers')

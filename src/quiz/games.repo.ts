@@ -19,7 +19,7 @@ export class GamesRepo {
   }
 
   async findGameById(id: number): Promise<Game | null> {
-    return this.repo.findOneBy({ id });
+    return this.repo.findOne({ where: { id }, order: { players: { connectedAt: 'ASC' } } }); // players in game should be sorted by connectedAt by default
   }
 
   async findActiveOrPendingGameByUserId(userId: number): Promise<Game | null> {
@@ -32,7 +32,7 @@ export class GamesRepo {
           .subQuery()
           .select('player2.gameId')
           .from(Player, 'player2')
-          .where('player2.userId = :userId', { userId })
+          .where('player2.userId = :userId', { userId }) // players in game should be sorted by connectedAt by default
           .getQuery();
 
         return 'game.id IN ' + subQuery;
