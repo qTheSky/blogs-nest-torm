@@ -122,7 +122,7 @@ export class Game {
     return question.correctAnswers.some((answer) => answer.toLowerCase() === possibleAnswer.toLowerCase());
   }
 
-  isGameActive(): boolean {
+  isActive(): boolean {
     return this.status === 'Active';
   }
 }

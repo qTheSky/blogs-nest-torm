@@ -222,7 +222,7 @@ export class ViewModelMapper {
       startGameDate: game.startGameDate ? game.startGameDate.toISOString() : null,
       pairCreatedDate: game.pairCreatedDate.toISOString(),
       finishGameDate: game.finishGameDate ? game.finishGameDate.toISOString() : null,
-      questions: game.questions ? game.questions.map((q) => ({ ...q, id: q.id.toString() })) : null,
+      questions: game.questions ? game.questions.map((q) => ({ id: q.id.toString(), body: q.body })) : null,
     };
   }
   getAnswerViewModel(answer: Answer): AnswerViewModel {
