@@ -38,6 +38,9 @@ export class QuizController {
     @Param('gameId') gameId: number,
     @CurrentUserId() currentUserId: number,
   ): Promise<GamePairViewModel> {
+    if (typeof gameId !== 'number' || isNaN(gameId)) {
+      throw new NotFoundException('Bad gameId');
+    }
     const game = await this.gamesRepo.findGameById(+gameId);
     if (!game) throw new BadRequestException([{ field: 'id', message: 'bad id' }]);
     if (!game.isPlayerParticipant(currentUserId)) throw new ForbiddenException('You are not participant in this game');

@@ -32,13 +32,13 @@ export class GamesRepo {
           .subQuery()
           .select('player2.gameId')
           .from(Player, 'player2')
-          .where('player2.userId = :userId', { userId }) // players in game should be sorted by connectedAt by default
+          .where('player2.userId = :userId', { userId })
           .getQuery();
 
         return 'game.id IN ' + subQuery;
       })
       .andWhere('game.status IN (:...statuses)', { statuses: ['Active', 'PendingSecondPlayer'] })
-      .orderBy('player.connectedAt', 'ASC')
+      .orderBy('player.connectedAt', 'ASC') // players in game should be sorted by connectedAt by default
       .getOne();
 
     return game;

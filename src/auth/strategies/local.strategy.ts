@@ -23,7 +23,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
     if (!user) throw new UnauthorizedException('Incorrect credentials');
     if (!user.emailConfirmation.isConfirmed) throw new UnauthorizedException('Confirm your email first');
-    if (user.banInfo.isBanned) throw new UnauthorizedException();
+    if (user.banInfo.isBanned) throw new UnauthorizedException('You are banned');
     const isHashesEquals = await bcrypt.compare(password, user.passwordHash);
     if (!isHashesEquals) throw new UnauthorizedException('Incorrect credentials');
     return user;
