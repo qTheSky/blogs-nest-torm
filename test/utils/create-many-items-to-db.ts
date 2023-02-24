@@ -8,13 +8,18 @@ export const createManyItemsToDb = async <M extends object>(
   howManyItems: number,
   createModels: M[],
   accessToken?: string,
-) => {
+): Promise<{ someViewModels: any[] }> => {
   const authHeader = accessToken ? `Bearer ${accessToken}` : superAdminBasicHeader;
+  const requestBodies: object[] = [];
   for (let i = 0; i < howManyItems; i++) {
     await request(app.getHttpServer())
       .post(endPoint)
       .send(createModels[i])
       .set('Authorization', authHeader)
-      .expect(201);
+      .expect(201)
+      .then(({ body }) => {
+        requestBodies.push(body);
+      });
   }
+  return { someViewModels: requestBodies };
 };

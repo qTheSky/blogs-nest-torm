@@ -11,13 +11,10 @@ export class User {
 
   @Column()
   email: string;
-
   @Column({ collation: 'C' })
   login: string;
-
   @Column()
   passwordHash: string;
-
   @Column()
   createdAt: Date;
 
@@ -27,7 +24,6 @@ export class User {
     eager: true,
   })
   emailConfirmation: UserEmailConfirmation;
-
   @OneToOne(() => UserBanInfo, (banInfo) => banInfo.user, {
     cascade: true,
     onDelete: 'CASCADE',

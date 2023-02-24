@@ -23,4 +23,8 @@ export class QuizQuestionsRepo {
   async save(question: QuizQuestion): Promise<QuizQuestion> {
     return await this.repo.save(question);
   }
+
+  async getFiveRandomQuestions(): Promise<QuizQuestion[]> {
+    return this.repo.createQueryBuilder('q').select().where('q.published = true').orderBy('RANDOM()').take(5).getMany();
+  }
 }

@@ -1,4 +1,12 @@
-import { IsEmail, Length, Matches, Validate, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  Length,
+  Matches,
+  Validate,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 import { Injectable } from '@nestjs/common';
 import { UsersRepo } from '../users.repo';
 
@@ -20,7 +28,9 @@ export class CreateUserModel {
   @Validate(IsEmailOrLoginUniqueConstraint, { message: 'Login already exist' })
   @Length(3, 10)
   @Matches('[a-zA-Z0-9_-]*$')
+  @IsString()
   login: string;
   @Length(6, 20)
+  @IsString()
   password: string;
 }

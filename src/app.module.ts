@@ -89,6 +89,12 @@ import { DeleteQuestionUseCase } from './super-admin/use-cases/quiz/delete-quest
 import { QuizQuestionsRepo } from './super-admin/quiz.questions.repo';
 import { QuizQuestionsQueryRepo } from './super-admin/quiz.questions.query.repo';
 import { QuizQuestion } from './super-admin/quiz/QuizQuestion.entity';
+import { QuizController } from './quiz/quiz.controller';
+import { GamesRepo } from './quiz/games.repo';
+import { CreateOrConnectToGameUseCase } from './quiz/use-cases/create-or-connect-to-game.use-case';
+import { Game } from './quiz/entities/game.entity';
+import { Player } from './quiz/entities/player.entity';
+import { HandleAnswerUseCase } from './quiz/use-cases/handle-answer.use-case';
 
 //USE CASES
 const authUseCases = [
@@ -106,8 +112,10 @@ const postsUseCases = [CreatePostUseCase, DeletePostUseCase, UpdatePostUseCase, 
 const commentsUseCases = [CreateCommentUseCase, UpdateCommentUseCase, DeleteCommentUseCase, PutLikeToCommentUseCase];
 const saUseCases = [BindBlogWithUserUseCase, DeleteUserUseCase, BanUserUseCase, BanBlogUseCase];
 const saQuizUseCases = [CreateQuestionUseCase, UpdateQuestionUseCase, PublishQuestionUseCase, DeleteQuestionUseCase];
+const quizGameUseCases = [CreateOrConnectToGameUseCase, HandleAnswerUseCase];
 const sessionsUseCases = [DeleteSessionByDeviceIdUseCase, DeleteSessionsExceptCurrentUseCase];
 const useCases = [
+  ...quizGameUseCases,
   ...saQuizUseCases,
   ...commentsUseCases,
   ...authUseCases,
@@ -137,6 +145,7 @@ const adapters = [
   CommentsQueryRepo,
   QuizQuestionsRepo,
   QuizQuestionsQueryRepo,
+  GamesRepo,
 ];
 
 const constraints = [
@@ -208,6 +217,8 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
       Comment,
       LikeComment,
       QuizQuestion,
+      Game,
+      Player,
     ]),
     TypeOrmModule.forRoot(typeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),
@@ -223,6 +234,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
     SessionsController,
     BloggerController,
     SuperAdminController,
+    QuizController,
   ],
   providers: [
     ...useCases,

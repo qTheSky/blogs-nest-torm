@@ -14,7 +14,6 @@ export class QuizQuestion {
       from: (value: string) => JSON.parse(value),
     },
   })
-  // @Column('simple-array')
   correctAnswers: string[];
   @Column()
   published: boolean;

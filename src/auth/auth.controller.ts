@@ -32,7 +32,7 @@ export class AuthController {
   constructor(private commandBus: CommandBus) {}
 
   //todo make two routes for password recovery via email and confirm password recovery
-  @Post('/login')
+  @Post('login')
   // @Throttle(5, 10)
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)

@@ -21,6 +21,9 @@ import { LikesCommentsRepo } from '../blogs/posts/comments/likes/likes-comments-
 import { LikeComment } from '../blogs/posts/comments/likes/likeComment.entity';
 import { QuizQuestionViewModel } from '../super-admin/models/quiz/QuizQuestionViewModel';
 import { QuizQuestion } from '../super-admin/quiz/QuizQuestion.entity';
+import { Game } from '../quiz/entities/game.entity';
+import { AnswerViewModel, GamePairViewModel, GamePlayerProgressViewModel } from '../quiz/models/GameModels';
+import { Answer } from '../quiz/entities/player.entity';
 
 @Injectable()
 export class ViewModelMapper {
@@ -195,6 +198,39 @@ export class ViewModelMapper {
       published: question.published,
       createdAt: question.createdAt.toISOString(),
       updatedAt: question.updatedAt ? question.updatedAt.toISOString() : null,
+    };
+  }
+
+  getGameViewModel(game: Game): GamePairViewModel {
+    const firstPlayerProgress: GamePlayerProgressViewModel = {
+      answers: game.players[0].answers.map(this.getAnswerViewModel),
+      score: game.players[0].score,
+      player: { id: game.players[0].userId.toString(), login: game.players[0].user.login },
+    };
+    const secondPlayerProgress: GamePlayerProgressViewModel =
+      game.players.length === 2
+        ? {
+            answers: game.players[1].answers.map(this.getAnswerViewModel),
+            score: game.players[1].score,
+            player: { id: game.players[1].userId.toString(), login: game.players[1].user.login },
+          }
+        : null;
+    return {
+      id: game.id.toString(),
+      firstPlayerProgress,
+      secondPlayerProgress,
+      status: game.status,
+      startGameDate: game.startGameDate ? game.startGameDate.toISOString() : null,
+      pairCreatedDate: game.pairCreatedDate.toTimeString(),
+      finishGameDate: game.finishGameDate ? game.finishGameDate.toISOString() : null,
+      questions: game.questions ? game.questions.map((q) => ({ ...q, id: q.id.toString() })) : null,
+    };
+  }
+  getAnswerViewModel(answer: Answer): AnswerViewModel {
+    return {
+      answerStatus: answer.answerStatus,
+      addedAt: answer.addedAt.toISOString(),
+      questionId: answer.questionId.toString(),
     };
   }
 }
