@@ -13,7 +13,7 @@ export class HandleAnswerUseCase implements ICommandHandler<HandleAnswerCommand>
 
   async execute(command: HandleAnswerCommand): Promise<Answer> {
     const game = await this.gamesRepo.findActiveOrPendingGameByUserId(command.currentUserId);
-    if (!game || game.isPlayerAnsweredAllQuestions(command.currentUserId)) {
+    if (!game || !game.isGameActive() || game.isPlayerAnsweredAllQuestions(command.currentUserId)) {
       throw new ForbiddenException('You are not inside active pair or already answered to all questions');
     }
     const answer = game.handleAnswer(command.currentUserId, command.answer);

@@ -107,7 +107,7 @@ export class Game {
     const currentQuestionIndex = player.answers.length;
     const currentPlayerQuestion = this.questions[currentQuestionIndex];
     const answer = { addedAt: new Date(), questionId: currentPlayerQuestion.id } as Answer;
-    if (this.IsAnswerCorrect(currentPlayerQuestion, possibleAnswer)) {
+    if (this.isAnswerCorrect(currentPlayerQuestion, possibleAnswer)) {
       answer.answerStatus = 'Correct';
       player.answers.push(answer);
       player.addScore(1);
@@ -118,8 +118,12 @@ export class Game {
     return answer;
   }
 
-  IsAnswerCorrect(question: QuestionInGame, possibleAnswer: string): boolean {
+  isAnswerCorrect(question: QuestionInGame, possibleAnswer: string): boolean {
     return question.correctAnswers.some((answer) => answer.toLowerCase() === possibleAnswer.toLowerCase());
+  }
+
+  isGameActive(): boolean {
+    return this.status === 'Active';
   }
 }
 
