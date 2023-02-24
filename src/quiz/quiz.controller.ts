@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -16,7 +17,6 @@ import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorato
 import { ViewModelMapper } from '../common/view-model-mapper';
 import { AnswerViewModel, GamePairViewModel } from './models/GameModels';
 import { GamesRepo } from './games.repo';
-import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 import { AnswerInputModel } from './models/AnswerInputModel';
 import { HandleAnswerCommand } from './use-cases/handle-answer.use-case';
 import { Answer } from './entities/player.entity';
@@ -35,11 +35,11 @@ export class QuizController {
 
   @Get(':gameId')
   async getGameById(
-    @Param('gameId', ParseNumberPipe) gameId: number,
+    @Param('gameId') gameId: number,
     @CurrentUserId() currentUserId: number,
   ): Promise<GamePairViewModel> {
-    const game = await this.gamesRepo.findGameById(gameId);
-    if (!game) throw new NotFoundException('Game not found');
+    const game = await this.gamesRepo.findGameById(+gameId);
+    if (!game) throw new BadRequestException([{ field: 'id', message: 'bad id' }]);
     if (!game.isPlayerParticipant(currentUserId)) throw new ForbiddenException('You are not participant in this game');
     return this.viewModelMapper.getGameViewModel(game);
   }
