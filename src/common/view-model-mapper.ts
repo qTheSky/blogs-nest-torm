@@ -146,7 +146,6 @@ export class ViewModelMapper {
 
   async getCommentForBloggerModel(comment: Comment, userId: number): Promise<CommentForBloggerViewModel> {
     const likesInfo = await this.getCommentLikesInfo(comment, userId);
-    // const post = await this.postsRepo.get(comment.id);
     return {
       id: comment.id.toString(),
       content: comment.content,
@@ -221,7 +220,7 @@ export class ViewModelMapper {
       secondPlayerProgress,
       status: game.status,
       startGameDate: game.startGameDate ? game.startGameDate.toISOString() : null,
-      pairCreatedDate: game.pairCreatedDate.toTimeString(),
+      pairCreatedDate: game.pairCreatedDate.toISOString(),
       finishGameDate: game.finishGameDate ? game.finishGameDate.toISOString() : null,
       questions: game.questions ? game.questions.map((q) => ({ ...q, id: q.id.toString() })) : null,
     };
