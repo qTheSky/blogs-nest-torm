@@ -38,6 +38,7 @@ export class GamesRepo {
         return 'game.id IN ' + subQuery;
       })
       .andWhere('game.status IN (:...statuses)', { statuses: ['Active', 'PendingSecondPlayer'] })
+      .orderBy('player.connectedAt', 'ASC')
       .getOne();
 
     return game;

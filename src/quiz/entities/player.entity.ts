@@ -39,6 +39,8 @@ export class Player {
   score: number;
   @Column()
   isFirstFinished: boolean;
+  @Column()
+  connectedAt: Date;
 
   addScore(count: number) {
     this.score += count;

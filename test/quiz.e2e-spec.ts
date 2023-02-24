@@ -197,4 +197,16 @@ describe('quiz e2e', () => {
         } as GamePairViewModel);
       });
   });
+  it('should create new game by first user and second user should connect to new game', async () => {
+    await request(app.getHttpServer())
+      .post(`/pair-game-quiz/pairs/connection`)
+      .set('Authorization', `Bearer ${firstUserToken}`)
+      .send({})
+      .expect(200);
+    await request(app.getHttpServer())
+      .post(`/pair-game-quiz/pairs/connection`)
+      .set('Authorization', `Bearer ${secondUserToken}`)
+      .send({})
+      .expect(200);
+  });
 });

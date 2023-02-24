@@ -74,6 +74,7 @@ export class Game {
 
   addPlayer(user: User) {
     const player = new Player();
+    player.connectedAt = new Date();
     player.score = 0;
     player.answers = [];
     player.user = user;
