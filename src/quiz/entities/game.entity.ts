@@ -125,6 +125,10 @@ export class Game {
   isActive(): boolean {
     return this.status === 'Active';
   }
+
+  isPlayerCanAnswer(playerId: number): boolean {
+    return this.isActive() && this.isPlayerAnsweredAllQuestions(playerId);
+  }
 }
 
 type QuestionInGame = {

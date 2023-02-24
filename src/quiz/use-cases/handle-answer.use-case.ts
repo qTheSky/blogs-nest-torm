@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { GamesRepo } from '../games.repo';
-import { ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Answer } from '../entities/player.entity';
 
 export class HandleAnswerCommand {
@@ -13,7 +13,8 @@ export class HandleAnswerUseCase implements ICommandHandler<HandleAnswerCommand>
 
   async execute(command: HandleAnswerCommand): Promise<Answer> {
     const game = await this.gamesRepo.findActiveOrPendingGameByUserId(command.currentUserId);
-    if (!game || !game.isActive() || game.isPlayerAnsweredAllQuestions(command.currentUserId)) {
+    if (!game) throw new BadRequestException([{ field: 'id', message: 'Bad game id' }]);
+    if (!game.isPlayerCanAnswer(command.currentUserId)) {
       throw new ForbiddenException('You are not inside active pair or already answered to all questions');
     }
     const answer = game.handleAnswer(command.currentUserId, command.answer);
