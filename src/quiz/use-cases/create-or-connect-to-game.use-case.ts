@@ -19,17 +19,25 @@ export class CreateOrConnectToGameUseCase implements ICommandHandler<CreateOrCon
   ) {}
 
   async execute(command: CreateOrConnectToGameCommand) {
+    console.log('connection 1');
     const user = await this.usersRepo.findUserById(command.currentUserId);
+    console.log('connection 2');
     const isUserHasActiveOrPendingGame = await this.gamesRepo.findActiveOrPendingGameByUserId(user.id);
+    console.log('connection 3');
     if (isUserHasActiveOrPendingGame) throw new ForbiddenException('You are already participating in active pair');
+    console.log('connection 4');
     const pendingSecondPlayerGame = await this.gamesRepo.findPendingGame();
+    console.log('connection 5');
     if (!pendingSecondPlayerGame) return await this.gamesRepo.createGame(user);
+    console.log('connection 6');
     return await this.startGame(user, pendingSecondPlayerGame);
   }
 
   async startGame(secondPlayer: User, game: Game) {
     const questionsForGame = await this.quizQuestionsRepo.getFiveRandomQuestions();
+    console.log('connection 7');
     game.startGame(secondPlayer, questionsForGame);
+    console.log('connection 8');
     return await this.gamesRepo.save(game);
   }
 }

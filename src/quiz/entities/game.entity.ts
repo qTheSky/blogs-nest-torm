@@ -4,7 +4,7 @@ import { User } from '../../users/entities/user.entity';
 import { Answer, Player } from './player.entity';
 import { maxQuestionsCount } from '../constants/maxQuestionsCount';
 
-@Entity()
+@Entity({ orderBy: { pairCreatedDate: 'DESC' } })
 export class Game {
   @PrimaryGeneratedColumn()
   id: number;
