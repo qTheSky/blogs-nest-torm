@@ -46,7 +46,7 @@ export class GamesQueryRepo {
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: total,
-      items: games.map(this.viewModelMapper.getGameViewModel),
+      items: games.map(this.viewModelMapper.getGameViewModel.bind(this.viewModelMapper)),
     };
   }
 }

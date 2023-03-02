@@ -225,6 +225,7 @@ export class ViewModelMapper {
       questions: game.questions ? game.questions.map((q) => ({ id: q.id.toString(), body: q.body })) : null,
     };
   }
+
   getAnswerViewModel(answer: Answer): AnswerViewModel {
     return {
       answerStatus: answer.answerStatus,

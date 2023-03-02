@@ -24,6 +24,7 @@ import { Answer } from './entities/player.entity';
 import { GameQueryModel } from './models/GameQueryModel';
 import { GamesQueryRepo } from './games.query.repo';
 import { QueryNormalizer } from '../common/query-normalizer';
+import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(JwtAuthGuard)
@@ -36,6 +37,12 @@ export class QuizController {
     private queryNormalizer: QueryNormalizer,
   ) {}
 
+  @Get('my')
+  async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
+    const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
+    return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
+  }
+
   @Get('my-current')
   async getCurrentGame(@CurrentUserId() currentUserId: number): Promise<GamePairViewModel> {
     const game = await this.gamesRepo.findActiveOrPendingGameByUserId(currentUserId);
@@ -45,13 +52,13 @@ export class QuizController {
 
   @Get(':gameId')
   async getGameById(
-    @Param('gameId') gameId: number,
+    @Param('gameId', ParseNumberPipe) gameId: number,
     @CurrentUserId() currentUserId: number,
   ): Promise<GamePairViewModel> {
-    if (typeof gameId !== 'number' || isNaN(gameId)) {
-      throw new NotFoundException('Bad gameId');
-    }
-    const game = await this.gamesRepo.findGameById(+gameId);
+    // if (typeof gameId !== 'number' || isNaN(gameId)) {
+    //   throw new NotFoundException('Bad gameId');
+    // }
+    const game = await this.gamesRepo.findGameById(gameId);
     if (!game) throw new BadRequestException([{ field: 'id', message: 'bad id' }]);
     if (!game.isPlayerParticipant(currentUserId)) throw new ForbiddenException('You are not participant in this game');
     return this.viewModelMapper.getGameViewModel(game);
@@ -74,11 +81,5 @@ export class QuizController {
       new HandleAnswerCommand(currentUserId, answerModel.answer),
     );
     return this.viewModelMapper.getAnswerViewModel(answer);
-  }
-
-  @Get('my')
-  async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
-    const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
-    return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
   }
 }
