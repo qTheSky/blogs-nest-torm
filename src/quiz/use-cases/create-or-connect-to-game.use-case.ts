@@ -34,6 +34,7 @@ export class CreateOrConnectToGameUseCase implements ICommandHandler<CreateOrCon
   }
 
   async startGame(secondPlayer: User, game: Game) {
+    console.log('start game');
     const questionsForGame = await this.quizQuestionsRepo.getFiveRandomQuestions();
     console.log('connection 7');
     game.startGame(secondPlayer, questionsForGame);

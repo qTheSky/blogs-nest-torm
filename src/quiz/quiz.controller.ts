@@ -36,7 +36,7 @@ export class QuizController {
     private queryNormalizer: QueryNormalizer,
   ) {}
 
-  @Get('/my')
+  @Get('my')
   async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
     const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
     return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
