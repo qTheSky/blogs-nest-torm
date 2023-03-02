@@ -95,6 +95,7 @@ import { CreateOrConnectToGameUseCase } from './quiz/use-cases/create-or-connect
 import { Game } from './quiz/entities/game.entity';
 import { Player } from './quiz/entities/player.entity';
 import { HandleAnswerUseCase } from './quiz/use-cases/handle-answer.use-case';
+import { GamesQueryRepo } from './quiz/games.query.repo';
 
 //USE CASES
 const authUseCases = [
@@ -146,6 +147,7 @@ const adapters = [
   QuizQuestionsRepo,
   QuizQuestionsQueryRepo,
   GamesRepo,
+  GamesQueryRepo,
 ];
 
 const constraints = [

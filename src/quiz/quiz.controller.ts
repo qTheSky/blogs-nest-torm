@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guards';
@@ -20,11 +21,20 @@ import { GamesRepo } from './games.repo';
 import { AnswerInputModel } from './models/AnswerInputModel';
 import { HandleAnswerCommand } from './use-cases/handle-answer.use-case';
 import { Answer } from './entities/player.entity';
+import { GameQueryModel } from './models/GameQueryModel';
+import { GamesQueryRepo } from './games.query.repo';
+import { QueryNormalizer } from '../common/query-normalizer';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(JwtAuthGuard)
 export class QuizController {
-  constructor(private commandBus: CommandBus, private viewModelMapper: ViewModelMapper, private gamesRepo: GamesRepo) {}
+  constructor(
+    private commandBus: CommandBus,
+    private viewModelMapper: ViewModelMapper,
+    private gamesRepo: GamesRepo,
+    private gamesQueryRepo: GamesQueryRepo,
+    private queryNormalizer: QueryNormalizer,
+  ) {}
 
   @Get('my-current')
   async getCurrentGame(@CurrentUserId() currentUserId: number): Promise<GamePairViewModel> {
@@ -64,5 +74,11 @@ export class QuizController {
       new HandleAnswerCommand(currentUserId, answerModel.answer),
     );
     return this.viewModelMapper.getAnswerViewModel(answer);
+  }
+
+  @Get('my')
+  async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
+    const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
+    return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
   }
 }

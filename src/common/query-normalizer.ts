@@ -66,6 +66,14 @@ export class QueryNormalizer {
       publishedStatus: query.publishedStatus || 'all',
     };
   }
+  normalizeQuizGamesQuery(query: any): NormalizedQuizGamesQuery {
+    return {
+      pageNumber: query.pageNumber ? +query.pageNumber : 1,
+      pageSize: query.pageSize ? +query.pageSize : 10,
+      sortBy: query.sortBy || 'pairCreatedDate',
+      sortDirection: query.sortDirection || 'desc',
+    };
+  }
 }
 
 export type NormalizedUsersQuery = {
@@ -109,6 +117,12 @@ export type NormalizedBannedUsersInBlogQuery = {
 export type NormalizedQuizQuestionsQuery = {
   bodySearchTerm: string;
   publishedStatus: string; // all published notPublished
+  pageNumber: number;
+  pageSize: number;
+  sortBy: string;
+  sortDirection: string;
+};
+export type NormalizedQuizGamesQuery = {
   pageNumber: number;
   pageSize: number;
   sortBy: string;
