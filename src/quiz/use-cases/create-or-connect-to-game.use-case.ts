@@ -23,9 +23,7 @@ export class CreateOrConnectToGameUseCase implements ICommandHandler<CreateOrCon
     const isUserHasActiveOrPendingGame = await this.gamesRepo.findActiveOrPendingGameByUserId(user.id);
     if (isUserHasActiveOrPendingGame) throw new ForbiddenException('You are already participating in active pair');
     const pendingSecondPlayerGame = await this.gamesRepo.findPendingGame();
-    if (!pendingSecondPlayerGame) {
-      return await this.gamesRepo.createGame(user);
-    }
+    if (!pendingSecondPlayerGame) return await this.gamesRepo.createGame(user);
     return await this.startGame(user, pendingSecondPlayerGame);
   }
 
