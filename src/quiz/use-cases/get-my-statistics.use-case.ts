@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { StatisticsViewModel } from '../models/StatisticsViewModel';
 import { GamesRepo } from '../games.repo';
 import { GameEntity } from '../entities/game.entity';
+import { GameStatuses } from '../models/GameModels';
 
 export class GetMyStatisticsCommand {
   constructor(public currentUserId: number) {}
@@ -13,15 +14,26 @@ export class GetMyStatisticsUseCase implements ICommandHandler<GetMyStatisticsCo
 
   async execute(command: GetMyStatisticsCommand): Promise<StatisticsViewModel> {
     const allUserGames = await this.gamesRepo.findAllGamesOfUser(command.currentUserId);
+    const finishedGames = this.cutNotFinishedGames(allUserGames);
 
-    const gamesCount = allUserGames.length;
-    const sumScore = this.getSumScore(allUserGames, command.currentUserId);
+    const gamesCount = finishedGames.length;
+    const sumScore = this.getSumScore(finishedGames, command.currentUserId);
     return {
       gamesCount,
       sumScore,
-      ...this.countWinsDrawsAndLoses(allUserGames, command.currentUserId),
+      ...this.countWinsDrawsAndLoses(finishedGames, command.currentUserId),
       avgScores: this.getAvgScore(gamesCount, sumScore),
     };
+  }
+
+  cutNotFinishedGames(games: GameEntity[]): GameEntity[] {
+    const finishedGames: GameEntity[] = [];
+    for (const game of games) {
+      if (game.status === GameStatuses.FINISHED) {
+        finishedGames.push(game);
+      }
+    }
+    return finishedGames;
   }
 
   countWinsDrawsAndLoses(
