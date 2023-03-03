@@ -3,19 +3,20 @@ import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { createTwoUsersAndGetTokens } from './utils/create-user-and-get-token/create-two-users';
 import * as request from 'supertest';
 import { UserViewModel } from '../src/users/models/UserViewModel';
-import { GamePairViewModel } from '../src/quiz/models/GameModels';
+import { GamePairViewModel, GameStatuses } from '../src/quiz/models/GameModels';
 import { getCreateModels } from './utils/get-create-models';
 import { CreateQuizQuestionModel } from '../src/super-admin/models/quiz/CreateQuizQuestionModel';
 import { createManyItemsToDb } from './utils/create-many-items-to-db';
 import { PublishQuestionModel } from '../src/super-admin/models/quiz/PublishQuestionModel';
 import { superAdminBasicHeader } from './constants';
 import { AnswerInputModel } from '../src/quiz/models/AnswerInputModel';
+import { PaginatorResponseType } from '../src/common/paginator-response-type';
 
 jest.setTimeout(15000);
 describe('quiz e2e', () => {
   let app: INestApplication;
-  let firstUser: UserViewModel;
-  let firstUserToken: string;
+  let firstUser: UserViewModel; //qTheSky
+  let firstUserToken: string; //zeska
   let secondUser: UserViewModel;
   let secondUserToken: string;
   beforeAll(async () => {
@@ -250,5 +251,57 @@ describe('quiz e2e', () => {
       .set('Authorization', `Bearer ${secondUserToken}`)
       .send({})
       .expect(200);
+  });
+  it('first player should get all games with paging', async () => {
+    await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/my`)
+      .set('Authorization', `Bearer ${firstUserToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          totalCount: 2,
+          page: 1,
+          pageSize: 10,
+          pagesCount: 1,
+          items: [
+            {
+              id: expect.any(String),
+              status: GameStatuses.ACTIVE,
+              startGameDate: expect.any(String),
+              finishGameDate: null,
+              pairCreatedDate: expect.any(String),
+              questions: expect.any(Array),
+              firstPlayerProgress: {
+                score: 0,
+                player: { id: firstUser.id, login: firstUser.login },
+                answers: expect.any(Array),
+              },
+              secondPlayerProgress: {
+                score: 0,
+                player: { id: secondUser.id, login: secondUser.login },
+                answers: expect.any(Array),
+              },
+            },
+            {
+              id: game.id,
+              status: GameStatuses.FINISHED,
+              startGameDate: expect.any(String),
+              finishGameDate: expect.any(String),
+              pairCreatedDate: expect.any(String),
+              questions: expect.any(Array),
+              firstPlayerProgress: {
+                answers: expect.any(Array),
+                score: 6,
+                player: { id: firstUser.id, login: firstUser.login },
+              },
+              secondPlayerProgress: {
+                answers: expect.any(Array),
+                score: 5,
+                player: { id: secondUser.id, login: secondUser.login },
+              },
+            },
+          ],
+        } as PaginatorResponseType<GamePairViewModel[]>);
+      });
   });
 });

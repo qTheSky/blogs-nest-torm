@@ -4,6 +4,7 @@ import { QueryPostModel } from '../blogs/posts/models/QueryPostModel';
 import { QueryCommentModel } from '../blogs/posts/comments/models/QueryCommentModel';
 import { BannedUserInBlogQueryModel } from '../blogs/models/BannedUserInBlogQueryModel';
 import { QueryQuizModel } from '../super-admin/models/quiz/QueryQuizModel';
+import { GameQueryModel } from '../quiz/models/GameQueryModel';
 
 export class QueryNormalizer {
   normalizeUsersQuery(query: QueryUserModel): NormalizedUsersQuery {
@@ -66,7 +67,7 @@ export class QueryNormalizer {
       publishedStatus: query.publishedStatus || 'all',
     };
   }
-  normalizeQuizGamesQuery(query: any): NormalizedQuizGamesQuery {
+  normalizeQuizGamesQuery(query: GameQueryModel): NormalizedQuizGamesQuery {
     return {
       pageNumber: query.pageNumber ? +query.pageNumber : 1,
       pageSize: query.pageSize ? +query.pageSize : 10,
