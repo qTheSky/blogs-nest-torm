@@ -33,7 +33,7 @@ export class GamesQueryRepo {
 
         return 'game.id IN ' + subQuery;
       })
-      // .orderBy('player.connectedAt', 'ASC') // players in game should be sorted by connectedAt by default
+      .orderBy('player.connectedAt', 'ASC') // players in game should be sorted by connectedAt by default
       .orderBy(`game.${query.sortBy}`, query.sortDirection.toUpperCase() as 'ASC' | 'DESC');
 
     const [games, total] = await builder
