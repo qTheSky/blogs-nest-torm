@@ -3,7 +3,7 @@ import { InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { BanUserModel } from '../models/BanUserModel';
 import { AuthService } from '../../auth/application/auth.service';
 import { UsersRepo } from '../../users/users.repo';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { SessionsRepo } from '../../security/sessions.repo';
 
 export class BanUserCommand {
@@ -32,12 +32,12 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
     }
   }
 
-  async ban(user: User, banReason: string) {
+  async ban(user: UserEntity, banReason: string) {
     user.ban(banReason);
     await this.banSessions(user.id);
   }
 
-  async unBan(user: User) {
+  async unBan(user: UserEntity) {
     user.unBan();
   }
 

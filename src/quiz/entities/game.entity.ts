@@ -1,16 +1,19 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { GameStatuses } from '../models/GameModels';
-import { User } from '../../users/entities/user.entity';
-import { Answer, Player } from './player.entity';
+import { UserEntity } from '../../users/entities/user.entity';
+import { Answer, PlayerEntity } from './player.entity';
 import { maxQuestionsCount } from '../constants/maxQuestionsCount';
 
-@Entity({ orderBy: { pairCreatedDate: 'DESC' } })
-export class Game {
+@Entity({ orderBy: { pairCreatedDate: 'DESC' }, name: 'Games' })
+export class GameEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => Player, (p) => p.game, { eager: true, cascade: true, onDelete: 'CASCADE' })
-  players: Player[];
+  @OneToMany(() => PlayerEntity, (p) => p.game, { eager: true, cascade: true, onDelete: 'CASCADE' })
+  players: PlayerEntity[];
+
+  @Column({ nullable: true })
+  winnerId: number;
 
   @Column()
   status: GameStatuses;
@@ -30,24 +33,25 @@ export class Game {
   })
   questions: QuestionInGame[] | null;
 
-  public static create(user: User): Game {
-    const game = new Game();
+  public static create(user: UserEntity): GameEntity {
+    const game = new GameEntity();
     game.players = [];
     game.addPlayer(user);
 
-    game.status = 'PendingSecondPlayer';
+    game.status = GameStatuses.PENDING;
     game.pairCreatedDate = new Date();
     game.finishGameDate = null;
     game.startGameDate = null;
     game.questions = null;
+    game.winnerId = null;
 
     return game;
   }
 
-  startGame(user: User, questions: QuestionInGame[]) {
+  startGame(user: UserEntity, questions: QuestionInGame[]) {
     this.addPlayer(user);
 
-    this.status = 'Active';
+    this.status = GameStatuses.ACTIVE;
     this.startGameDate = new Date();
     this.questions = questions;
   }
@@ -60,20 +64,50 @@ export class Game {
     if (firstFinishedPlayer.isAtLeastOneAnswerIsRight()) {
       firstFinishedPlayer.addScore(1);
     }
-    this.status = 'Finished';
+    this.declareWinnerOrDraw();
+    this.status = GameStatuses.FINISHED;
     this.finishGameDate = new Date();
+  }
+
+  declareWinnerOrDraw() {
+    const winner = this.getPlayerIdWithHighestScore();
+    if (!winner) {
+      return;
+    }
+    this.winnerId = winner;
+  }
+
+  getPlayerIdWithHighestScore(): number | null {
+    let maxScore = -Infinity;
+    let maxScorePlayer: PlayerEntity | null = null;
+
+    for (const player of this.players) {
+      if (player.score > maxScore) {
+        maxScore = player.score;
+        maxScorePlayer = player;
+      }
+    }
+
+    // Check if there are multiple players with the same max score
+    for (const player of this.players) {
+      if (player.score === maxScore && player !== maxScorePlayer) {
+        return null;
+      }
+    }
+
+    return maxScorePlayer ? maxScorePlayer.id : null;
   }
 
   canBeFinished(): boolean {
     return this.isBothPlayersAnsweredAllQuestions();
   }
 
-  findFirstFinishedPlayer(): Player {
+  findFirstFinishedPlayer(): PlayerEntity {
     return this.players.find((p) => p.isFirstFinished === true);
   }
 
-  addPlayer(user: User) {
-    const player = new Player();
+  addPlayer(user: UserEntity) {
+    const player = new PlayerEntity();
     player.connectedAt = new Date();
     player.score = 0;
     player.answers = [];
@@ -84,7 +118,7 @@ export class Game {
     this.players.push(player);
   }
 
-  findPlayerById(userId: number): Player {
+  findPlayerById(userId: number): PlayerEntity {
     return this.players.find((p) => p.userId === userId);
   }
 

@@ -1,20 +1,20 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { AnswerStatuses } from '../models/GameModels';
-import { Game } from './game.entity';
-import { User } from '../../users/entities/user.entity';
+import { GameEntity } from './game.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { maxQuestionsCount } from '../constants/maxQuestionsCount';
 
-@Entity()
-export class Player {
+@Entity({ name: 'Players', orderBy: { connectedAt: 'ASC' } })
+export class PlayerEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { eager: true, onDelete: 'CASCADE', cascade: true })
-  user: User;
+  @ManyToOne(() => UserEntity, { eager: true, onDelete: 'CASCADE', cascade: true })
+  user: UserEntity;
   @Column()
   userId: number;
-  @ManyToOne(() => Game, { onDelete: 'CASCADE' })
-  game: Game;
+  @ManyToOne(() => GameEntity, { onDelete: 'CASCADE' })
+  game: GameEntity;
   @Column()
   gameId: number;
 

@@ -8,9 +8,9 @@ import { PostsService } from '../blogs/posts/posts.service';
 import { LikesInfoViewModel, NewestLikes } from './like.types';
 import { SessionViewModel } from '../security/models/SessionViewModel';
 import { BannedUserInBlogViewModel } from '../blogs/models/BannedUserInBlogViewModel';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 import { Session } from '../security/entities/session.entity';
-import { Blog } from '../blogs/entities/blog.entity';
+import { BlogEntity } from '../blogs/entities/blog.entity';
 import { BannedUserInBlog } from '../blogs/entities/banned-user-in-blog.entity';
 import { Post } from '../blogs/posts/entities/post.entity';
 import { LikePost } from '../blogs/posts/likes/LikePost.entity';
@@ -21,7 +21,7 @@ import { LikesCommentsRepo } from '../blogs/posts/comments/likes/likes-comments-
 import { LikeComment } from '../blogs/posts/comments/likes/likeComment.entity';
 import { QuizQuestionViewModel } from '../super-admin/models/quiz/QuizQuestionViewModel';
 import { QuizQuestion } from '../super-admin/quiz/QuizQuestion.entity';
-import { Game } from '../quiz/entities/game.entity';
+import { GameEntity } from '../quiz/entities/game.entity';
 import { AnswerViewModel, GamePairViewModel, GamePlayerProgressViewModel } from '../quiz/models/GameModels';
 import { Answer } from '../quiz/entities/player.entity';
 
@@ -34,7 +34,7 @@ export class ViewModelMapper {
     private likesCommentsRepo: LikesCommentsRepo,
   ) {}
 
-  getUserViewModel(user: User): UserViewModel {
+  getUserViewModel(user: UserEntity): UserViewModel {
     return {
       id: user.id.toString(),
       email: user.email,
@@ -48,7 +48,7 @@ export class ViewModelMapper {
     };
   }
 
-  getBlogForSAViewModel(blog: Blog): BlogForSAViewModel {
+  getBlogForSAViewModel(blog: BlogEntity): BlogForSAViewModel {
     return {
       id: blog.id.toString(),
       name: blog.name,
@@ -61,7 +61,7 @@ export class ViewModelMapper {
     };
   }
 
-  getBlogViewModel(blog: Blog): BlogViewModel {
+  getBlogViewModel(blog: BlogEntity): BlogViewModel {
     return {
       id: blog.id.toString(),
       name: blog.name,
@@ -200,7 +200,7 @@ export class ViewModelMapper {
     };
   }
 
-  getGameViewModel(game: Game): GamePairViewModel {
+  getGameViewModel(game: GameEntity): GamePairViewModel {
     const firstPlayerProgress: GamePlayerProgressViewModel = {
       answers: game.players[0].answers.map(this.getAnswerViewModel),
       score: game.players[0].score,

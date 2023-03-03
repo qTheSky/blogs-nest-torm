@@ -1,13 +1,13 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 
-@Entity()
+@Entity('UsersBanInfo')
 export class UserBanInfo {
   @PrimaryColumn()
   userId: number;
-  @OneToOne(() => User, (u) => u.banInfo, { onDelete: 'CASCADE' })
+  @OneToOne(() => UserEntity, (u) => u.banInfo, { onDelete: 'CASCADE' })
   @JoinColumn()
-  user: User;
+  user: UserEntity;
 
   @Column()
   isBanned: boolean;

@@ -2,14 +2,14 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { JwtService } from '@nestjs/jwt';
 import { RefreshPayload } from '../../auth/jwt.payloads';
 import { SessionsRepo } from '../sessions.repo';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Injectable()
 export class SessionsService {
   constructor(private jwtService: JwtService, private sessionsRepo: SessionsRepo) {}
 
   async createSession(
-    user: User,
+    user: UserEntity,
     sessionData: { ip: string; deviceName: string; userId: number },
     refreshToken: string,
   ) {

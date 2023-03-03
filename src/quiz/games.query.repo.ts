@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Game } from './entities/game.entity';
+import { GameEntity } from './entities/game.entity';
 import { Repository } from 'typeorm';
 import { NormalizedQuizGamesQuery } from '../common/query-normalizer';
-import { Player } from './entities/player.entity';
+import { PlayerEntity } from './entities/player.entity';
 import { GamePairViewModel } from './models/GameModels';
 import { ViewModelMapper } from '../common/view-model-mapper';
 import { PaginatorResponseType } from '../common/paginator-response-type';
@@ -11,7 +11,7 @@ import { PaginatorResponseType } from '../common/paginator-response-type';
 @Injectable()
 export class GamesQueryRepo {
   constructor(
-    @InjectRepository(Game) private readonly repo: Repository<Game>,
+    @InjectRepository(GameEntity) private readonly repo: Repository<GameEntity>,
     private readonly viewModelMapper: ViewModelMapper,
   ) {}
 
@@ -27,13 +27,13 @@ export class GamesQueryRepo {
         const subQuery = qb
           .subQuery()
           .select('player2.gameId')
-          .from(Player, 'player2')
+          .from(PlayerEntity, 'player2')
           .where('player2.userId = :userId', { userId })
           .getQuery();
 
         return 'game.id IN ' + subQuery;
       })
-      .orderBy('player.connectedAt', 'ASC') // players in game should be sorted by connectedAt by default
+      // .orderBy('player.connectedAt', 'ASC') // players in game should be sorted by connectedAt by default
       .orderBy(`game.${query.sortBy}`, query.sortDirection.toUpperCase() as 'ASC' | 'DESC');
 
     const [games, total] = await builder

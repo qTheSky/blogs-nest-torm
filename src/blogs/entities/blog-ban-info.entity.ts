@@ -1,13 +1,13 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { Blog } from './blog.entity';
+import { BlogEntity } from './blog.entity';
 
-@Entity()
+@Entity('BlogsBanInfo')
 export class BlogBanInfo {
   @PrimaryColumn()
   blogId: number;
-  @OneToOne(() => Blog, (b) => b.banInfo, { onDelete: 'CASCADE' })
+  @OneToOne(() => BlogEntity, (b) => b.banInfo, { onDelete: 'CASCADE' })
   @JoinColumn()
-  blog: Blog;
+  blog: BlogEntity;
 
   @Column()
   isBanned: boolean;

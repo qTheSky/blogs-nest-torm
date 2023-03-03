@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { NormalizedUsersQuery } from '../common/query-normalizer';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import { ViewModelMapper } from '../common/view-model-mapper';
 @Injectable()
 export class UsersQueryRepo {
   constructor(
-    @InjectRepository(User) private readonly usersRepo: Repository<User>,
+    @InjectRepository(UserEntity) private readonly usersRepo: Repository<UserEntity>,
     private readonly viewModelMapper: ViewModelMapper,
   ) {}
 

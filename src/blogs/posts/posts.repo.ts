@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Blog } from '../entities/blog.entity';
-import { User } from '../../users/entities/user.entity';
+import { BlogEntity } from '../entities/blog.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,7 +11,7 @@ import { cutLikesByBannedUsers } from './utils/cut-likes-by-banned-users';
 export class PostsRepo {
   constructor(@InjectRepository(Post) private readonly repo: Repository<Post>) {}
 
-  async create(blog: Blog, user: User, createPostModel: CreatePostModel): Promise<Post> {
+  async create(blog: BlogEntity, user: UserEntity, createPostModel: CreatePostModel): Promise<Post> {
     const newPost = blog.createPost(user, blog, createPostModel);
     return await this.save(newPost);
   }

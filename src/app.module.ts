@@ -54,7 +54,7 @@ import { DeleteCommentUseCase } from './blogs/posts/comments/use-cases/delete-co
 import { PutLikeToCommentUseCase } from './blogs/posts/comments/use-cases/put-like-to-comment.use-case';
 import { PutLikeToPostUseCase } from './blogs/posts/use-cases/put-like-to-post.use-case';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from './users/entities/user.entity';
+import { UserEntity } from './users/entities/user.entity';
 import { UserEmailConfirmation } from './users/entities/userEmailConfirmation.entity';
 import { UsersRepo } from './users/users.repo';
 import { UserBanInfo } from './users/entities/userBanInfo.entity';
@@ -66,7 +66,7 @@ import { RefreshTokenBL } from './security/entities/refreshTokenBlackList.entity
 import { RefreshTokenBlackListRepo } from './security/refreshTokenBlackList.repo';
 import { UsersQueryRepo } from './users/users.query.repo';
 import { BlogsRepo } from './blogs/blogs.repo';
-import { Blog } from './blogs/entities/blog.entity';
+import { BlogEntity } from './blogs/entities/blog.entity';
 import { BlogBanInfo } from './blogs/entities/blog-ban-info.entity';
 import { Post } from './blogs/posts/entities/post.entity';
 import { PostsRepo } from './blogs/posts/posts.repo';
@@ -92,10 +92,11 @@ import { QuizQuestion } from './super-admin/quiz/QuizQuestion.entity';
 import { QuizController } from './quiz/quiz.controller';
 import { GamesRepo } from './quiz/games.repo';
 import { CreateOrConnectToGameUseCase } from './quiz/use-cases/create-or-connect-to-game.use-case';
-import { Game } from './quiz/entities/game.entity';
-import { Player } from './quiz/entities/player.entity';
+import { GameEntity } from './quiz/entities/game.entity';
+import { PlayerEntity } from './quiz/entities/player.entity';
 import { HandleAnswerUseCase } from './quiz/use-cases/handle-answer.use-case';
 import { GamesQueryRepo } from './quiz/games.query.repo';
+import { GetMyStatisticsUseCase } from './quiz/use-cases/get-my-statistics.use-case';
 
 //USE CASES
 const authUseCases = [
@@ -113,7 +114,7 @@ const postsUseCases = [CreatePostUseCase, DeletePostUseCase, UpdatePostUseCase, 
 const commentsUseCases = [CreateCommentUseCase, UpdateCommentUseCase, DeleteCommentUseCase, PutLikeToCommentUseCase];
 const saUseCases = [BindBlogWithUserUseCase, DeleteUserUseCase, BanUserUseCase, BanBlogUseCase];
 const saQuizUseCases = [CreateQuestionUseCase, UpdateQuestionUseCase, PublishQuestionUseCase, DeleteQuestionUseCase];
-const quizGameUseCases = [CreateOrConnectToGameUseCase, HandleAnswerUseCase];
+const quizGameUseCases = [CreateOrConnectToGameUseCase, HandleAnswerUseCase, GetMyStatisticsUseCase];
 const sessionsUseCases = [DeleteSessionByDeviceIdUseCase, DeleteSessionsExceptCurrentUseCase];
 const useCases = [
   ...quizGameUseCases,
@@ -206,12 +207,12 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
     CqrsModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([
-      User,
+      UserEntity,
       UserEmailConfirmation,
       UserBanInfo,
       Session,
       RefreshTokenBL,
-      Blog,
+      BlogEntity,
       BlogBanInfo,
       Post,
       BannedUserInBlog,
@@ -219,8 +220,8 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
       Comment,
       LikeComment,
       QuizQuestion,
-      Game,
-      Player,
+      GameEntity,
+      PlayerEntity,
     ]),
     TypeOrmModule.forRoot(typeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),

@@ -4,8 +4,8 @@ import { add } from 'date-fns';
 import { UserEmailConfirmation } from './userEmailConfirmation.entity';
 import { UserBanInfo } from './userBanInfo.entity';
 
-@Entity()
-export class User {
+@Entity('Users')
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -60,8 +60,8 @@ export class User {
     this.banInfo.banReason = null;
   }
 
-  public static create(login: string, email: string, passwordHash: string, isConfirmedEmail: boolean): User {
-    const user = new User();
+  public static create(login: string, email: string, passwordHash: string, isConfirmedEmail: boolean): UserEntity {
+    const user = new UserEntity();
 
     user.login = login;
     user.email = email;

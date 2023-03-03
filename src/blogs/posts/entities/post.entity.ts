@@ -1,21 +1,21 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Blog } from '../../entities/blog.entity';
-import { User } from '../../../users/entities/user.entity';
+import { BlogEntity } from '../../entities/blog.entity';
+import { UserEntity } from '../../../users/entities/user.entity';
 import { LikePost } from '../likes/LikePost.entity';
 import { LikeStatuses } from '../../../common/like.types';
 import { Comment } from '../comments/entities/comment.entity';
 import { CreateCommentModel } from '../comments/models/CreateCommentModel';
 
-@Entity()
+@Entity('Posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Blog, (b) => b.posts, { eager: true })
-  blog: Blog;
+  @ManyToOne(() => BlogEntity, (b) => b.posts, { eager: true })
+  blog: BlogEntity;
   @Column()
   blogId: number;
-  @ManyToOne(() => User, { onDelete: 'SET NULL' })
-  user: User;
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })
+  user: UserEntity;
   @Column({ nullable: true })
   userId: number;
   @OneToMany(() => LikePost, (l) => l.post, { onDelete: 'CASCADE', cascade: true, eager: true })
@@ -32,7 +32,7 @@ export class Post {
   @Column()
   createdAt: Date;
 
-  createLike(post: Post, user: User, likeStatus: LikeStatuses): LikePost {
+  createLike(post: Post, user: UserEntity, likeStatus: LikeStatuses): LikePost {
     const like = new LikePost();
     like.user = user;
     like.post = post;
@@ -42,7 +42,7 @@ export class Post {
     return like;
   }
 
-  createComment(user: User, post: Post, dto: CreateCommentModel): Comment {
+  createComment(user: UserEntity, post: Post, dto: CreateCommentModel): Comment {
     const comment = new Comment();
     comment.post = post;
     comment.user = user;

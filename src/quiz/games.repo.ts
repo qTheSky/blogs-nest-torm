@@ -1,28 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Game } from './entities/game.entity';
+import { GameEntity } from './entities/game.entity';
 import { Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
-import { Player } from './entities/player.entity';
+import { UserEntity } from '../users/entities/user.entity';
+import { PlayerEntity } from './entities/player.entity';
+import { GameStatuses } from './models/GameModels';
 
 @Injectable()
 export class GamesRepo {
-  constructor(@InjectRepository(Game) private readonly repo: Repository<Game>) {}
+  constructor(@InjectRepository(GameEntity) private readonly repo: Repository<GameEntity>) {}
 
-  async createGame(user: User) {
-    const newGame = Game.create(user);
+  async createGame(user: UserEntity) {
+    const newGame = GameEntity.create(user);
     return this.save(newGame);
   }
 
-  async findPendingGame(): Promise<Game | null> {
-    return this.repo.findOneBy({ status: 'PendingSecondPlayer' });
+  async findPendingGame(): Promise<GameEntity | null> {
+    return this.repo.findOneBy({ status: GameStatuses.PENDING });
   }
 
-  async findGameById(id: number): Promise<Game | null> {
+  async findGameById(id: number): Promise<GameEntity | null> {
     return this.repo.findOne({ where: { id }, order: { players: { connectedAt: 'ASC' } } }); // players in game should be sorted by connectedAt by default
   }
 
-  async findActiveOrPendingGameByUserId(userId: number): Promise<Game | null> {
+  async findActiveOrPendingGameByUserId(userId: number): Promise<GameEntity | null> {
     const game = await this.repo
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.players', 'player')
@@ -31,7 +32,7 @@ export class GamesRepo {
         const subQuery = qb
           .subQuery()
           .select('player2.gameId')
-          .from(Player, 'player2')
+          .from(PlayerEntity, 'player2')
           .where('player2.userId = :userId', { userId })
           .getQuery();
 
@@ -44,7 +45,11 @@ export class GamesRepo {
     return game;
   }
 
-  async save(game: Game): Promise<Game> {
+  async save(game: GameEntity): Promise<GameEntity> {
     return await this.repo.save(game);
+  }
+
+  async findAllGamesOfUser(userId: number): Promise<GameEntity[]> {
+    return await this.repo.find({ where: { players: { userId } } });
   }
 }

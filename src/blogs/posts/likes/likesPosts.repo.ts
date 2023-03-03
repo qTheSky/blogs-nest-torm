@@ -1,4 +1,4 @@
-import { User } from '../../../users/entities/user.entity';
+import { UserEntity } from '../../../users/entities/user.entity';
 import { LikeStatuses } from '../../../common/like.types';
 import { Post } from '../entities/post.entity';
 import { LikePost } from './LikePost.entity';
@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class LikesPostsRepo {
   constructor(@InjectRepository(LikePost) private readonly repo: Repository<LikePost>) {}
-  async create(user: User, post: Post, status: LikeStatuses) {
+  async create(user: UserEntity, post: Post, status: LikeStatuses) {
     const newLike = post.createLike(post, user, status);
     return this.save(newLike);
   }

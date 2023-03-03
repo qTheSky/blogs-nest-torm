@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AuthService } from '../auth.service';
 import { SessionsService } from '../../../security/application/sessions.service';
-import { User } from '../../../users/entities/user.entity';
+import { UserEntity } from '../../../users/entities/user.entity';
 
 export class LoginCommand {
-  constructor(public user: User, public ip: string, public deviceName: string) {}
+  constructor(public user: UserEntity, public ip: string, public deviceName: string) {}
 }
 
 @CommandHandler(LoginCommand)

@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BannedUserInBlog } from './entities/banned-user-in-blog.entity';
-import { Blog } from './entities/blog.entity';
-import { User } from '../users/entities/user.entity';
+import { BlogEntity } from './entities/blog.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class BannedUsersInBlogRepo {
   constructor(@InjectRepository(BannedUserInBlog) private readonly repo: Repository<BannedUserInBlog>) {}
 
-  async create(blog: Blog, user: User, banReason: string): Promise<BannedUserInBlog> {
+  async create(blog: BlogEntity, user: UserEntity, banReason: string): Promise<BannedUserInBlog> {
     const bannedUser = blog.createBannedUser(blog, { user, banReason });
     return this.save(bannedUser);
   }

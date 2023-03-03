@@ -24,6 +24,8 @@ import { GameQueryModel } from './models/GameQueryModel';
 import { GamesQueryRepo } from './games.query.repo';
 import { QueryNormalizer } from '../common/query-normalizer';
 import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
+import { StatisticsViewModel } from './models/StatisticsViewModel';
+import { GetMyStatisticsCommand } from './use-cases/get-my-statistics.use-case';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(JwtAuthGuard)
@@ -35,6 +37,13 @@ export class QuizController {
     private gamesQueryRepo: GamesQueryRepo,
     private queryNormalizer: QueryNormalizer,
   ) {}
+
+  @Get('my-statistic')
+  async getStatisticsOfUser(@CurrentUserId() currentUserId: number): Promise<StatisticsViewModel> {
+    return this.commandBus.execute<GetMyStatisticsCommand, StatisticsViewModel>(
+      new GetMyStatisticsCommand(currentUserId),
+    );
+  }
 
   @Get('my')
   async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {

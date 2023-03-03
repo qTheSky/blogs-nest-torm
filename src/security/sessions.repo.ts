@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshPayload } from '../auth/jwt.payloads';
 import { Session } from './entities/session.entity';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 import { Not, Repository } from 'typeorm';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class SessionsRepo {
   constructor(@InjectRepository(Session) private readonly sessionsRepository: Repository<Session>) {}
 
   async create(
-    user: User,
+    user: UserEntity,
     dto: { decodedRefreshToken: RefreshPayload; ip: string; deviceName: string; refreshToken: string },
   ): Promise<Session> {
     const session = new Session();

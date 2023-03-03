@@ -1,17 +1,17 @@
 import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { BlogBanInfo } from './blog-ban-info.entity';
 import { CreateBlogModel } from '../models/CreateBlogModel';
 import { Post } from '../posts/entities/post.entity';
 import { CreatePostModel } from '../posts/models/CreatePostModel';
 import { BannedUserInBlog } from './banned-user-in-blog.entity';
 
-@Entity()
-export class Blog {
+@Entity('Blogs')
+export class BlogEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => User, { onDelete: 'SET NULL' })
-  user: User;
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })
+  user: UserEntity;
   @Column({ nullable: true })
   userId: number;
 
@@ -41,8 +41,8 @@ export class Blog {
     this.banInfo.banDate = null;
   }
 
-  public static create(user: User, dto: CreateBlogModel): Blog {
-    const blog = new Blog();
+  public static create(user: UserEntity, dto: CreateBlogModel): BlogEntity {
+    const blog = new BlogEntity();
     blog.user = user;
 
     blog.name = dto.name;
@@ -59,7 +59,7 @@ export class Blog {
     return blog;
   }
 
-  createPost(user: User, blog: Blog, dto: CreatePostModel): Post {
+  createPost(user: UserEntity, blog: BlogEntity, dto: CreatePostModel): Post {
     const post = new Post();
     post.user = user;
     post.blog = blog;
@@ -74,7 +74,7 @@ export class Blog {
     return post;
   }
 
-  createBannedUser(blog: Blog, dto: { user: User; banReason: string }): BannedUserInBlog {
+  createBannedUser(blog: BlogEntity, dto: { user: UserEntity; banReason: string }): BannedUserInBlog {
     const bannedUser = new BannedUserInBlog();
 
     bannedUser.userId = dto.user.id;

@@ -1,12 +1,12 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Blog } from './blog.entity';
+import { BlogEntity } from './blog.entity';
 
-@Entity()
+@Entity('BannedUsersInBlogs')
 export class BannedUserInBlog {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Blog)
-  blog: Blog;
+  @ManyToOne(() => BlogEntity)
+  blog: BlogEntity;
   @Column()
   blogId: number;
 

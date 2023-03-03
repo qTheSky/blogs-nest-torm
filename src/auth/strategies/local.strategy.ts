@@ -4,7 +4,7 @@ import { Strategy } from 'passport-local';
 import { AuthCredentialsModel } from '../models/AuthCredentialsModel';
 import * as bcrypt from 'bcrypt';
 import { UsersRepo } from '../../users/users.repo';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -14,11 +14,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(loginOrEmail: string, password: string): Promise<User> {
+  async validate(loginOrEmail: string, password: string): Promise<UserEntity> {
     return await this.checkAuthCredentials({ loginOrEmail, password });
   }
 
-  async checkAuthCredentials(authCredentialsModel: AuthCredentialsModel): Promise<User> {
+  async checkAuthCredentials(authCredentialsModel: AuthCredentialsModel): Promise<UserEntity> {
     const { loginOrEmail, password } = authCredentialsModel;
     const user = await this.usersRepo.findUserByLoginOrEmail(loginOrEmail);
     if (!user) throw new UnauthorizedException('Incorrect credentials');

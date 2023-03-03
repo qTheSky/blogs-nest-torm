@@ -25,7 +25,7 @@ import { RefreshTokenCommand } from './application/use-cases/refresh-token.use-c
 import { LoginCommand } from './application/use-cases/login.use-case';
 import { AuthUserDataModel } from './models/AuthUserDataModel';
 import { GetAuthUserDataCommand } from './application/use-cases/get-auth-user-data.use-case';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -80,7 +80,7 @@ export class AuthController {
   // @Throttle(5, 10)
   @HttpCode(204)
   async registration(@Body() createUserModel: CreateUserModel): Promise<void> {
-    const isUserCreated = await this.commandBus.execute<RegistrationCommand, User | null>(
+    const isUserCreated = await this.commandBus.execute<RegistrationCommand, UserEntity | null>(
       new RegistrationCommand(createUserModel, false),
     );
     if (!isUserCreated) throw new InternalServerErrorException('something went wrong');

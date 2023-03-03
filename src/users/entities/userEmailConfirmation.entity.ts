@@ -1,13 +1,13 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 
-@Entity()
+@Entity('UsersEmailConfirm')
 export class UserEmailConfirmation {
   @PrimaryColumn()
   userId: number;
-  @OneToOne(() => User, (u) => u.emailConfirmation, { onDelete: 'CASCADE' })
+  @OneToOne(() => UserEntity, (u) => u.emailConfirmation, { onDelete: 'CASCADE' })
   @JoinColumn()
-  user: User;
+  user: UserEntity;
 
   @Column()
   confirmationCode: string;

@@ -12,7 +12,7 @@ export type PlayerViewModel = {
   id: string;
   login: string;
 };
-export type GameStatuses = 'PendingSecondPlayer' | 'Active' | 'Finished';
+// export type GameStatuses = 'PendingSecondPlayer' | 'Active' | 'Finished';
 export type GamePlayerProgressViewModel = {
   answers: AnswerViewModel[];
   player: PlayerViewModel;
@@ -28,3 +28,9 @@ export type GamePairViewModel = {
   startGameDate: string | null;
   finishGameDate: string | null;
 };
+
+export enum GameStatuses {
+  PENDING = 'PendingSecondPlayer',
+  ACTIVE = 'Active',
+  FINISHED = 'Finished',
+}

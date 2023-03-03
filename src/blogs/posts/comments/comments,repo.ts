@@ -4,14 +4,14 @@ import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
 import { CreateCommentModel } from './models/CreateCommentModel';
 import { Post } from '../entities/post.entity';
-import { User } from '../../../users/entities/user.entity';
+import { UserEntity } from '../../../users/entities/user.entity';
 import { cutLikesByBannedUsers } from '../utils/cut-likes-by-banned-users';
 
 @Injectable()
 export class CommentsRepo {
   constructor(@InjectRepository(Comment) private readonly repo: Repository<Comment>) {}
 
-  async create(user: User, post: Post, createCommentModel: CreateCommentModel): Promise<Comment> {
+  async create(user: UserEntity, post: Post, createCommentModel: CreateCommentModel): Promise<Comment> {
     const newComment = post.createComment(user, post, createCommentModel);
     return this.save(newComment);
   }

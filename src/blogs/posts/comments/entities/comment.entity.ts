@@ -1,10 +1,10 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from '../../entities/post.entity';
-import { User } from '../../../../users/entities/user.entity';
+import { UserEntity } from '../../../../users/entities/user.entity';
 import { LikeComment } from '../likes/likeComment.entity';
 import { LikeStatuses } from '../../../../common/like.types';
 
-@Entity()
+@Entity('Comments')
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
@@ -12,8 +12,8 @@ export class Comment {
   post: Post;
   @Column()
   postId: number;
-  @ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
-  user: User;
+  @ManyToOne(() => UserEntity, { eager: true, onDelete: 'CASCADE' })
+  user: UserEntity;
   @Column()
   userId: number;
   @OneToMany(() => LikeComment, (l) => l.comment, { eager: true, cascade: true, onDelete: 'CASCADE' })
@@ -24,7 +24,7 @@ export class Comment {
   @Column()
   createdAt: Date;
 
-  createLike(user: User, comment: Comment, likeStatus: LikeStatuses): LikeComment {
+  createLike(user: UserEntity, comment: Comment, likeStatus: LikeStatuses): LikeComment {
     const like = new LikeComment();
 
     like.user = user;

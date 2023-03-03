@@ -1,13 +1,13 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
-@Entity()
+@Entity('Sessions')
 export class Session {
   @PrimaryColumn({ unique: true })
   deviceId: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE', eager: true })
-  user: User;
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', eager: true })
+  user: UserEntity;
 
   @Column()
   userId: number;

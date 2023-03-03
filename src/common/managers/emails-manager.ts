@@ -1,11 +1,11 @@
 import { EmailAdapter } from '../adapters/email.adapter';
 import { Injectable } from '@nestjs/common';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Injectable()
 export class EmailsManager {
   constructor(private emailAdapter: EmailAdapter) {}
-  async sendEmailConfirmationMessage(user: User) {
+  async sendEmailConfirmationMessage(user: UserEntity) {
     await this.emailAdapter.sendEmail(
       user.email,
       'email confirmation',

@@ -37,7 +37,7 @@ import { CommentForBloggerViewModel } from './posts/comments/models/CommentViewM
 import { QueryCommentModel } from './posts/comments/models/QueryCommentModel';
 import { BannedUserInBlogQueryModel } from './models/BannedUserInBlogQueryModel';
 import { BannedUserInBlogViewModel } from './models/BannedUserInBlogViewModel';
-import { Blog } from './entities/blog.entity';
+import { BlogEntity } from './entities/blog.entity';
 import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 import { BlogsQueryRepo } from './blogs.query.repo';
 import { BlogsRepo } from './blogs.repo';
@@ -102,7 +102,7 @@ export class BloggerController {
     @Body() createBlogModel: CreateBlogModel,
     @CurrentUserId() currentUserId: number,
   ): Promise<BlogViewModel> {
-    const createdBlog = await this.commandBus.execute<CreateBlogCommand, Blog>(
+    const createdBlog = await this.commandBus.execute<CreateBlogCommand, BlogEntity>(
       new CreateBlogCommand(currentUserId, createBlogModel),
     );
     return this.viewModelMapper.getBlogViewModel(createdBlog);

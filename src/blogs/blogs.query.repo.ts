@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Blog } from './entities/blog.entity';
+import { BlogEntity } from './entities/blog.entity';
 import { Repository } from 'typeorm';
 import { PaginatorResponseType } from '../common/paginator-response-type';
 import { NormalizedBlogsQuery } from '../common/query-normalizer';
 
 @Injectable()
 export class BlogsQueryRepo {
-  constructor(@InjectRepository(Blog) private readonly repo: Repository<Blog>) {}
+  constructor(@InjectRepository(BlogEntity) private readonly repo: Repository<BlogEntity>) {}
 
   async findBlogs(
     query: NormalizedBlogsQuery,
@@ -15,7 +15,7 @@ export class BlogsQueryRepo {
       blogsOfSpecifiedUserId: undefined,
       isAdminRequesting: false,
     },
-  ): Promise<PaginatorResponseType<Blog[]>> {
+  ): Promise<PaginatorResponseType<BlogEntity[]>> {
     const builder = this.repo
       .createQueryBuilder('b')
       .leftJoinAndSelect('b.banInfo', 'banInfo')

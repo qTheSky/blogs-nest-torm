@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LikeComment } from './likeComment.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { LikeStatuses } from '../../../../common/like.types';
 import { Comment } from '../entities/comment.entity';
 
@@ -10,7 +10,7 @@ import { Comment } from '../entities/comment.entity';
 export class LikesCommentsRepo {
   constructor(@InjectRepository(LikeComment) private readonly repo: Repository<LikeComment>) {}
 
-  async create(user: User, comment: Comment, status: LikeStatuses): Promise<LikeComment> {
+  async create(user: UserEntity, comment: Comment, status: LikeStatuses): Promise<LikeComment> {
     const newLike = comment.createLike(user, comment, status);
     return await this.save(newLike);
   }

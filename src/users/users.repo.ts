@@ -1,18 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersRepo {
-  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {}
+  constructor(@InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>) {}
 
-  async create(dto: { login: string; email: string; passwordHash: string; isConfirmedEmail: boolean }): Promise<User> {
-    const newUser = User.create(dto.login, dto.email, dto.passwordHash, dto.isConfirmedEmail);
+  async create(dto: {
+    login: string;
+    email: string;
+    passwordHash: string;
+    isConfirmedEmail: boolean;
+  }): Promise<UserEntity> {
+    const newUser = UserEntity.create(dto.login, dto.email, dto.passwordHash, dto.isConfirmedEmail);
     return await this.usersRepository.save(newUser);
   }
 
-  async save(user: User) {
+  async save(user: UserEntity) {
     return this.usersRepository.save(user);
   }
 
@@ -20,7 +25,7 @@ export class UsersRepo {
     await this.usersRepository.delete(id);
   }
 
-  findUserByEmailConfirmationCode(code: string): Promise<User | null> {
+  findUserByEmailConfirmationCode(code: string): Promise<UserEntity | null> {
     return this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.emailConfirmation', 'UserEmailConfirmation')
@@ -28,11 +33,11 @@ export class UsersRepo {
       .getOne();
   }
 
-  findUserById(id: number): Promise<User | null> {
+  findUserById(id: number): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy({ id });
   }
 
-  findUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
+  findUserByLoginOrEmail(loginOrEmail: string): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy([{ login: loginOrEmail }, { email: loginOrEmail }]);
   }
 }
