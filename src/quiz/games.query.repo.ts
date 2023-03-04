@@ -36,10 +36,6 @@ export class GamesQueryRepo {
       .orderBy(`game.${query.sortBy}`, query.sortDirection.toUpperCase() as 'ASC' | 'DESC')
       .addOrderBy('player.connectedAt', 'ASC'); // players in game should be sorted by connectedAt by default
 
-    if (query.sortBy === 'status') {
-      builder.addOrderBy(`game.pairCreatedDate`, 'DESC');
-    }
-
     const [games, total] = await builder
       .take(query.pageSize)
       .skip((query.pageNumber - 1) * query.pageSize)
