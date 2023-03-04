@@ -27,7 +27,7 @@ import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
 import { StatisticsViewModel } from './models/StatisticsViewModel';
 import { GetMyStatisticsCommand } from './use-cases/get-my-statistics.use-case';
 
-@Controller('pair-game-quiz/pairs')
+@Controller('pair-game-quiz')
 @UseGuards(JwtAuthGuard)
 export class QuizController {
   constructor(
@@ -38,27 +38,27 @@ export class QuizController {
     private queryNormalizer: QueryNormalizer,
   ) {}
 
-  @Get('my-statistic')
+  @Get('users/my-statistic')
   async getStatisticsOfUser(@CurrentUserId() currentUserId: number): Promise<StatisticsViewModel> {
     return this.commandBus.execute<GetMyStatisticsCommand, StatisticsViewModel>(
       new GetMyStatisticsCommand(currentUserId),
     );
   }
 
-  @Get('my')
+  @Get('pairs/my')
   async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
     const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
     return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
   }
 
-  @Get('my-current')
+  @Get('pairs/my-current')
   async getCurrentGame(@CurrentUserId() currentUserId: number): Promise<GamePairViewModel> {
     const game = await this.gamesRepo.findActiveOrPendingGameByUserId(currentUserId);
     if (!game) throw new NotFoundException('You dont have any active or pending games');
     return this.viewModelMapper.getGameViewModel(game);
   }
 
-  @Get(':gameId')
+  @Get('pairs/:gameId')
   async getGameById(
     @Param('gameId', ParseNumberPipe) gameId: number,
     @CurrentUserId() currentUserId: number,
@@ -70,14 +70,14 @@ export class QuizController {
     return this.viewModelMapper.getGameViewModel(game);
   }
 
-  @Post('connection')
+  @Post('pairs/connection')
   @HttpCode(200)
   async createGameOrConnectToExist(@CurrentUserId() currentUserId: number): Promise<GamePairViewModel> {
     const newGame = await this.commandBus.execute(new CreateOrConnectToGameCommand(currentUserId));
     return this.viewModelMapper.getGameViewModel(newGame);
   }
 
-  @Post('my-current/answers')
+  @Post('pairs/my-current/answers')
   @HttpCode(200)
   async handleAnswerByPlayer(
     @CurrentUserId() currentUserId: number,
