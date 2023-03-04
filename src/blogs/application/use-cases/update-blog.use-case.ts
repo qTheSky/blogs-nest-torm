@@ -14,7 +14,7 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   async execute(command: UpdateBlogCommand): Promise<void> {
     const blog = await this.blogsRepo.get(command.blogId);
     if (!blog) throw new NotFoundException('Blog doesnt exits');
-    if (blog.userId !== command.userId) throw new ForbiddenException();
+    if (blog.userId !== command.userId) throw new ForbiddenException('You cant update not your blog');
     blog.websiteUrl = command.updateBlogModel.websiteUrl;
     blog.name = command.updateBlogModel.name;
     blog.description = command.updateBlogModel.description;

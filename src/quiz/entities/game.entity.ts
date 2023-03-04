@@ -95,7 +95,7 @@ export class GameEntity {
       }
     }
 
-    return maxScorePlayer ? maxScorePlayer.id : null;
+    return maxScorePlayer ? maxScorePlayer.userId : null;
   }
 
   canBeFinished(): boolean {

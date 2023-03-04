@@ -17,8 +17,8 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   async execute(command: CreatePostCommand): Promise<Post> {
     const blog = await this.blogsRepo.get(command.blogId);
     const user = await this.usersRepo.findUserById(command.userId);
-    if (!blog) throw new NotFoundException();
-    if (blog.userId !== command.userId) throw new ForbiddenException();
+    if (!blog) throw new NotFoundException('Blog not found');
+    if (blog.userId !== command.userId) throw new ForbiddenException('You cant create blog inside not your blog');
     return await this.postsRepo.create(blog, user, command.createPostModel);
   }
 }

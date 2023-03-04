@@ -19,6 +19,7 @@ export class GetMyStatisticsUseCase implements ICommandHandler<GetMyStatisticsCo
     const gamesCount = finishedGames.length;
     const sumScore = this.getSumScore(finishedGames, command.currentUserId);
     const { winsCount, lossesCount, drawsCount } = this.countWinsDrawsAndLoses(finishedGames, command.currentUserId);
+
     return {
       gamesCount,
       sumScore,
@@ -46,17 +47,17 @@ export class GetMyStatisticsUseCase implements ICommandHandler<GetMyStatisticsCo
     let lossesCount = 0;
     let winsCount = 0;
     let drawsCount = 0;
-    games.forEach((g) => {
-      if (g.winnerId === null) {
+    for (const game of games) {
+      if (game.winnerId === null) {
         drawsCount++;
       }
-      if (g.winnerId === userId) {
+      if (game.winnerId === userId) {
         winsCount++;
       }
-      if (g.winnerId !== userId && g.winnerId !== null) {
+      if (game.winnerId !== userId && game.winnerId !== null) {
         lossesCount++;
       }
-    });
+    }
     return { lossesCount, drawsCount, winsCount };
   }
 

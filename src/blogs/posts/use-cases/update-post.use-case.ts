@@ -18,10 +18,10 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
 
   async execute(command: UpdatePostCommand): Promise<void> {
     const blog = await this.blogsRepo.get(command.blogId);
-    if (!blog) throw new NotFoundException();
+    if (!blog) throw new NotFoundException('Blog not found');
     const post = await this.postsRepo.get(command.postId);
-    if (!post) throw new NotFoundException();
-    if (post.userId !== command.currentUserId) throw new ForbiddenException();
+    if (!post) throw new NotFoundException('Post not found');
+    if (post.userId !== command.currentUserId) throw new ForbiddenException('You can`t edit not your post');
     post.title = command.updatePostModel.title;
     post.shortDescription = command.updatePostModel.shortDescription;
     post.content = command.updatePostModel.content;
