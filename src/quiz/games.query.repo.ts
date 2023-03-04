@@ -17,8 +17,8 @@ export class GamesQueryRepo {
 
   async findGames(
     query: NormalizedQuizGamesQuery,
-    userId: number, // : Promise<PaginatorResponseType<GamePairViewModel[]>>
-  ) {
+    userId: number,
+  ): Promise<PaginatorResponseType<GamePairViewModel[]>> {
     const builder = this.repo
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.players', 'player')
@@ -40,23 +40,13 @@ export class GamesQueryRepo {
       .take(query.pageSize)
       .skip((query.pageNumber - 1) * query.pageSize)
       .getManyAndCount();
-    const itemsViewModels = games.map(this.viewModelMapper.getGameViewModel.bind(this.viewModelMapper));
-    const otherItems = [itemsViewModels[3], itemsViewModels[2], itemsViewModels[1]];
-    const itemsForResponse = [itemsViewModels[0], ...otherItems];
 
     return {
       pagesCount: Math.ceil(total / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: total,
-      items: itemsForResponse,
+      items: games.map(this.viewModelMapper.getGameViewModel.bind(this.viewModelMapper)),
     };
-    // return {
-    //   pagesCount: Math.ceil(total / query.pageSize),
-    //   page: query.pageNumber,
-    //   pageSize: query.pageSize,
-    //   totalCount: total,
-    //   items: games.map(this.viewModelMapper.getGameViewModel.bind(this.viewModelMapper)),
-    // };
   }
 }
