@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../users/users.repo';
 import { GamesRepo } from '../games.repo';
-import { GameEntity } from '../entities/game.entity';
+import { GameEntity, QuestionInGame } from '../entities/game.entity';
 import { UserEntity } from '../../users/entities/user.entity';
 import { QuizQuestionsRepo } from '../../super-admin/quiz.questions.repo';
 import { ForbiddenException } from '@nestjs/common';
@@ -28,8 +28,13 @@ export class CreateOrConnectToGameUseCase implements ICommandHandler<CreateOrCon
   }
 
   async startGame(secondPlayer: UserEntity, game: GameEntity) {
-    const questionsForGame = await this.quizQuestionsRepo.getFiveRandomQuestions();
-    game.startGame(secondPlayer, questionsForGame);
+    const questionsForGame = await this.quizQuestionsRepo.getRandomQuestionsForStartGame();
+    const questions: QuestionInGame[] = questionsForGame.map((q) => ({
+      id: q.id,
+      body: q.body,
+      correctAnswers: q.correctAnswers,
+    })); // map because in questionsForGame plenty of unnecessary fields
+    game.startGame(secondPlayer, questions);
     return await this.gamesRepo.save(game);
   }
 }

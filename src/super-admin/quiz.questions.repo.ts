@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QuizQuestion } from './quiz/QuizQuestion.entity';
 import { Repository } from 'typeorm';
 import { CreateQuizQuestionModel } from './models/quiz/CreateQuizQuestionModel';
+import { maxQuestionsCount } from '../quiz/constants/maxQuestionsCount';
 
 @Injectable()
 export class QuizQuestionsRepo {
@@ -24,7 +25,13 @@ export class QuizQuestionsRepo {
     return await this.repo.save(question);
   }
 
-  async getFiveRandomQuestions(): Promise<QuizQuestion[]> {
-    return this.repo.createQueryBuilder('q').select().where('q.published = true').orderBy('RANDOM()').take(5).getMany();
+  async getRandomQuestionsForStartGame(): Promise<QuizQuestion[]> {
+    return this.repo
+      .createQueryBuilder('q')
+      .select()
+      .where('q.published = true')
+      .orderBy('RANDOM()')
+      .take(maxQuestionsCount)
+      .getMany();
   }
 }

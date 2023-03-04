@@ -18,10 +18,13 @@ export class GetMyStatisticsUseCase implements ICommandHandler<GetMyStatisticsCo
 
     const gamesCount = finishedGames.length;
     const sumScore = this.getSumScore(finishedGames, command.currentUserId);
+    const { winsCount, lossesCount, drawsCount } = this.countWinsDrawsAndLoses(finishedGames, command.currentUserId);
     return {
       gamesCount,
       sumScore,
-      ...this.countWinsDrawsAndLoses(finishedGames, command.currentUserId),
+      drawsCount,
+      winsCount,
+      lossesCount,
       avgScores: this.getAvgScore(gamesCount, sumScore),
     };
   }

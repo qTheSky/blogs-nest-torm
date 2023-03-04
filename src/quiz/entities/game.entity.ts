@@ -162,7 +162,7 @@ export class GameEntity {
   }
 }
 
-type QuestionInGame = {
+export type QuestionInGame = {
   id: number;
   body: string;
   correctAnswers: string[];
