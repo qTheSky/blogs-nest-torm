@@ -28,7 +28,7 @@ export class BlogEntity {
   @Column()
   isMembership: boolean;
 
-  @OneToMany(() => Post, (p) => p.blog, { cascade: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Post, (p) => p.blog)
   posts: Post[];
 
   ban() {

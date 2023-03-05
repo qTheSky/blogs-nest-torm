@@ -10,7 +10,7 @@ import { CreateCommentModel } from '../comments/models/CreateCommentModel';
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => BlogEntity, (b) => b.posts, { eager: true })
+  @ManyToOne(() => BlogEntity, (b) => b.posts, { eager: true, onDelete: 'CASCADE' })
   blog: BlogEntity;
   @Column()
   blogId: number;
