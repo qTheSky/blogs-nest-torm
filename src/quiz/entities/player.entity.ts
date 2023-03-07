@@ -3,6 +3,7 @@ import { AnswerStatuses } from '../models/GameModels';
 import { GameEntity } from './game.entity';
 import { UserEntity } from '../../users/entities/user.entity';
 import { maxQuestionsCount } from '../constants/maxQuestionsCount';
+import { PlayerStatisticsEntity } from './player-statistics.entity';
 
 @Entity({ name: 'Players', orderBy: { connectedAt: 'ASC' } })
 export class PlayerEntity {
@@ -17,6 +18,9 @@ export class PlayerEntity {
   game: GameEntity;
   @Column()
   gameId: number;
+
+  @ManyToOne(() => PlayerStatisticsEntity, (s) => s.gameParticipatingAsPlayer)
+  statistics: PlayerStatisticsEntity;
 
   @Column({
     nullable: true,

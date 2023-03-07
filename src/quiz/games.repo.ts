@@ -5,13 +5,14 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../users/entities/user.entity';
 import { PlayerEntity } from './entities/player.entity';
 import { GameStatuses } from './models/GameModels';
+import { PlayerStatisticsEntity } from './entities/player-statistics.entity';
 
 @Injectable()
 export class GamesRepo {
   constructor(@InjectRepository(GameEntity) private readonly repo: Repository<GameEntity>) {}
 
-  async createGame(user: UserEntity) {
-    const newGame = GameEntity.create(user);
+  async createGame(user: UserEntity, userStatistics: PlayerStatisticsEntity) {
+    const newGame = GameEntity.create(user, userStatistics);
     return this.save(newGame);
   }
 
@@ -23,11 +24,16 @@ export class GamesRepo {
     return this.repo.findOne({ where: { id }, order: { players: { connectedAt: 'ASC' } } }); // players in game should be sorted by connectedAt by default
   }
 
+  async findGameByIdWithPlayersWithStatistics(id: number): Promise<GameEntity | null> {
+    return this.repo.findOne({ where: { id }, relations: { players: { statistics: true } } });
+  }
+
   async findActiveOrPendingGameByUserId(userId: number): Promise<GameEntity | null> {
     const game = await this.repo
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.players', 'player')
       .leftJoinAndSelect('player.user', 'user')
+      // .leftJoinAndSelect('player.statistics', 'statistics')
       .where((qb) => {
         const subQuery = qb
           .subQuery()
@@ -50,6 +56,7 @@ export class GamesRepo {
   }
 
   async findAllGamesOfUser(userId: number): Promise<GameEntity[]> {
+    // this method should be deleted soon
     return await this.repo.find({ where: { players: { userId } } });
   }
 }

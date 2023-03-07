@@ -96,7 +96,8 @@ import { GameEntity } from './quiz/entities/game.entity';
 import { PlayerEntity } from './quiz/entities/player.entity';
 import { HandleAnswerUseCase } from './quiz/use-cases/handle-answer.use-case';
 import { GamesQueryRepo } from './quiz/games.query.repo';
-import { GetMyStatisticsUseCase } from './quiz/use-cases/get-my-statistics.use-case';
+import { PlayerStatisticsRepo } from './quiz/player.statistics.repo';
+import { PlayerStatisticsEntity } from './quiz/entities/player-statistics.entity';
 
 //USE CASES
 const authUseCases = [
@@ -114,7 +115,7 @@ const postsUseCases = [CreatePostUseCase, DeletePostUseCase, UpdatePostUseCase, 
 const commentsUseCases = [CreateCommentUseCase, UpdateCommentUseCase, DeleteCommentUseCase, PutLikeToCommentUseCase];
 const saUseCases = [BindBlogWithUserUseCase, DeleteUserUseCase, BanUserUseCase, BanBlogUseCase];
 const saQuizUseCases = [CreateQuestionUseCase, UpdateQuestionUseCase, PublishQuestionUseCase, DeleteQuestionUseCase];
-const quizGameUseCases = [CreateOrConnectToGameUseCase, HandleAnswerUseCase, GetMyStatisticsUseCase];
+const quizGameUseCases = [CreateOrConnectToGameUseCase, HandleAnswerUseCase];
 const sessionsUseCases = [DeleteSessionByDeviceIdUseCase, DeleteSessionsExceptCurrentUseCase];
 const useCases = [
   ...quizGameUseCases,
@@ -149,6 +150,7 @@ const adapters = [
   QuizQuestionsQueryRepo,
   GamesRepo,
   GamesQueryRepo,
+  PlayerStatisticsRepo,
 ];
 
 const constraints = [
@@ -222,6 +224,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
       QuizQuestion,
       GameEntity,
       PlayerEntity,
+      PlayerStatisticsEntity,
     ]),
     TypeOrmModule.forRoot(typeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),

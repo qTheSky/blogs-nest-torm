@@ -24,6 +24,8 @@ import { QuizQuestion } from '../super-admin/quiz/QuizQuestion.entity';
 import { GameEntity } from '../quiz/entities/game.entity';
 import { AnswerViewModel, GamePairViewModel, GamePlayerProgressViewModel } from '../quiz/models/GameModels';
 import { Answer } from '../quiz/entities/player.entity';
+import { PlayerStatisticsEntity } from '../quiz/entities/player-statistics.entity';
+import { StatisticsViewModel } from '../quiz/models/StatisticsViewModel';
 
 @Injectable()
 export class ViewModelMapper {
@@ -231,6 +233,17 @@ export class ViewModelMapper {
       answerStatus: answer.answerStatus,
       addedAt: answer.addedAt.toISOString(),
       questionId: answer.questionId.toString(),
+    };
+  }
+
+  getPlayerStatsViewModel(stats: PlayerStatisticsEntity): StatisticsViewModel {
+    return {
+      sumScore: stats.sumScore,
+      avgScores: stats.avgScores,
+      gamesCount: stats.gamesCount,
+      winsCount: stats.winsCount,
+      lossesCount: stats.lossesCount,
+      drawsCount: stats.drawsCount,
     };
   }
 }

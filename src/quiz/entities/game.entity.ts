@@ -3,6 +3,7 @@ import { GameStatuses } from '../models/GameModels';
 import { UserEntity } from '../../users/entities/user.entity';
 import { Answer, PlayerEntity } from './player.entity';
 import { maxQuestionsCount } from '../constants/maxQuestionsCount';
+import { PlayerStatisticsEntity } from './player-statistics.entity';
 
 @Entity({ orderBy: { pairCreatedDate: 'DESC' }, name: 'Games' })
 export class GameEntity {
@@ -13,7 +14,7 @@ export class GameEntity {
   players: PlayerEntity[];
 
   @Column({ nullable: true })
-  winnerId: number;
+  winnerId: number | null;
 
   @Column()
   status: GameStatuses;
@@ -33,10 +34,10 @@ export class GameEntity {
   })
   questions: QuestionInGame[] | null;
 
-  public static create(user: UserEntity): GameEntity {
+  public static create(user: UserEntity, userStatistics: PlayerStatisticsEntity): GameEntity {
     const game = new GameEntity();
     game.players = [];
-    game.addPlayer(user);
+    game.addPlayer(user, userStatistics);
 
     game.status = GameStatuses.PENDING;
     game.pairCreatedDate = new Date();
@@ -48,8 +49,8 @@ export class GameEntity {
     return game;
   }
 
-  startGame(user: UserEntity, questions: QuestionInGame[]) {
-    this.addPlayer(user);
+  startGame(secondUser: UserEntity, questions: QuestionInGame[], secondUserStatistics: PlayerStatisticsEntity) {
+    this.addPlayer(secondUser, secondUserStatistics);
 
     this.status = GameStatuses.ACTIVE;
     this.startGameDate = new Date();
@@ -70,14 +71,13 @@ export class GameEntity {
   }
 
   declareWinnerOrDraw() {
-    const winner = this.getPlayerIdWithHighestScore();
-    if (!winner) {
-      return;
+    const winner = this.getPlayerUserIdWithHighestScore();
+    if (winner) {
+      this.winnerId = winner.userId;
     }
-    this.winnerId = winner;
   }
 
-  getPlayerIdWithHighestScore(): number | null {
+  getPlayerUserIdWithHighestScore(): PlayerEntity | null {
     let maxScore = -Infinity;
     let maxScorePlayer: PlayerEntity | null = null;
 
@@ -95,7 +95,7 @@ export class GameEntity {
       }
     }
 
-    return maxScorePlayer ? maxScorePlayer.userId : null;
+    return maxScorePlayer ? maxScorePlayer : null;
   }
 
   canBeFinished(): boolean {
@@ -106,14 +106,16 @@ export class GameEntity {
     return this.players.find((p) => p.isFirstFinished === true);
   }
 
-  addPlayer(user: UserEntity) {
+  addPlayer(user: UserEntity, userStatistics: PlayerStatisticsEntity) {
     const player = new PlayerEntity();
+    player.user = user;
+
     player.connectedAt = new Date();
     player.score = 0;
     player.answers = [];
-    player.user = user;
     player.game = this;
     player.isFirstFinished = false;
+    player.statistics = userStatistics;
 
     this.players.push(player);
   }

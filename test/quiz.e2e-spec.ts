@@ -11,6 +11,8 @@ import { PublishQuestionModel } from '../src/super-admin/models/quiz/PublishQues
 import { superAdminBasicHeader } from './constants';
 import { AnswerInputModel } from '../src/quiz/models/AnswerInputModel';
 import { PaginatorResponseType } from '../src/common/paginator-response-type';
+import { maxQuestionsCount } from '../src/quiz/constants/maxQuestionsCount';
+import { StatisticsViewModel } from '../src/quiz/models/StatisticsViewModel';
 
 jest.setTimeout(15000);
 describe('quiz e2e', () => {
@@ -305,3 +307,91 @@ describe('quiz e2e', () => {
       });
   });
 });
+
+describe('quiz game and get stats', () => {
+  let app: INestApplication;
+  let firstUser: UserViewModel; //qTheSky
+  let firstUserToken: string; //zeska
+  let secondUser: UserViewModel;
+  let secondUserToken: string;
+  beforeAll(async () => {
+    app = await getAppAndCleanDB();
+    const { user1, user2 } = await createTwoUsersAndGetTokens(app);
+    firstUser = user1.user;
+    firstUserToken = user1.token;
+    secondUser = user2.user;
+    secondUserToken = user2.token;
+  });
+  it('should create five questions (with 111 or 222 as right answers) and publish them', async () => {
+    //create questions
+    const createQuizQuestionModels = getCreateModels<CreateQuizQuestionModel>(
+      5,
+      { body: 'no matter it will change to unique', correctAnswers: ['111', '222'] },
+      'body',
+    );
+    for (let i = 0; i < createQuizQuestionModels.length; i++) {
+      createQuizQuestionModels[i].body = createQuizQuestionModels[i].body + '**********';
+    }
+    const { someViewModels } = await createManyItemsToDb(app, '/sa/quiz/questions', 5, createQuizQuestionModels);
+    //create questions
+    //publish them
+    for (let i = 0; i < someViewModels.length; i++) {
+      await request(app.getHttpServer())
+        .put(`/sa/quiz/questions/${someViewModels[i].id}/publish`)
+        .send({ published: true } as PublishQuestionModel)
+        .set('Authorization', superAdminBasicHeader)
+        .expect(204);
+    }
+    //publish them
+  });
+  it('create 2 games and finish them. first user should answer first and 10 times correctly (12 scores)', async () => {
+    await createNewGameByFirstUser(app, firstUserToken);
+    await connectToGameBySecondUser(app, secondUserToken);
+    await answerQuestionsByUser(app, firstUserToken);
+    await answerQuestionsByUser(app, secondUserToken);
+    await createNewGameByFirstUser(app, firstUserToken);
+    await connectToGameBySecondUser(app, secondUserToken);
+    await answerQuestionsByUser(app, firstUserToken);
+    await answerQuestionsByUser(app, secondUserToken);
+    await request(app.getHttpServer())
+      .get(`/pair-game-quiz/users/my-statistic`)
+      .set('Authorization', `Bearer ${firstUserToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          lossesCount: 0,
+          winsCount: 2,
+          drawsCount: 0,
+          gamesCount: 2,
+          sumScore: 12,
+          avgScores: 6,
+        } as StatisticsViewModel);
+      });
+  });
+});
+
+async function createNewGameByFirstUser(app: INestApplication, firstUserToken: string) {
+  await request(app.getHttpServer())
+    .post(`/pair-game-quiz/pairs/connection`)
+    .set('Authorization', `Bearer ${firstUserToken}`)
+    .send({})
+    .expect(200);
+}
+
+async function connectToGameBySecondUser(app: INestApplication, secondUserToken: string) {
+  await request(app.getHttpServer())
+    .post(`/pair-game-quiz/pairs/connection`)
+    .set('Authorization', `Bearer ${secondUserToken}`)
+    .send({})
+    .expect(200);
+}
+
+async function answerQuestionsByUser(app: INestApplication, token: string) {
+  for (let i = 0; i < maxQuestionsCount; i++) {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ answer: '111' } as AnswerInputModel)
+      .expect(200);
+  }
+}
