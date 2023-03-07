@@ -239,7 +239,7 @@ export class ViewModelMapper {
   getPlayerStatsViewModel(stats: PlayerStatisticsEntity): StatisticsViewModel {
     return {
       sumScore: stats.sumScore,
-      avgScores: stats.avgScores,
+      avgScores: +(stats.sumScore / stats.gamesCount).toFixed(2),
       gamesCount: stats.gamesCount,
       winsCount: stats.winsCount,
       lossesCount: stats.lossesCount,

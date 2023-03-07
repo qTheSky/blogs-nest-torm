@@ -16,8 +16,8 @@ export class PlayerStatisticsEntity {
 
   @Column()
   sumScore: number;
-  @Column({ type: 'int' })
-  avgScores: number;
+  // @Column({ type: 'int' })
+  // avgScores: number;
   @Column()
   gamesCount: number;
   @Column()
@@ -32,7 +32,7 @@ export class PlayerStatisticsEntity {
     statistics.user = user;
 
     statistics.sumScore = 0;
-    statistics.avgScores = 0;
+    // statistics.avgScores = 0;
     statistics.gamesCount = 0;
 
     statistics.winsCount = 0;
