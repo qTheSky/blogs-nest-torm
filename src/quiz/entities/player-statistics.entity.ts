@@ -16,7 +16,7 @@ export class PlayerStatisticsEntity {
 
   @Column()
   sumScore: number;
-  @Column()
+  @Column({ type: 'int' })
   avgScores: number;
   @Column()
   gamesCount: number;
