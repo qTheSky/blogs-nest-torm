@@ -39,11 +39,13 @@ export class QuizController {
     private playerStatisticsRepo: PlayerStatisticsRepo,
   ) {}
 
+  @Get('users/top')
+  async getTopUsers() {
+    return null;
+  }
+
   @Get('users/my-statistic')
   async getStatisticsOfUser(@CurrentUserId() currentUserId: number): Promise<StatisticsViewModel> {
-    // return this.commandBus.execute<GetMyStatisticsCommand, StatisticsViewModel>(
-    //   new GetMyStatisticsCommand(currentUserId),
-    // );
     const stats = await this.playerStatisticsRepo.findUserStatistics(currentUserId);
     if (!stats) throw new NotFoundException('Stats not found');
     return this.viewModelMapper.getPlayerStatsViewModel(stats);
