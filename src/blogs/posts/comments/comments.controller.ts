@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, UseGuards } from '@nestjs/common';
 import { CommentViewModel } from './models/CommentViewModel';
-import { ViewModelMapper } from '../../../common/view-model-mapper';
+import { ViewModelMapper } from '../../../shared/view-model-mapper';
 import { UpdateCommentModel } from './models/UpdateCommentModel';
-import { LikeModel } from '../../../common/like.types';
+import { LikeModel } from '../../../shared/like.types';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guards';
 import { CurrentUserId } from '../../../auth/decorators/current-user-id.param.decorator';
 import { GetCurrentUserIdOrNull } from '../../../auth/get-user.decorator';
@@ -11,7 +11,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from './use-cases/update-comment.use-case';
 import { DeleteCommentCommand } from './use-cases/delete-comment.use-case';
 import { PutLikeToCommentCommand } from './use-cases/put-like-to-comment.use-case';
-import { ParseNumberPipe } from '../../../common/pipes/parse-number-pipe';
+import { ParseNumberPipe } from '../../../shared/pipes/parse-number-pipe';
 import { CommentsRepo } from './comments,repo';
 
 @Controller('comments')

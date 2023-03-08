@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BannedUserInBlog } from './entities/banned-user-in-blog.entity';
 import { Repository } from 'typeorm';
-import { NormalizedBannedUsersInBlogQuery } from '../common/query-normalizer';
-import { PaginatorResponseType } from '../common/paginator-response-type';
+import { PaginatorResponseType } from '../shared/paginator-response-type';
 import { BannedUserInBlogViewModel } from './models/BannedUserInBlogViewModel';
-import { ViewModelMapper } from '../common/view-model-mapper';
+import { ViewModelMapper } from '../shared/view-model-mapper';
+import { BannedUsersInBlogsQuery } from './models/BannedUserInBlogQueryModel';
 
 @Injectable()
 export class BannedUsersInBlogQueryRepo {
@@ -14,7 +14,7 @@ export class BannedUsersInBlogQueryRepo {
     private viewModelMapper: ViewModelMapper,
   ) {}
   async findUsers(
-    query: NormalizedBannedUsersInBlogQuery,
+    query: BannedUsersInBlogsQuery,
     blogId: number,
   ): Promise<PaginatorResponseType<BannedUserInBlogViewModel[]>> {
     const builder = this.repo.createQueryBuilder(`u`).where('u.blogId = :blogId', { blogId });

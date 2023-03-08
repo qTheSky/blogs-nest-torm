@@ -1,6 +1,3 @@
-export interface QueryCommentModel {
-  pageNumber?: string;
-  pageSize?: string;
-  sortBy?: string;
-  sortDirection?: string;
-}
+import { BasePagination } from '../../../../shared/dto/BasePagination';
+
+export class CommentsQuery extends BasePagination {}

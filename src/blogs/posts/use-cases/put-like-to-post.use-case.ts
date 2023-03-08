@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
-import { LikeStatuses } from '../../../common/like.types';
+import { LikeStatuses } from '../../../shared/like.types';
 import { PostsRepo } from '../posts.repo';
 import { UsersRepo } from '../../../users/users.repo';
 import { LikesPostsRepo } from '../likes/likesPosts.repo';

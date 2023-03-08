@@ -1,9 +1,7 @@
-export type QueryUserModel = {
-  pageNumber?: string;
-  pageSize?: string;
-  sortBy?: string;
-  sortDirection?: string;
-  searchLoginTerm?: string;
-  searchEmailTerm?: string;
-  banStatus?: string;
-};
+import { BasePagination } from '../../shared/dto/BasePagination';
+
+export class UsersQuery extends BasePagination {
+  searchLoginTerm = '';
+  searchEmailTerm = '';
+  banStatus = 'all'; // all, banned, notBanned
+}

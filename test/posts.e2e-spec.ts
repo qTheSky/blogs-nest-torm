@@ -11,7 +11,7 @@ import { updatePostModel } from './models-for-tests/positive/udate/Post';
 import { UpdatePostModel } from '../src/blogs/posts/models/UpdatePostModel';
 import { INestApplication } from '@nestjs/common';
 import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
-import { LikeModel } from '../src/common/like.types';
+import { LikeModel } from '../src/shared/like.types';
 import { UserViewModel } from '../src/users/models/UserViewModel';
 
 jest.setTimeout(15000);

@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'ty
 import { Post } from '../../entities/post.entity';
 import { UserEntity } from '../../../../users/entities/user.entity';
 import { LikeComment } from '../likes/likeComment.entity';
-import { LikeStatuses } from '../../../../common/like.types';
+import { LikeStatuses } from '../../../../shared/like.types';
 
 @Entity('Comments')
 export class Comment {

@@ -10,7 +10,7 @@ import { createManyItemsToDb } from './utils/create-many-items-to-db';
 import { PublishQuestionModel } from '../src/super-admin/models/quiz/PublishQuestionModel';
 import { superAdminBasicHeader } from './constants';
 import { AnswerInputModel } from '../src/quiz/models/AnswerInputModel';
-import { PaginatorResponseType } from '../src/common/paginator-response-type';
+import { PaginatorResponseType } from '../src/shared/paginator-response-type';
 import { maxQuestionsCount } from '../src/quiz/constants/maxQuestionsCount';
 import { StatisticsViewModel } from '../src/quiz/models/StatisticsViewModel';
 

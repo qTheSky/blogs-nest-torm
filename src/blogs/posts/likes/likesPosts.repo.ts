@@ -1,5 +1,5 @@
 import { UserEntity } from '../../../users/entities/user.entity';
-import { LikeStatuses } from '../../../common/like.types';
+import { LikeStatuses } from '../../../shared/like.types';
 import { Post } from '../entities/post.entity';
 import { LikePost } from './LikePost.entity';
 import { Injectable } from '@nestjs/common';

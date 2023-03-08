@@ -1,5 +1,5 @@
 import { AuthService } from '../auth.service';
-import { EmailsManager } from '../../../common/managers/emails-manager';
+import { EmailsManager } from '../../../shared/managers/emails-manager';
 import { CreateUserModel } from '../../../users/models/CreateUserModel';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../../users/users.repo';

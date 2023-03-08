@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from './common/exception.filters';
+import { HttpExceptionFilter } from './shared/exception.filters';
 import { useContainer } from 'class-validator';
-import { TrimStrings } from './common/interceptors/trim-strings-in-body/TrimStrings';
-import cookieParser from 'cookie-parser'; // deploy
-// import * as cookieParser from 'cookie-parser'; // dev
+import { TrimStrings } from './shared/interceptors/trim-strings-in-body/TrimStrings';
+// import cookieParser from 'cookie-parser'; // deploy
+import * as cookieParser from 'cookie-parser'; // dev
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

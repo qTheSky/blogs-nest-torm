@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users/users.service';
-import { ViewModelMapper } from './common/view-model-mapper';
-import { QueryNormalizer } from './common/query-normalizer';
+import { ViewModelMapper } from './shared/view-model-mapper';
 import { BlogsController } from './blogs/blogs.controller';
 import { PostsController } from './blogs/posts/posts.controller';
 import { TestingController } from './testing/testing.controller';
 import { PostsService } from './blogs/posts/posts.service';
 import { IsEmailOrLoginUniqueConstraint } from './users/models/CreateUserModel';
-import { EmailsManager } from './common/managers/emails-manager';
-import { EmailAdapter } from './common/adapters/email.adapter';
+import { EmailsManager } from './shared/managers/emails-manager';
+import { EmailAdapter } from './shared/adapters/email.adapter';
 import { AuthController } from './auth/auth.controller';
 import { IsConfirmationCodeValidConstraint } from './auth/models/ConfirmationCodeModel';
 import { CheckIsEmailConfirmedConstraint } from './auth/models/EmailResendModel';
@@ -176,7 +175,7 @@ export const __typeOrmOptions: TypeOrmModuleOptions = {
 };
 //elephant
 //neon
-export const typeOrmOptions: TypeOrmModuleOptions = {
+export const _typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'ep-curly-unit-690125.eu-central-1.aws.neon.tech',
   port: 5432,
@@ -190,7 +189,7 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
 //neon
 //CLOUD
 //LOCAL
-export const _typeOrmOptions: TypeOrmModuleOptions = {
+export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -248,7 +247,6 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
     ...adapters,
     ...services,
     ViewModelMapper,
-    QueryNormalizer,
     ...authStrategies,
     {
       provide: APP_GUARD,

@@ -1,16 +1,16 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { PaginatorResponseType } from '../../../common/paginator-response-type';
-import { NormalizedCommentsQuery } from '../../../common/query-normalizer';
+import { PaginatorResponseType } from '../../../shared/paginator-response-type';
 import { cutLikesByBannedUsers } from '../utils/cut-likes-by-banned-users';
 import { LikeComment } from './likes/likeComment.entity';
+import { CommentsQuery } from './models/QueryCommentModel';
 
 export class CommentsQueryRepo {
   constructor(@InjectRepository(Comment) private readonly repo: Repository<Comment>) {}
 
   async findComments(
-    query: NormalizedCommentsQuery,
+    query: CommentsQuery,
     settings: { forPostId?: number; commentsOnlyForBlogsOfUserId?: number },
   ): Promise<PaginatorResponseType<Comment[]>> {
     const where: FindOptionsWhere<Comment> = { user: { banInfo: { isBanned: false } } };

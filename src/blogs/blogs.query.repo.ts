@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { Repository } from 'typeorm';
-import { PaginatorResponseType } from '../common/paginator-response-type';
-import { NormalizedBlogsQuery } from '../common/query-normalizer';
+import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { BlogsQuery } from './models/QueryBlogModel';
 
 @Injectable()
 export class BlogsQueryRepo {
   constructor(@InjectRepository(BlogEntity) private readonly repo: Repository<BlogEntity>) {}
 
   async findBlogs(
-    query: NormalizedBlogsQuery,
+    query: BlogsQuery,
     settings: { blogsOfSpecifiedUserId?: number; isAdminRequesting?: boolean } = {
       blogsOfSpecifiedUserId: undefined,
       isAdminRequesting: false,

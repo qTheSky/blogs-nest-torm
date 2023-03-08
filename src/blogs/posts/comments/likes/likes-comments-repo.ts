@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LikeComment } from './likeComment.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { LikeStatuses } from '../../../../common/like.types';
+import { LikeStatuses } from '../../../../shared/like.types';
 import { Comment } from '../entities/comment.entity';
 
 @Injectable()

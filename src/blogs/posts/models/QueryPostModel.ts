@@ -1,6 +1,3 @@
-export interface QueryPostModel {
-  pageNumber?: string;
-  pageSize?: string;
-  sortBy?: string;
-  sortDirection?: string;
-}
+import { BasePagination } from '../../../shared/dto/BasePagination';
+
+export class PostsQuery extends BasePagination {}

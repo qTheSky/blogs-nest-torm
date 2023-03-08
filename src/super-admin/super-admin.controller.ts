@@ -13,21 +13,20 @@ import {
 } from '@nestjs/common';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { PaginatorResponseType } from '../common/paginator-response-type';
-import { QueryBlogModel } from '../blogs/models/QueryBlogModel';
-import { QueryNormalizer } from '../common/query-normalizer';
-import { ViewModelMapper } from '../common/view-model-mapper';
+import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { BlogsQuery } from '../blogs/models/QueryBlogModel';
+import { ViewModelMapper } from '../shared/view-model-mapper';
 import { CreateUserModel } from '../users/models/CreateUserModel';
 import { UserViewModel } from '../users/models/UserViewModel';
 import { RegistrationCommand } from '../auth/application/use-cases/registration-use-case';
 import { DeleteUserCommand } from './use-cases/delete-user.use-case';
-import { QueryUserModel } from '../users/models/QueryUserModel';
+import { UsersQuery } from '../users/models/QueryUserModel';
 import { BanUserModel } from './models/BanUserModel';
 import { BanUserCommand } from './use-cases/ban-user.use-case';
 import { BanBlogInputModel } from './models/BanBlogInputModel';
 import { BanBlogCommand } from './use-cases/ban-blog.use-case';
 import { UsersQueryRepo } from '../users/users.query.repo';
-import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
+import { ParseNumberPipe } from '../shared/pipes/parse-number-pipe';
 import { BlogForSAViewModel } from '../blogs/models/BlogViewModel';
 import { BlogsQueryRepo } from '../blogs/blogs.query.repo';
 import { QuizQuestionViewModel } from './models/quiz/QuizQuestionViewModel';
@@ -40,14 +39,13 @@ import { PublishQuestionModel } from './models/quiz/PublishQuestionModel';
 import { PublishQuestionCommand } from './use-cases/quiz/publish-question.use-case';
 import { DeleteQuestionCommand } from './use-cases/quiz/delete-question.use-case';
 import { QuizQuestionsQueryRepo } from './quiz.questions.query.repo';
-import { QueryQuizModel } from './models/quiz/QueryQuizModel';
+import { QuizQuestionsQuery } from './models/quiz/QueryQuizModel';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
 export class SuperAdminController {
   constructor(
     private commandBus: CommandBus,
-    private queryNormalizer: QueryNormalizer,
     private viewModelConverter: ViewModelMapper,
     private usersQueryRepo: UsersQueryRepo,
     private blogsQueryRepo: BlogsQueryRepo,
@@ -65,9 +63,8 @@ export class SuperAdminController {
   }
 
   @Get('blogs')
-  async findBlogs(@Query() query: QueryBlogModel): Promise<PaginatorResponseType<BlogForSAViewModel[]>> {
-    const normalizeBlogsQuery = this.queryNormalizer.normalizeBlogsQuery(query);
-    const foundBlogsWithPagination = await this.blogsQueryRepo.findBlogs(normalizeBlogsQuery, {
+  async findBlogs(@Query() query: BlogsQuery): Promise<PaginatorResponseType<BlogForSAViewModel[]>> {
+    const foundBlogsWithPagination = await this.blogsQueryRepo.findBlogs(query, {
       isAdminRequesting: true,
     });
     return {
@@ -80,9 +77,8 @@ export class SuperAdminController {
 
   // =======quiz======
   @Get('quiz/questions')
-  async findQuestions(@Query() query: QueryQuizModel): Promise<PaginatorResponseType<QuizQuestionViewModel[]>> {
-    const normalizedQuizQuestionsQuery = this.queryNormalizer.normalizeQuizQuestionsQuery(query);
-    return this.quizQuestionsQueryRepo.findQuestions(normalizedQuizQuestionsQuery);
+  async findQuestions(@Query() query: QuizQuestionsQuery): Promise<PaginatorResponseType<QuizQuestionViewModel[]>> {
+    return this.quizQuestionsQueryRepo.findQuestions(query);
   }
 
   @Post('quiz/questions')
@@ -127,9 +123,9 @@ export class SuperAdminController {
   }
 
   @Get('/users')
-  async findUsers(@Query() query: QueryUserModel): Promise<PaginatorResponseType<UserViewModel[]>> {
-    const normalizedUsersQuery = this.queryNormalizer.normalizeUsersQuery(query);
-    return this.usersQueryRepo.findUsers(normalizedUsersQuery);
+  async findUsers(@Query() query: UsersQuery): Promise<PaginatorResponseType<UserViewModel[]>> {
+    // const normalizedUsersQuery = this.queryNormalizer.normalizeUsersQuery(query);
+    return this.usersQueryRepo.findUsers(query);
   }
 
   @Post('/users')

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
-import { EmailsManager } from '../../../common/managers/emails-manager';
+import { EmailsManager } from '../../../shared/managers/emails-manager';
 import { UsersRepo } from '../../../users/users.repo';
 
 export class UpdateEmailConfirmationCodeCommand {

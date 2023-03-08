@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QuizQuestion } from './quiz/QuizQuestion.entity';
 import { FindOptionsOrder, FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { NormalizedQuizQuestionsQuery } from '../common/query-normalizer';
-import { PaginatorResponseType } from '../common/paginator-response-type';
+import { PaginatorResponseType } from '../shared/paginator-response-type';
 import { QuizQuestionViewModel } from './models/quiz/QuizQuestionViewModel';
-import { ViewModelMapper } from '../common/view-model-mapper';
+import { ViewModelMapper } from '../shared/view-model-mapper';
+import { QuizQuestionsQuery } from './models/quiz/QueryQuizModel';
 
 @Injectable()
 export class QuizQuestionsQueryRepo {
@@ -14,7 +14,7 @@ export class QuizQuestionsQueryRepo {
     private viewModelMapper: ViewModelMapper,
   ) {}
 
-  async findQuestions(query: NormalizedQuizQuestionsQuery): Promise<PaginatorResponseType<QuizQuestionViewModel[]>> {
+  async findQuestions(query: QuizQuestionsQuery): Promise<PaginatorResponseType<QuizQuestionViewModel[]>> {
     const where: FindOptionsWhere<QuizQuestion> = {};
     const order: FindOptionsOrder<QuizQuestion> = { [query.sortBy]: query.sortDirection };
 

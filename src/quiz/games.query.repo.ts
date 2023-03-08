@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from './entities/game.entity';
 import { Repository } from 'typeorm';
-import { NormalizedQuizGamesQuery } from '../common/query-normalizer';
 import { PlayerEntity } from './entities/player.entity';
 import { GamePairViewModel } from './models/GameModels';
-import { ViewModelMapper } from '../common/view-model-mapper';
-import { PaginatorResponseType } from '../common/paginator-response-type';
+import { ViewModelMapper } from '../shared/view-model-mapper';
+import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { GamesQuery } from './models/GameQueryModel';
 
 @Injectable()
 export class GamesQueryRepo {
@@ -15,10 +15,7 @@ export class GamesQueryRepo {
     private readonly viewModelMapper: ViewModelMapper,
   ) {}
 
-  async findGames(
-    query: NormalizedQuizGamesQuery,
-    userId: number,
-  ): Promise<PaginatorResponseType<GamePairViewModel[]>> {
+  async findGames(query: GamesQuery, userId: number): Promise<PaginatorResponseType<GamePairViewModel[]>> {
     const builder = this.repo
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.players', 'player')

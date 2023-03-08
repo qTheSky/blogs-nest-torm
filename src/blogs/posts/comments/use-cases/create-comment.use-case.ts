@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateCommentModel } from '../models/CreateCommentModel';
 import { CommentViewModel } from '../models/CommentViewModel';
-import { ViewModelMapper } from '../../../../common/view-model-mapper';
+import { ViewModelMapper } from '../../../../shared/view-model-mapper';
 import { BannedUsersInBlogRepo } from '../../../banned-users-in-blog.repo';
 import { BlogsRepo } from '../../../blogs.repo';
 import { PostsRepo } from '../../posts.repo';

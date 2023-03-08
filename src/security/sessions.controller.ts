@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, HttpCode, Param, Req } from '@nestjs/common';
 import { SessionsService } from './application/sessions.service';
 import { SessionViewModel } from './models/SessionViewModel';
-import { ViewModelMapper } from '../common/view-model-mapper';
+import { ViewModelMapper } from '../shared/view-model-mapper';
 import { Request } from 'express';
 import { AuthService } from '../auth/application/auth.service';
 import { SessionsRepo } from './sessions.repo';

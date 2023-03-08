@@ -1,8 +1,6 @@
-export type QueryQuizModel = {
-  pageNumber?: string;
-  pageSize?: string;
-  sortBy?: string;
-  sortDirection?: string;
-  bodySearchTerm?: string;
-  publishedStatus?: string;
-};
+import { BasePagination } from '../../../shared/dto/BasePagination';
+
+export class QuizQuestionsQuery extends BasePagination {
+  bodySearchTerm = '';
+  publishedStatus = 'all';
+}

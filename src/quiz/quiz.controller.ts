@@ -9,23 +9,23 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guards';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateOrConnectToGameCommand } from './use-cases/create-or-connect-to-game.use-case';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
-import { ViewModelMapper } from '../common/view-model-mapper';
+import { ViewModelMapper } from '../shared/view-model-mapper';
 import { AnswerViewModel, GamePairViewModel } from './models/GameModels';
 import { GamesRepo } from './games.repo';
 import { AnswerInputModel } from './models/AnswerInputModel';
 import { HandleAnswerCommand } from './use-cases/handle-answer.use-case';
 import { Answer } from './entities/player.entity';
-import { GameQueryModel } from './models/GameQueryModel';
 import { GamesQueryRepo } from './games.query.repo';
-import { QueryNormalizer } from '../common/query-normalizer';
-import { ParseNumberPipe } from '../common/pipes/parse-number-pipe';
+import { ParseNumberPipe } from '../shared/pipes/parse-number-pipe';
 import { StatisticsViewModel } from './models/StatisticsViewModel';
 import { PlayerStatisticsRepo } from './player.statistics.repo';
+import { GamesQuery } from './models/GameQueryModel';
 
 @Controller('pair-game-quiz')
 export class QuizController {
@@ -34,10 +34,10 @@ export class QuizController {
     private viewModelMapper: ViewModelMapper,
     private gamesRepo: GamesRepo,
     private gamesQueryRepo: GamesQueryRepo,
-    private queryNormalizer: QueryNormalizer,
     private playerStatisticsRepo: PlayerStatisticsRepo,
   ) {}
 
+  @UseInterceptors()
   @Get('users/top')
   async getTopUsers() {
     return null;
@@ -53,9 +53,8 @@ export class QuizController {
 
   @UseGuards(JwtAuthGuard)
   @Get('pairs/my')
-  async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
-    const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
-    return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
+  async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GamesQuery) {
+    return this.gamesQueryRepo.findGames(query, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)
