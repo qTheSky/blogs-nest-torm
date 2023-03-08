@@ -25,7 +25,7 @@ export class HandleAnswerUseCase implements ICommandHandler<HandleAnswerCommand>
     }
     if (game.canBeFinished()) {
       game.finishGame();
-      await this.gamesRepo.save(game); //because when updating statistics, there should be a game with actual information(finishGame add first finished player 1 score)
+      await this.gamesRepo.save(game); //because when updating statistics, there should be a game with actual information
       await this.updatePlayersStatistics(game);
     }
     await this.gamesRepo.save(game);
@@ -38,7 +38,6 @@ export class HandleAnswerUseCase implements ICommandHandler<HandleAnswerCommand>
       const statistics = player.statistics;
       statistics.gamesCount++;
       statistics.sumScore += player.score;
-      // statistics.avgScores = +(statistics.sumScore / statistics.gamesCount).toFixed(2);
       if (game.winnerId === null) {
         statistics.drawsCount++;
       }

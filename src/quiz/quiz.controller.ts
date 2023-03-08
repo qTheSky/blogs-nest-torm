@@ -28,7 +28,6 @@ import { StatisticsViewModel } from './models/StatisticsViewModel';
 import { PlayerStatisticsRepo } from './player.statistics.repo';
 
 @Controller('pair-game-quiz')
-@UseGuards(JwtAuthGuard)
 export class QuizController {
   constructor(
     private commandBus: CommandBus,
@@ -44,6 +43,7 @@ export class QuizController {
     return null;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('users/my-statistic')
   async getStatisticsOfUser(@CurrentUserId() currentUserId: number): Promise<StatisticsViewModel> {
     const stats = await this.playerStatisticsRepo.findUserStatistics(currentUserId);
@@ -51,12 +51,14 @@ export class QuizController {
     return this.viewModelMapper.getPlayerStatsViewModel(stats);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('pairs/my')
   async findGamesOfUser(@CurrentUserId() currentUserId: number, @Query() query: GameQueryModel) {
     const normalizeQuizGamesQuery = this.queryNormalizer.normalizeQuizGamesQuery(query);
     return this.gamesQueryRepo.findGames(normalizeQuizGamesQuery, currentUserId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('pairs/my-current')
   async getCurrentGame(@CurrentUserId() currentUserId: number): Promise<GamePairViewModel> {
     const game = await this.gamesRepo.findActiveOrPendingGameByUserId(currentUserId);
@@ -64,6 +66,7 @@ export class QuizController {
     return this.viewModelMapper.getGameViewModel(game);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('pairs/:gameId')
   async getGameById(
     @Param('gameId', ParseNumberPipe) gameId: number,
@@ -76,6 +79,7 @@ export class QuizController {
     return this.viewModelMapper.getGameViewModel(game);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('pairs/connection')
   @HttpCode(200)
   async createGameOrConnectToExist(@CurrentUserId() currentUserId: number): Promise<GamePairViewModel> {
@@ -83,6 +87,7 @@ export class QuizController {
     return this.viewModelMapper.getGameViewModel(newGame);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('pairs/my-current/answers')
   @HttpCode(200)
   async handleAnswerByPlayer(
