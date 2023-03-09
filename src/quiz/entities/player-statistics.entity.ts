@@ -33,7 +33,7 @@ export class PlayerStatisticsEntity {
 
     statistics.sumScore = 0;
     statistics.gamesCount = 0;
-
+    statistics.avgScores = 0;
     statistics.winsCount = 0;
     statistics.lossesCount = 0;
     statistics.drawsCount = 0;
