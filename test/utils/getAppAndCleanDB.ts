@@ -4,7 +4,8 @@ import { AppModule, typeOrmOptions } from '../../src/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { useContainer } from 'class-validator';
-import * as cookieParser from 'cookie-parser'; // dev
+// import * as cookieParser from 'cookie-parser'; // dev
+import cookieParser from 'cookie-parser'; // deploy
 
 export const getAppAndCleanDB = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
