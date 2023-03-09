@@ -16,8 +16,6 @@ export class PlayerStatisticsEntity {
 
   @Column()
   sumScore: number;
-  // @Column({ type: 'int' })
-  // avgScores: number;
   @Column()
   gamesCount: number;
   @Column()
@@ -26,13 +24,14 @@ export class PlayerStatisticsEntity {
   lossesCount: number;
   @Column()
   drawsCount: number;
+  @Column({ type: 'numeric', precision: 1000, scale: 2 })
+  avgScores: number;
 
-  public static create(user: UserEntity): PlayerStatisticsEntity {
+  static create(user: UserEntity): PlayerStatisticsEntity {
     const statistics = new PlayerStatisticsEntity();
     statistics.user = user;
 
     statistics.sumScore = 0;
-    // statistics.avgScores = 0;
     statistics.gamesCount = 0;
 
     statistics.winsCount = 0;

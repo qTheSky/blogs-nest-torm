@@ -26,6 +26,8 @@ import { ParseNumberPipe } from '../shared/pipes/parse-number-pipe';
 import { StatisticsViewModel } from './models/StatisticsViewModel';
 import { PlayerStatisticsRepo } from './player.statistics.repo';
 import { GamesQuery } from './models/GameQueryModel';
+import { TopPlayersQueryRepo } from './top-players.query.repo';
+import { TopPlayersQuery } from './models/TopPlayersQuery';
 
 @Controller('pair-game-quiz')
 export class QuizController {
@@ -35,12 +37,13 @@ export class QuizController {
     private gamesRepo: GamesRepo,
     private gamesQueryRepo: GamesQueryRepo,
     private playerStatisticsRepo: PlayerStatisticsRepo,
+    private topPlayersQueryRepo: TopPlayersQueryRepo,
   ) {}
 
   @UseInterceptors()
   @Get('users/top')
-  async getTopUsers() {
-    return null;
+  async getTopUsers(@Query() query: TopPlayersQuery) {
+    return this.topPlayersQueryRepo.findTopPlayers(query);
   }
 
   @UseGuards(JwtAuthGuard)

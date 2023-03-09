@@ -38,6 +38,8 @@ export class HandleAnswerUseCase implements ICommandHandler<HandleAnswerCommand>
       const statistics = player.statistics;
       statistics.gamesCount++;
       statistics.sumScore += player.score;
+      statistics.avgScores = +(statistics.sumScore / statistics.gamesCount).toFixed(2);
+
       if (game.winnerId === null) {
         statistics.drawsCount++;
       }
