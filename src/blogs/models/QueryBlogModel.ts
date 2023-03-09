@@ -1,6 +1,6 @@
-import { BasePagination } from '../../shared/dto/BasePagination';
+import { DefaultPagination } from '../../shared/dto/BasePagination';
 
-export class BlogsQuery extends BasePagination {
+export class BlogsQuery extends DefaultPagination {
   searchNameTerm = '';
 }
 

@@ -1,5 +1,5 @@
-import { BasePagination } from '../../shared/dto/BasePagination';
+import { DefaultPagination } from '../../shared/dto/BasePagination';
 
-export class GamesQuery extends BasePagination {
+export class GamesQuery extends DefaultPagination {
   sortBy = 'pairCreatedDate';
 }

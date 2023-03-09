@@ -1,5 +1,5 @@
-export class TopPlayersQuery {
-  pageNumber = 1;
-  pageSize = 10;
+import { BasicPagination } from '../../shared/dto/BasePagination';
+
+export class TopPlayersQuery extends BasicPagination {
   sort = ['avgScores desc', 'sumScore desc'];
 }

@@ -26,6 +26,7 @@ import { AnswerViewModel, GamePairViewModel, GamePlayerProgressViewModel } from 
 import { Answer } from '../quiz/entities/player.entity';
 import { PlayerStatisticsEntity } from '../quiz/entities/player-statistics.entity';
 import { StatisticsViewModel } from '../quiz/models/StatisticsViewModel';
+import { TopPlayerViewModel } from '../quiz/models/TopPlayerViewModel';
 
 @Injectable()
 export class ViewModelMapper {
@@ -240,11 +241,18 @@ export class ViewModelMapper {
     return {
       sumScore: stats.sumScore,
       // avgScores: +(stats.sumScore / stats.gamesCount).toFixed(2),
-      avgScores: stats.avgScores,
+      avgScores: +(+stats.avgScores).toFixed(2),
       gamesCount: stats.gamesCount,
       winsCount: stats.winsCount,
       lossesCount: stats.lossesCount,
       drawsCount: stats.drawsCount,
+    };
+  }
+
+  getTopPlayerViewModel(stats: PlayerStatisticsEntity): TopPlayerViewModel {
+    return {
+      ...this.getPlayerStatsViewModel(stats),
+      player: { id: stats.user.id.toString(), login: stats.user.login },
     };
   }
 }

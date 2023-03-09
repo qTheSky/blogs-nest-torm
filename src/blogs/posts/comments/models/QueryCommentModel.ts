@@ -1,3 +1,3 @@
-import { BasePagination } from '../../../../shared/dto/BasePagination';
+import { DefaultPagination } from '../../../../shared/dto/BasePagination';
 
-export class CommentsQuery extends BasePagination {}
+export class CommentsQuery extends DefaultPagination {}

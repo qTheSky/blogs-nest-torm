@@ -1,10 +1,13 @@
 import { Transform } from 'class-transformer';
 
-export class BasePagination {
+export class BasicPagination {
   @Transform((v) => toNumber(v.value, 1))
   pageNumber = 1;
   @Transform((v) => toNumber(v.value, 10))
   pageSize = 10;
+}
+
+export class DefaultPagination extends BasicPagination {
   sortBy = 'createdAt';
   sortDirection = 'desc';
 }

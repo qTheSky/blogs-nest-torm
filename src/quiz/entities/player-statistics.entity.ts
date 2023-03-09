@@ -24,8 +24,8 @@ export class PlayerStatisticsEntity {
   lossesCount: number;
   @Column()
   drawsCount: number;
-  @Column({ type: 'numeric', precision: 1000, scale: 2 })
-  avgScores: number;
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  avgScores: string;
 
   static create(user: UserEntity): PlayerStatisticsEntity {
     const statistics = new PlayerStatisticsEntity();
@@ -33,7 +33,7 @@ export class PlayerStatisticsEntity {
 
     statistics.sumScore = 0;
     statistics.gamesCount = 0;
-    statistics.avgScores = 0;
+    statistics.avgScores = '0';
     statistics.winsCount = 0;
     statistics.lossesCount = 0;
     statistics.drawsCount = 0;
