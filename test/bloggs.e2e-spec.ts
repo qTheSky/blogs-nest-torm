@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { cleanDb } from './utils/cleanDb';
-import * as request from 'supertest';
+import request from 'supertest';
 import { createUserAndGetAccessToken } from './utils/create-user-and-get-token/create-user-and-get-token';
 import { newBlog } from './models-for-tests/positive/create/Blog';
 import { CreateBlogModel } from '../src/blogs/models/CreateBlogModel';

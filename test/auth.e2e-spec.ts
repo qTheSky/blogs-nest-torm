@@ -1,5 +1,4 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { CreateUserModel } from '../src/users/models/CreateUserModel';
 import { randomUUID } from 'crypto';
 import { AuthCredentialsModel } from '../src/auth/models/AuthCredentialsModel';
@@ -9,6 +8,7 @@ import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { cleanDb } from './utils/cleanDb';
 import { createUserAndGetTokens } from './utils/create-user-and-get-token/create-user-and-get-token';
 import { EmailResendModel } from '../src/auth/models/EmailResendModel';
+import request from 'supertest';
 
 jest.setTimeout(15000);
 describe('AuthController (e2e)', () => {

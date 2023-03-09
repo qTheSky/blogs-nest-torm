@@ -43,8 +43,6 @@ export class UsersQueryRepo {
       .skip((query.pageNumber - 1) * query.pageSize)
       .getManyAndCount();
 
-    console.log(query);
-
     return {
       pagesCount: Math.ceil(total / query.pageSize),
       page: query.pageNumber,

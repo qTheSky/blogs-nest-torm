@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { superAdminBasicHeader } from '../constants';
-import * as request from 'supertest';
+import request from 'supertest';
 
 export const createManyItemsToDb = async <M extends object>(
   app: INestApplication,

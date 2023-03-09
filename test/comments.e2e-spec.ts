@@ -3,7 +3,7 @@ import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { BlogViewModel } from '../src/blogs/models/BlogViewModel';
 import { cleanDb } from './utils/cleanDb';
 import { createUserAndGetAccessToken } from './utils/create-user-and-get-token/create-user-and-get-token';
-import * as request from 'supertest';
+import request from 'supertest';
 import { newBlog } from './models-for-tests/positive/create/Blog';
 import { CreateBlogModel } from '../src/blogs/models/CreateBlogModel';
 import { PostViewModel } from '../src/blogs/posts/models/PostViewModel';

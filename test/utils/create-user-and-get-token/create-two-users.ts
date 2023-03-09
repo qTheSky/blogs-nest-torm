@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { createCommonUser } from './create-common-user';
 import { makeCommonLoginAndGetToken } from './make-common-login';
-import * as request from 'supertest';
+import request from 'supertest';
 import { CreateUserModel } from '../../../src/users/models/CreateUserModel';
 import { UserViewModel } from '../../../src/users/models/UserViewModel';
 

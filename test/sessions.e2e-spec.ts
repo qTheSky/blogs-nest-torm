@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { cleanDb } from './utils/cleanDb';
 import { createUserAndGetTokens } from './utils/create-user-and-get-token/create-user-and-get-token';
-import * as request from 'supertest';
+import request from 'supertest';
 import { SessionViewModel } from '../src/security/models/SessionViewModel';
 import {
   makeCommonLoginAndGetToken,

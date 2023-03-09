@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
-import * as request from 'supertest';
+import request from 'supertest';
 import { CreateUserModel } from '../src/users/models/CreateUserModel';
 import { UserViewModel } from '../src/users/models/UserViewModel';
 import { newUser } from './models-for-tests/positive/create/User';

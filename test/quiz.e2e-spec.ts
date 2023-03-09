@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { createTwoUsersAndGetTokens } from './utils/create-user-and-get-token/create-two-users';
-import * as request from 'supertest';
+import request from 'supertest';
 import { UserViewModel } from '../src/users/models/UserViewModel';
 import { GamePairViewModel, GameStatuses } from '../src/quiz/models/GameModels';
 import { getCreateModels } from './utils/get-create-models';

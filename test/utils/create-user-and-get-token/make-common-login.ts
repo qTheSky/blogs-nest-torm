@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { newUser } from '../../models-for-tests/positive/create/User';
 
 export const makeCommonLoginAndGetToken = async (app: INestApplication): Promise<string> => {
