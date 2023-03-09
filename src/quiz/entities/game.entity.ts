@@ -33,6 +33,8 @@ export class GameEntity {
     },
   })
   questions: QuestionInGame[] | null;
+  @Column({ nullable: true })
+  forciblyFinishDate: Date | null;
 
   public static create(user: UserEntity, userStatistics: PlayerStatisticsEntity): GameEntity {
     const game = new GameEntity();
@@ -45,6 +47,7 @@ export class GameEntity {
     game.startGameDate = null;
     game.questions = null;
     game.winnerId = null;
+    game.forciblyFinishDate = null;
 
     return game;
   }
@@ -57,10 +60,13 @@ export class GameEntity {
     this.questions = questions;
   }
 
-  finishGame() {
-    if (!this.isBothPlayersAnsweredAllQuestions()) {
-      throw new Error('Both players should answer to questions');
+  finishGame(isForcibly = false) {
+    if (!isForcibly) {
+      if (!this.isBothPlayersAnsweredAllQuestions()) {
+        throw new Error('Both players should answer to questions');
+      }
     }
+
     const firstFinishedPlayer = this.findFirstFinishedPlayer();
     if (firstFinishedPlayer.isAtLeastOneAnswerIsRight()) {
       firstFinishedPlayer.addScore(1);
@@ -103,7 +109,9 @@ export class GameEntity {
   }
 
   findFirstFinishedPlayer(): PlayerEntity {
-    return this.players.find((p) => p.isFirstFinished === true);
+    const player = this.players.find((p) => p.isFirstFinished === true);
+    if (!player) throw new Error('First finished player should be found');
+    return player;
   }
 
   addPlayer(user: UserEntity, userStatistics: PlayerStatisticsEntity) {

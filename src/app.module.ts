@@ -98,6 +98,7 @@ import { GamesQueryRepo } from './quiz/games.query.repo';
 import { PlayerStatisticsRepo } from './quiz/player.statistics.repo';
 import { PlayerStatisticsEntity } from './quiz/entities/player-statistics.entity';
 import { TopPlayersQueryRepo } from './quiz/top-players.query.repo';
+import { ScheduleModule } from '@nestjs/schedule';
 
 //USE CASES
 const authUseCases = [
@@ -177,7 +178,7 @@ export const __typeOrmOptions: TypeOrmModuleOptions = {
 };
 //elephant
 //neon
-export const typeOrmOptions: TypeOrmModuleOptions = {
+export const _typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'ep-curly-unit-690125.eu-central-1.aws.neon.tech',
   port: 5432,
@@ -191,7 +192,7 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
 //neon
 //CLOUD
 //LOCAL
-export const _typeOrmOptions: TypeOrmModuleOptions = {
+export const typeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -207,6 +208,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     CqrsModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([

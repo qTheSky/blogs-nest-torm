@@ -28,12 +28,15 @@ export class GamesRepo {
     return this.repo.findOne({ where: { id }, relations: { players: { statistics: true } } });
   }
 
+  async findAllActiveGames(): Promise<GameEntity[]> {
+    return this.repo.find({ where: { status: GameStatuses.ACTIVE }, order: { players: { connectedAt: 'ASC' } } }); // players in game should be sorted by connectedAt by default
+  }
+
   async findActiveOrPendingGameByUserId(userId: number): Promise<GameEntity | null> {
     const game = await this.repo
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.players', 'player')
       .leftJoinAndSelect('player.user', 'user')
-      // .leftJoinAndSelect('player.statistics', 'statistics')
       .where((qb) => {
         const subQuery = qb
           .subQuery()
@@ -53,10 +56,5 @@ export class GamesRepo {
 
   async save(game: GameEntity): Promise<GameEntity> {
     return await this.repo.save(game);
-  }
-
-  async findAllGamesOfUser(userId: number): Promise<GameEntity[]> {
-    // this method should be deleted soon
-    return await this.repo.find({ where: { players: { userId } } });
   }
 }
