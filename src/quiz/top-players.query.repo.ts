@@ -15,11 +15,18 @@ export class TopPlayersQueryRepo {
   async findTopPlayers(query: TopPlayersQuery) {
     const builder = this.repo.createQueryBuilder('playerStatistics').leftJoinAndSelect('playerStatistics.user', 'user');
 
-    // Проходим по всем параметрам сортировки и добавляем их в запрос
-    for (const sort of query.sort) {
-      const [field, _direction] = sort.split(' ');
-      const direction = _direction.toUpperCase();
-      builder.addOrderBy(`playerStatistics.${field}`, direction as 'ASC' | 'DESC');
+    //if sort is array
+    if (Array.isArray(query.sort)) {
+      // Проходим по всем параметрам сортировки и добавляем их в запрос
+      for (const sort of query.sort) {
+        const [field, _direction] = sort.split(' ');
+        const direction = _direction.toUpperCase();
+        builder.addOrderBy(`playerStatistics.${field}`, direction as 'ASC' | 'DESC');
+      }
+    } else {
+      //if sort is string
+      const sort = (query.sort as string).split(' '); // sort[0] field sort[1] direction
+      builder.orderBy(`playerStatistics.${sort[0]}`, sort[1].toUpperCase() as 'ASC' | 'DESC');
     }
 
     const [foundPlayers, total] = await builder
