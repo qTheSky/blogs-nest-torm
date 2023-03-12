@@ -35,6 +35,6 @@ export class UploadWallpaperUseCase implements ICommandHandler<UploadWallpaperCo
 
     await this.blogsRepo.save(blog);
 
-    return { main: null, wallpaper: fileData };
+    return { main: [], wallpaper: fileData };
   }
 }
