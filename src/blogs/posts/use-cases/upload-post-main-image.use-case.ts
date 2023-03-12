@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlogsRepo } from '../../blogs.repo';
 import { S3StorageAdapter } from '../../../shared/adapters/s3-storage.adapter';
 import { PostsRepo } from '../posts.repo';
 import { ImageViewModel } from '../../models/ImageViewModel';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { validateImage } from '../../utils/validate-image';
 import sharp from 'sharp';
 import { ViewModelMapper } from '../../../shared/view-model-mapper';
+import { PostsService } from '../posts.service';
+
 export class UploadPostMainImageCommand {
   constructor(
     public blogId: number,
@@ -19,17 +19,17 @@ export class UploadPostMainImageCommand {
 @CommandHandler(UploadPostMainImageCommand)
 export class UploadPostMainImageUseCase implements ICommandHandler<UploadPostMainImageCommand> {
   constructor(
-    private blogsRepo: BlogsRepo,
     private s3StorageAdapter: S3StorageAdapter,
     private postsRepo: PostsRepo,
     private viewModelMapper: ViewModelMapper,
+    private postsService: PostsService,
   ) {}
   async execute(command: UploadPostMainImageCommand): Promise<{ main: ImageViewModel[] }> {
-    const blog = await this.blogsRepo.findById(command.blogId);
-    if (!blog) throw new NotFoundException('Blog doesnt exist');
-    const post = await this.postsRepo.findPostById(command.postId);
-    if (!post) throw new NotFoundException('Post doesnt exist');
-    if (post.userId !== command.currentUserId) throw new ForbiddenException('You can`t upload image for not your post');
+    const post = await this.postsService.validateExistPostAndOwnByUser(
+      command.blogId,
+      command.postId,
+      command.currentUserId,
+    );
 
     const { validatedImage, imageExtension } = await validateImage(command.mainImage, {
       maxFileSizeKB: 100,
@@ -38,6 +38,7 @@ export class UploadPostMainImageUseCase implements ICommandHandler<UploadPostMai
     });
 
     const imagesBuffersToUpload: { size: 'SMALL' | 'MEDIUM' | 'LARGE'; buffer: Buffer }[] = [];
+
     imagesBuffersToUpload.push({ size: 'LARGE', buffer: validatedImage.buffer });
     const middleBuffer = await sharp(validatedImage.buffer).resize({ width: 300, height: 180 }).toBuffer();
     imagesBuffersToUpload.push({ size: 'MEDIUM', buffer: middleBuffer });
