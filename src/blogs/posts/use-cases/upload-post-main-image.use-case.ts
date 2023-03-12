@@ -46,14 +46,14 @@ export class UploadPostMainImageUseCase implements ICommandHandler<UploadPostMai
     imagesBuffersToUpload.push({ size: 'SMALL', buffer: smallBuffer });
 
     post.mainImages = [];
-    for (let i = 0; i < imagesBuffersToUpload.length; i++) {
+    for (const image of imagesBuffersToUpload) {
       const { url } = await this.s3StorageAdapter.uploadPostMainImage(
         command.postId,
-        validatedImage.buffer,
+        image.buffer,
         imageExtension,
-        imagesBuffersToUpload[i].size,
+        image.size,
       );
-      const metadata = await sharp(imagesBuffersToUpload[i].buffer).metadata();
+      const metadata = await sharp(image.buffer).metadata();
       const fileData = {
         url: 'https://qthesky0.storage.yandexcloud.net/' + url,
         width: metadata.width,
@@ -62,6 +62,7 @@ export class UploadPostMainImageUseCase implements ICommandHandler<UploadPostMai
       };
       post.mainImages.push({ ...fileData, filePath: url });
     }
+
     await this.postsRepo.save(post);
 
     return { main: post.mainImages.map(this.viewModelMapper.getImageViewModel) };
