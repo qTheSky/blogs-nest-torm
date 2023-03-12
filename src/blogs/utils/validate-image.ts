@@ -9,7 +9,7 @@ export const validateImage = async (
   if (!image) throw new BadRequestException([{ field: 'file', message: 'no file' }]);
 
   const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image.png'];
-
+  console.log(image.mimetype);
   if (!allowedMimeTypes.includes(image.mimetype)) {
     throw new BadRequestException([{ field: 'file', message: 'file must be png, jpg or jpeg' }]);
   }
