@@ -119,6 +119,7 @@ export class ViewModelMapper {
         myStatus,
         newestLikes: getNewestLikes(post.likes),
       },
+      images: { main: post.mainImage ? [this.getImageViewModel(post.mainImage)] : [] },
     };
   }
 

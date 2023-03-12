@@ -67,4 +67,24 @@ export class S3StorageAdapter {
       throw exception;
     }
   }
+
+  async uploadPostMainImage(postId: number, image: Express.Multer.File, imageExtension: string) {
+    const key = `posts/${postId}/images/main/${postId}post_main${imageExtension}`;
+    const bucketParams = {
+      Bucket: this.bucketName,
+      Key: key,
+      Body: image.buffer,
+      ContentType: `image/${imageExtension}`,
+    };
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(bucketParams));
+      return {
+        url: key,
+      };
+    } catch (exception) {
+      console.error(exception);
+      throw exception;
+    }
+  }
 }

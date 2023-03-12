@@ -1,4 +1,5 @@
 import { LikeStatuses, NewestLikes } from '../../../shared/types/like.types';
+import { ImageViewModel } from '../../models/ImageViewModel';
 
 export type PostViewModel = {
   id: string;
@@ -9,6 +10,7 @@ export type PostViewModel = {
   blogName: string;
   createdAt: string;
   extendedLikesInfo: ExtendedLikesInfo;
+  images: { main: ImageViewModel[] };
 };
 
 export type ExtendedLikesInfo = {

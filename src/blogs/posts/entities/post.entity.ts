@@ -5,6 +5,7 @@ import { LikePost } from '../likes/LikePost.entity';
 import { LikeStatuses } from '../../../shared/types/like.types';
 import { Comment } from '../comments/entities/comment.entity';
 import { CreateCommentModel } from '../comments/models/CreateCommentModel';
+import { UploadedImageInDB } from '../../../shared/types/UploadedImageDBType';
 
 @Entity('Posts')
 export class PostEntity {
@@ -31,6 +32,15 @@ export class PostEntity {
   content: string;
   @Column()
   createdAt: Date;
+  @Column({
+    nullable: true,
+    type: 'json',
+    transformer: {
+      to: (value: object) => JSON.stringify(value),
+      from: (value: string) => JSON.parse(value),
+    },
+  })
+  mainImage: UploadedImageInDB | null;
 
   createLike(post: PostEntity, user: UserEntity, likeStatus: LikeStatuses): LikePost {
     const like = new LikePost();

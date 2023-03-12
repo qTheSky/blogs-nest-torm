@@ -46,8 +46,9 @@ import { BannedUsersInBlogQueryRepo } from './banned-users-in-blog.query.repo';
 import { CommentsQueryRepo } from './posts/comments/comments.query.repo';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadMainImageCommand } from './application/use-cases/upload-main-image.use-case';
-import { UploadedImageViewModel } from './models/ImageViewModel';
+import { ImageViewModel, UploadedImageViewModel } from './models/ImageViewModel';
 import { UploadWallpaperCommand } from './application/use-cases/upload-wallpaper.use-case';
+import { UploadPostMainImageCommand } from './posts/use-cases/upload-post-main-image.use-case';
 
 @UseGuards(JwtAuthGuard)
 @Controller('blogger')
@@ -82,6 +83,19 @@ export class BloggerController {
   ): Promise<UploadedImageViewModel> {
     return this.commandBus.execute<UploadMainImageCommand, UploadedImageViewModel>(
       new UploadMainImageCommand(currentUserId, blogId, mainImage),
+    );
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('blogs/:blogId/posts/:postId/images/main')
+  async uploadPostMainImage(
+    @UploadedFile() postMainImage: Express.Multer.File,
+    @CurrentUserId() currentUserId: number,
+    @Param('blogId', ParseNumberPipe) blogId: number,
+    @Param('postId', ParseNumberPipe) postId: number,
+  ): Promise<{ main: ImageViewModel[] }> {
+    return this.commandBus.execute<UploadPostMainImageCommand, { main: ImageViewModel[] }>(
+      new UploadPostMainImageCommand(blogId, postId, currentUserId, postMainImage),
     );
   }
 
