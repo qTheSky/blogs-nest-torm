@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { BlogsQuery } from '../blogs/models/QueryBlogModel';
 import { ViewModelMapper } from '../shared/view-model-mapper';
 import { CreateUserModel } from '../users/models/CreateUserModel';

@@ -2,9 +2,10 @@ import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn 
 import { UserEntity } from '../../users/entities/user.entity';
 import { BlogBanInfo } from './blog-ban-info.entity';
 import { CreateBlogModel } from '../models/CreateBlogModel';
-import { Post } from '../posts/entities/post.entity';
+import { PostEntity } from '../posts/entities/post.entity';
 import { CreatePostModel } from '../posts/models/CreatePostModel';
 import { BannedUserInBlog } from './banned-user-in-blog.entity';
+import { UploadedImageInDB } from '../../shared/types/UploadedImageDBType';
 
 @Entity('Blogs')
 export class BlogEntity {
@@ -14,6 +15,10 @@ export class BlogEntity {
   user: UserEntity;
   @Column({ nullable: true })
   userId: number;
+  @OneToMany(() => PostEntity, (p) => p.blog)
+  posts: PostEntity[];
+  @OneToOne(() => BlogBanInfo, (banInfo) => banInfo.blog, { eager: true, cascade: true, onDelete: 'CASCADE' })
+  banInfo: BlogBanInfo;
 
   @Column({ collation: 'C' })
   name: string;
@@ -23,13 +28,26 @@ export class BlogEntity {
   websiteUrl: string;
   @Column()
   createdAt: Date;
-  @OneToOne(() => BlogBanInfo, (banInfo) => banInfo.blog, { eager: true, cascade: true, onDelete: 'CASCADE' })
-  banInfo: BlogBanInfo;
   @Column()
   isMembership: boolean;
-
-  @OneToMany(() => Post, (p) => p.blog)
-  posts: Post[];
+  @Column({
+    nullable: true,
+    type: 'json',
+    transformer: {
+      to: (value: object) => JSON.stringify(value),
+      from: (value: string) => JSON.parse(value),
+    },
+  })
+  mainImage: UploadedImageInDB | null;
+  @Column({
+    nullable: true,
+    type: 'json',
+    transformer: {
+      to: (value: object) => JSON.stringify(value),
+      from: (value: string) => JSON.parse(value),
+    },
+  })
+  wallpaper: UploadedImageInDB | null;
 
   ban() {
     this.banInfo.isBanned = true;
@@ -50,17 +68,18 @@ export class BlogEntity {
     blog.websiteUrl = dto.websiteUrl;
     blog.createdAt = new Date();
     blog.isMembership = false;
+    blog.mainImage = null;
 
     const banInfo = new BlogBanInfo();
     banInfo.isBanned = false;
     banInfo.banDate = null;
-
     blog.banInfo = banInfo;
+
     return blog;
   }
 
-  createPost(user: UserEntity, blog: BlogEntity, dto: CreatePostModel): Post {
-    const post = new Post();
+  createPost(user: UserEntity, blog: BlogEntity, dto: CreatePostModel): PostEntity {
+    const post = new PostEntity();
     post.user = user;
     post.blog = blog;
     post.createdAt = new Date();

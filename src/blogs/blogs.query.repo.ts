@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { Repository } from 'typeorm';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { BlogsQuery } from './models/QueryBlogModel';
 
 @Injectable()

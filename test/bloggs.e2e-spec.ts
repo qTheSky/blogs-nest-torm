@@ -10,7 +10,7 @@ import { UpdateBlogModel } from '../src/blogs/models/UpdateBlogModel';
 import { updateBlogModel } from './models-for-tests/positive/udate/Blog';
 import { getCreateModels } from './utils/get-create-models';
 import { createManyItemsToDb } from './utils/create-many-items-to-db';
-import { PaginatorWithItems } from '../src/shared/paginator-response-type';
+import { PaginatorWithItems } from '../src/shared/types/paginator-response-type';
 import { BanUserForBlogModel } from '../src/blogs/models/BanUserForBlogModel';
 import { createTwoUsersAndGetTokens } from './utils/create-user-and-get-token/create-two-users';
 import { newPost } from './models-for-tests/positive/create/Post';

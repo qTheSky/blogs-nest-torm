@@ -5,14 +5,14 @@ import { CommentForBloggerViewModel, CommentViewModel } from '../blogs/posts/com
 import { likesMapper } from './utils/likes-mapper';
 import { Injectable } from '@nestjs/common';
 import { PostsService } from '../blogs/posts/posts.service';
-import { LikesInfoViewModel, NewestLikes } from './like.types';
+import { LikesInfoViewModel, NewestLikes } from './types/like.types';
 import { SessionViewModel } from '../security/models/SessionViewModel';
 import { BannedUserInBlogViewModel } from '../blogs/models/BannedUserInBlogViewModel';
 import { UserEntity } from '../users/entities/user.entity';
 import { Session } from '../security/entities/session.entity';
 import { BlogEntity } from '../blogs/entities/blog.entity';
 import { BannedUserInBlog } from '../blogs/entities/banned-user-in-blog.entity';
-import { Post } from '../blogs/posts/entities/post.entity';
+import { PostEntity } from '../blogs/posts/entities/post.entity';
 import { LikePost } from '../blogs/posts/likes/LikePost.entity';
 import { LikesPostsRepo } from '../blogs/posts/likes/likesPosts.repo';
 import { PostsRepo } from '../blogs/posts/posts.repo';
@@ -27,6 +27,8 @@ import { Answer } from '../quiz/entities/player.entity';
 import { PlayerStatisticsEntity } from '../quiz/entities/player-statistics.entity';
 import { StatisticsViewModel } from '../quiz/models/StatisticsViewModel';
 import { TopPlayerViewModel } from '../quiz/models/TopPlayerViewModel';
+import { UploadedImageInDB } from './types/UploadedImageDBType';
+import { ImageViewModel } from '../blogs/models/ImageViewModel';
 
 @Injectable()
 export class ViewModelMapper {
@@ -64,18 +66,24 @@ export class ViewModelMapper {
     };
   }
 
-  getBlogViewModel(blog: BlogEntity): BlogViewModel {
-    return {
-      id: blog.id.toString(),
-      name: blog.name,
-      description: blog.description,
-      createdAt: blog.createdAt.toISOString(),
-      websiteUrl: blog.websiteUrl,
-      isMembership: blog.isMembership,
-    };
+  getBlogViewModel = (blog: BlogEntity): BlogViewModel => ({
+    id: blog.id.toString(),
+    name: blog.name,
+    description: blog.description,
+    createdAt: blog.createdAt.toISOString(),
+    websiteUrl: blog.websiteUrl,
+    isMembership: blog.isMembership,
+    images: {
+      main: blog.mainImage ? [this.getImageViewModel(blog.mainImage)] : null,
+      wallpaper: blog.wallpaper ? this.getImageViewModel(blog.wallpaper) : null,
+    },
+  });
+
+  getImageViewModel(image: UploadedImageInDB): ImageViewModel {
+    return { url: image.url, width: image.width, height: image.height, fileSize: image.fileSize };
   }
 
-  async getPostViewModel(post: Post, userIdForLikeStatus: number | null): Promise<PostViewModel> {
+  async getPostViewModel(post: PostEntity, userIdForLikeStatus: number | null): Promise<PostViewModel> {
     let like: LikePost | null = null;
     if (userIdForLikeStatus) like = await this.likesPostsRepo.findLikeOfSpecifiedUser(userIdForLikeStatus, post.id);
     const myStatus = like?.status || 'None';
@@ -114,7 +122,7 @@ export class ViewModelMapper {
     };
   }
 
-  async getPostsViewModels(posts: Post[], userId: number | null): Promise<Awaited<PostViewModel>[]> {
+  async getPostsViewModels(posts: PostEntity[], userId: number | null): Promise<Awaited<PostViewModel>[]> {
     return await Promise.all(posts.map((post) => this.getPostViewModel(post, userId)));
   }
 

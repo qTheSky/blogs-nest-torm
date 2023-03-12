@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put,
 import { CommentViewModel } from './models/CommentViewModel';
 import { ViewModelMapper } from '../../../shared/view-model-mapper';
 import { UpdateCommentModel } from './models/UpdateCommentModel';
-import { LikeModel } from '../../../shared/like.types';
+import { LikeModel } from '../../../shared/types/like.types';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guards';
 import { CurrentUserId } from '../../../auth/decorators/current-user-id.param.decorator';
 import { GetCurrentUserIdOrNull } from '../../../auth/get-user.decorator';

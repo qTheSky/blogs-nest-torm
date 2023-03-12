@@ -1,7 +1,7 @@
 import { Controller, Get, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
 import { BlogViewModel } from './models/BlogViewModel';
 import { ViewModelMapper } from '../shared/view-model-mapper';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { PostViewModel } from './posts/models/PostViewModel';
 import { PostsQuery } from './posts/models/QueryPostModel';
 import { GetCurrentUserIdOrNull } from '../auth/get-user.decorator';

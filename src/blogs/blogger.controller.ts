@@ -10,7 +10,9 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guards';
 import { CreateBlogModel } from './models/CreateBlogModel';
@@ -22,7 +24,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { DeleteBlogCommand } from './application/use-cases/delete-blog.use-case';
 import { UpdateBlogModel } from './models/UpdateBlogModel';
 import { UpdateBlogCommand } from './application/use-cases/update-blog.use-case';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { BlogsQuery } from './models/QueryBlogModel';
 import { CreatePostModel } from './posts/models/CreatePostModel';
 import { PostViewModel } from './posts/models/PostViewModel';
@@ -42,7 +44,12 @@ import { BlogsQueryRepo } from './blogs.query.repo';
 import { BlogsRepo } from './blogs.repo';
 import { BannedUsersInBlogQueryRepo } from './banned-users-in-blog.query.repo';
 import { CommentsQueryRepo } from './posts/comments/comments.query.repo';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadMainImageCommand } from './application/use-cases/upload-main-image.use-case';
+import { UploadedImageViewModel } from './models/ImageViewModel';
+import { UploadWallpaperCommand } from './application/use-cases/upload-wallpaper.use-case';
 
+@UseGuards(JwtAuthGuard)
 @Controller('blogger')
 export class BloggerController {
   constructor(
@@ -54,8 +61,31 @@ export class BloggerController {
     private blogsRepo: BlogsRepo,
   ) {}
 
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('blogs/:blogId/images/wallpaper')
+  async uploadBlogWallpaper(
+    @UploadedFile() wallpaper: Express.Multer.File,
+    @CurrentUserId() currentUserId: number,
+    @Param('blogId', ParseNumberPipe) blogId: number,
+  ): Promise<UploadedImageViewModel> {
+    return this.commandBus.execute<UploadWallpaperCommand, UploadedImageViewModel>(
+      new UploadWallpaperCommand(currentUserId, blogId, wallpaper),
+    );
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('blogs/:blogId/images/main')
+  async uploadMainBlogImage(
+    @UploadedFile() mainImage: Express.Multer.File,
+    @CurrentUserId() currentUserId: number,
+    @Param('blogId', ParseNumberPipe) blogId: number,
+  ): Promise<UploadedImageViewModel> {
+    return this.commandBus.execute<UploadMainImageCommand, UploadedImageViewModel>(
+      new UploadMainImageCommand(currentUserId, blogId, mainImage),
+    );
+  }
+
   @Get('/blogs/comments')
-  @UseGuards(JwtAuthGuard)
   async getAllCommentsForPostsOfBlogger(
     @CurrentUserId() currentUserId: number,
     @Query() query: CommentsQuery,
@@ -72,7 +102,6 @@ export class BloggerController {
 
   @Put('/blogs/:blogId')
   @HttpCode(204)
-  @UseGuards(JwtAuthGuard)
   async updateBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
     @Body() updateBlogModel: UpdateBlogModel,
@@ -85,7 +114,6 @@ export class BloggerController {
 
   @Delete('/blogs/:id')
   @HttpCode(204)
-  @UseGuards(JwtAuthGuard)
   async deleteBlog(
     @Param('id', ParseNumberPipe) blogId: number,
     @CurrentUserId() currentUserId: number,
@@ -94,7 +122,6 @@ export class BloggerController {
   }
 
   @Post('/blogs')
-  @UseGuards(JwtAuthGuard)
   async createBlog(
     @Body() createBlogModel: CreateBlogModel,
     @CurrentUserId() currentUserId: number,
@@ -106,7 +133,6 @@ export class BloggerController {
   }
 
   @Get('blogs')
-  @UseGuards(JwtAuthGuard)
   async getOwnBlogs(
     @Query() query: BlogsQuery,
     @CurrentUserId() currentUserId: number,
@@ -122,7 +148,6 @@ export class BloggerController {
 
   // POSTS FOR BLOG
   @Post('/blogs/:blogId/posts')
-  @UseGuards(JwtAuthGuard)
   async createPostForBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
     @Body() createPostModel: CreatePostModel,
@@ -133,7 +158,6 @@ export class BloggerController {
   }
 
   @Put('/blogs/:blogId/posts/:postId')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
   async updatePost(
     @CurrentUserId() currentUserId,
@@ -147,7 +171,6 @@ export class BloggerController {
   }
 
   @Delete('/blogs/:blogId/posts/:postId')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
   async deletePost(
     @CurrentUserId() currentUserId,
@@ -161,7 +184,6 @@ export class BloggerController {
 
   // USERS
   @Put('/users/:userId/ban')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
   async banUserForBlog(
     @Param('userId', ParseNumberPipe) userId: number,
@@ -174,7 +196,6 @@ export class BloggerController {
   }
 
   @Get('/users/blog/:blogId')
-  @UseGuards(JwtAuthGuard)
   async findBannedUsersOfSpecifiedBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
     @Query() query: BannedUsersInBlogsQuery,

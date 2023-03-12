@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QuizQuestion } from './quiz/QuizQuestion.entity';
 import { FindOptionsOrder, FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { QuizQuestionViewModel } from './models/quiz/QuizQuestionViewModel';
 import { ViewModelMapper } from '../shared/view-model-mapper';
 import { QuizQuestionsQuery } from './models/quiz/QueryQuizModel';

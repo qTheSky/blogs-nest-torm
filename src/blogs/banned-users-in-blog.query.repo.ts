@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BannedUserInBlog } from './entities/banned-user-in-blog.entity';
 import { Repository } from 'typeorm';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { BannedUserInBlogViewModel } from './models/BannedUserInBlogViewModel';
 import { ViewModelMapper } from '../shared/view-model-mapper';
 import { BannedUsersInBlogsQuery } from './models/BannedUserInBlogQueryModel';

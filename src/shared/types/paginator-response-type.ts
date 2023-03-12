@@ -6,6 +6,7 @@ export type PaginatorResponseType<I> = {
   items: I;
 };
 
+//for tests
 export const PaginatorWithItems: PaginatorResponseType<any[]> = {
   pagesCount: 0,
   page: 1,

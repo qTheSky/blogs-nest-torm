@@ -1,11 +1,11 @@
 import { Like } from '../common/like.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { Post } from '../entities/post.entity';
+import { PostEntity } from '../entities/post.entity';
 
 @Entity('LikesPost')
 export class LikePost extends Like {
-  @ManyToOne(() => Post, (p) => p.likes, { onDelete: 'CASCADE' })
-  post: Post;
+  @ManyToOne(() => PostEntity, (p) => p.likes, { onDelete: 'CASCADE' })
+  post: PostEntity;
   @Column()
   postId: number;
 }

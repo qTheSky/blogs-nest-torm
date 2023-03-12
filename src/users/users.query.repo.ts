@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { UserViewModel } from './models/UserViewModel';
 import { ViewModelMapper } from '../shared/view-model-mapper';
 import { UsersQuery } from './models/QueryUserModel';

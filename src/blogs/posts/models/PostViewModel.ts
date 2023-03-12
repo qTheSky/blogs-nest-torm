@@ -1,4 +1,4 @@
-import { LikeStatuses, NewestLikes } from '../../../shared/like.types';
+import { LikeStatuses, NewestLikes } from '../../../shared/types/like.types';
 
 export type PostViewModel = {
   id: string;

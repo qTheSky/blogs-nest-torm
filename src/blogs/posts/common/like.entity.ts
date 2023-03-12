@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { LikeStatuses } from '../../../shared/like.types';
+import { LikeStatuses } from '../../../shared/types/like.types';
 import { UserEntity } from '../../../users/entities/user.entity';
 
 @Entity()

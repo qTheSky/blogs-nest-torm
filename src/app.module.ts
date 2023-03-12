@@ -67,7 +67,7 @@ import { UsersQueryRepo } from './users/users.query.repo';
 import { BlogsRepo } from './blogs/blogs.repo';
 import { BlogEntity } from './blogs/entities/blog.entity';
 import { BlogBanInfo } from './blogs/entities/blog-ban-info.entity';
-import { Post } from './blogs/posts/entities/post.entity';
+import { PostEntity } from './blogs/posts/entities/post.entity';
 import { PostsRepo } from './blogs/posts/posts.repo';
 import { BlogsQueryRepo } from './blogs/blogs.query.repo';
 import { BannedUserInBlog } from './blogs/entities/banned-user-in-blog.entity';
@@ -99,6 +99,9 @@ import { PlayerStatisticsRepo } from './quiz/player.statistics.repo';
 import { PlayerStatisticsEntity } from './quiz/entities/player-statistics.entity';
 import { TopPlayersQueryRepo } from './quiz/top-players.query.repo';
 import { ScheduleModule } from '@nestjs/schedule';
+import { S3StorageAdapter } from './shared/adapters/s3-storage.adapter';
+import { UploadMainImageUseCase } from './blogs/application/use-cases/upload-main-image.use-case';
+import { UploadWallpaperUseCase } from './blogs/application/use-cases/upload-wallpaper.use-case';
 
 //USE CASES
 const authUseCases = [
@@ -111,7 +114,14 @@ const authUseCases = [
   GetAuthUserDataUseCase,
   UpdateEmailConfirmationCodeUseCase,
 ];
-const blogsUseCases = [DeleteBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, BanUserForBlogUseCase];
+const blogsUseCases = [
+  DeleteBlogUseCase,
+  CreateBlogUseCase,
+  UpdateBlogUseCase,
+  BanUserForBlogUseCase,
+  UploadMainImageUseCase,
+  UploadWallpaperUseCase,
+];
 const postsUseCases = [CreatePostUseCase, DeletePostUseCase, UpdatePostUseCase, PutLikeToPostUseCase];
 const commentsUseCases = [CreateCommentUseCase, UpdateCommentUseCase, DeleteCommentUseCase, PutLikeToCommentUseCase];
 const saUseCases = [BindBlogWithUserUseCase, DeleteUserUseCase, BanUserUseCase, BanBlogUseCase];
@@ -153,6 +163,7 @@ const adapters = [
   GamesQueryRepo,
   PlayerStatisticsRepo,
   TopPlayersQueryRepo,
+  S3StorageAdapter,
 ];
 
 const constraints = [
@@ -219,7 +230,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
       RefreshTokenBL,
       BlogEntity,
       BlogBanInfo,
-      Post,
+      PostEntity,
       BannedUserInBlog,
       LikePost,
       Comment,

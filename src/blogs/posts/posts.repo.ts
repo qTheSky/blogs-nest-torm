@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BlogEntity } from '../entities/blog.entity';
 import { UserEntity } from '../../users/entities/user.entity';
-import { Post } from './entities/post.entity';
+import { PostEntity } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostModel } from './models/CreatePostModel';
@@ -9,9 +9,9 @@ import { cutLikesByBannedUsers } from './utils/cut-likes-by-banned-users';
 
 @Injectable()
 export class PostsRepo {
-  constructor(@InjectRepository(Post) private readonly repo: Repository<Post>) {}
+  constructor(@InjectRepository(PostEntity) private readonly repo: Repository<PostEntity>) {}
 
-  async create(blog: BlogEntity, user: UserEntity, createPostModel: CreatePostModel): Promise<Post> {
+  async create(blog: BlogEntity, user: UserEntity, createPostModel: CreatePostModel): Promise<PostEntity> {
     const newPost = blog.createPost(user, blog, createPostModel);
     return await this.save(newPost);
   }
@@ -20,7 +20,7 @@ export class PostsRepo {
     return this.repo.delete({ id });
   }
 
-  async findPostById(id: number): Promise<Post | null> {
+  async findPostById(id: number): Promise<PostEntity | null> {
     const post = await this.repo.findOneBy({
       id,
       blog: { banInfo: { isBanned: false } },
@@ -31,11 +31,11 @@ export class PostsRepo {
     return post;
   }
 
-  async get(id: number): Promise<Post | null> {
+  async get(id: number): Promise<PostEntity | null> {
     return this.repo.findOneBy({ id });
   }
 
-  async save(post: Post): Promise<Post> {
+  async save(post: PostEntity): Promise<PostEntity> {
     return await this.repo.save(post);
   }
 }

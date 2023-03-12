@@ -2,12 +2,12 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'ty
 import { BlogEntity } from '../../entities/blog.entity';
 import { UserEntity } from '../../../users/entities/user.entity';
 import { LikePost } from '../likes/LikePost.entity';
-import { LikeStatuses } from '../../../shared/like.types';
+import { LikeStatuses } from '../../../shared/types/like.types';
 import { Comment } from '../comments/entities/comment.entity';
 import { CreateCommentModel } from '../comments/models/CreateCommentModel';
 
 @Entity('Posts')
-export class Post {
+export class PostEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @ManyToOne(() => BlogEntity, (b) => b.posts, { eager: true, onDelete: 'CASCADE' })
@@ -32,7 +32,7 @@ export class Post {
   @Column()
   createdAt: Date;
 
-  createLike(post: Post, user: UserEntity, likeStatus: LikeStatuses): LikePost {
+  createLike(post: PostEntity, user: UserEntity, likeStatus: LikeStatuses): LikePost {
     const like = new LikePost();
     like.user = user;
     like.post = post;
@@ -42,7 +42,7 @@ export class Post {
     return like;
   }
 
-  createComment(user: UserEntity, post: Post, dto: CreateCommentModel): Comment {
+  createComment(user: UserEntity, post: PostEntity, dto: CreateCommentModel): Comment {
     const comment = new Comment();
     comment.post = post;
     comment.user = user;

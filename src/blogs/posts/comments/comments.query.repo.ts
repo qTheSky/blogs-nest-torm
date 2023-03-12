@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { PaginatorResponseType } from '../../../shared/paginator-response-type';
+import { PaginatorResponseType } from '../../../shared/types/paginator-response-type';
 import { cutLikesByBannedUsers } from '../utils/cut-likes-by-banned-users';
 import { LikeComment } from './likes/likeComment.entity';
 import { CommentsQuery } from './models/QueryCommentModel';

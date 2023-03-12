@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { PlayerEntity } from './entities/player.entity';
 import { GamePairViewModel } from './models/GameModels';
 import { ViewModelMapper } from '../shared/view-model-mapper';
-import { PaginatorResponseType } from '../shared/paginator-response-type';
+import { PaginatorResponseType } from '../shared/types/paginator-response-type';
 import { GamesQuery } from './models/GameQueryModel';
 
 @Injectable()

@@ -3,7 +3,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CreatePostModel } from '../models/CreatePostModel';
 import { BlogsRepo } from '../../blogs.repo';
 import { PostsRepo } from '../posts.repo';
-import { Post } from '../entities/post.entity';
+import { PostEntity } from '../entities/post.entity';
 import { UsersRepo } from '../../../users/users.repo';
 
 export class CreatePostCommand {
@@ -14,7 +14,7 @@ export class CreatePostCommand {
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(private blogsRepo: BlogsRepo, private postsRepo: PostsRepo, private usersRepo: UsersRepo) {}
 
-  async execute(command: CreatePostCommand): Promise<Post> {
+  async execute(command: CreatePostCommand): Promise<PostEntity> {
     const blog = await this.blogsRepo.get(command.blogId);
     const user = await this.usersRepo.findUserById(command.userId);
     if (!blog) throw new NotFoundException('Blog not found');

@@ -11,7 +11,7 @@ import { BanUserModel } from '../src/super-admin/models/BanUserModel';
 import { AuthCredentialsModel } from '../src/auth/models/AuthCredentialsModel';
 import { getCreateModels } from './utils/get-create-models';
 import { createManyItemsToDb } from './utils/create-many-items-to-db';
-import { PaginatorResponseType, PaginatorWithItems } from '../src/shared/paginator-response-type';
+import { PaginatorResponseType, PaginatorWithItems } from '../src/shared/types/paginator-response-type';
 import { BlogViewModel } from '../src/blogs/models/BlogViewModel';
 import { createUserAndGetAccessToken } from './utils/create-user-and-get-token/create-user-and-get-token';
 import { BanBlogInputModel } from '../src/super-admin/models/BanBlogInputModel';

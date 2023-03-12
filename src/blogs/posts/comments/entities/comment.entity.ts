@@ -1,15 +1,15 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Post } from '../../entities/post.entity';
+import { PostEntity } from '../../entities/post.entity';
 import { UserEntity } from '../../../../users/entities/user.entity';
 import { LikeComment } from '../likes/likeComment.entity';
-import { LikeStatuses } from '../../../../shared/like.types';
+import { LikeStatuses } from '../../../../shared/types/like.types';
 
 @Entity('Comments')
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Post, (p) => p.comments, { eager: true, onDelete: 'CASCADE' })
-  post: Post;
+  @ManyToOne(() => PostEntity, (p) => p.comments, { eager: true, onDelete: 'CASCADE' })
+  post: PostEntity;
   @Column()
   postId: number;
   @ManyToOne(() => UserEntity, { eager: true, onDelete: 'CASCADE' })

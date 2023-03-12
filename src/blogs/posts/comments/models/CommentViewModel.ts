@@ -1,4 +1,4 @@
-import { LikesInfoViewModel } from '../../../../shared/like.types';
+import { LikesInfoViewModel } from '../../../../shared/types/like.types';
 
 export interface CommentViewModel {
   id: string;
