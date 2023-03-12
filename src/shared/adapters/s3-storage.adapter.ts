@@ -68,12 +68,17 @@ export class S3StorageAdapter {
     }
   }
 
-  async uploadPostMainImage(postId: number, image: Express.Multer.File, imageExtension: string) {
-    const key = `content/posts/${postId}/images/main/${postId}post_main${imageExtension}`;
+  async uploadPostMainImage(
+    postId: number,
+    imageBuffer: Buffer,
+    imageExtension: string,
+    size: 'SMALL' | 'MEDIUM' | 'LARGE',
+  ) {
+    const key = `content/posts/${postId}/images/main/${postId}post${size}_main${imageExtension}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
-      Body: image.buffer,
+      Body: imageBuffer,
       ContentType: `image/${imageExtension}`,
     };
 

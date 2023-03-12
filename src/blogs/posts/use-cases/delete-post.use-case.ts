@@ -18,8 +18,10 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     const post = await this.postsRepo.get(command.postId);
     if (!post) throw new NotFoundException('Post doesnt exist');
     if (post.userId !== command.currentUserId) throw new ForbiddenException('You cant delete not your post');
-    if (post.mainImage) {
-      await this.s3StorageAdapter.deleteFile(post.mainImage.filePath);
+    if (post.mainImages) {
+      for (let i = 0; i < post.mainImages.length; i++) {
+        await this.s3StorageAdapter.deleteFile(post.mainImages[i].filePath);
+      }
     }
     await this.postsRepo.deletePost(post.id);
   }

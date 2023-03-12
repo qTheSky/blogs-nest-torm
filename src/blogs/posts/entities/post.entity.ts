@@ -40,7 +40,7 @@ export class PostEntity {
       from: (value: string) => JSON.parse(value),
     },
   })
-  mainImage: UploadedImageInDB | null;
+  mainImages: UploadedImageInDB[] | null;
 
   createLike(post: PostEntity, user: UserEntity, likeStatus: LikeStatuses): LikePost {
     const like = new LikePost();

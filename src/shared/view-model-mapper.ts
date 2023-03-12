@@ -83,7 +83,7 @@ export class ViewModelMapper {
     return { url: image.url, width: image.width, height: image.height, fileSize: image.fileSize };
   }
 
-  async getPostViewModel(post: PostEntity, userIdForLikeStatus: number | null): Promise<PostViewModel> {
+  getPostViewModel = async (post: PostEntity, userIdForLikeStatus: number | null): Promise<PostViewModel> => {
     let like: LikePost | null = null;
     if (userIdForLikeStatus) like = await this.likesPostsRepo.findLikeOfSpecifiedUser(userIdForLikeStatus, post.id);
     const myStatus = like?.status || 'None';
@@ -119,9 +119,9 @@ export class ViewModelMapper {
         myStatus,
         newestLikes: getNewestLikes(post.likes),
       },
-      images: { main: post.mainImage ? [this.getImageViewModel(post.mainImage)] : [] },
+      images: { main: post.mainImages ? post.mainImages.map(this.getImageViewModel) : [] },
     };
-  }
+  };
 
   async getPostsViewModels(posts: PostEntity[], userId: number | null): Promise<Awaited<PostViewModel>[]> {
     return await Promise.all(posts.map((post) => this.getPostViewModel(post, userId)));
