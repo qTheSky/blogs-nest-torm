@@ -18,7 +18,7 @@ export class S3StorageAdapter {
   }
 
   async uploadBlogMainImage(blogId: number, image: Express.Multer.File, imageExtension: string) {
-    const key = `blogs/${blogId}/images/main/${blogId}blog_main${imageExtension}`;
+    const key = `content/blogs/${blogId}/images/main/${blogId}blog_main${imageExtension}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
@@ -38,7 +38,7 @@ export class S3StorageAdapter {
   }
 
   async uploadBlogWallpaper(blogId: number, image: Express.Multer.File, imageExtension: string) {
-    const key = `blogs/${blogId}/images/wallpaper/${blogId}blog_wallpaper${imageExtension}`;
+    const key = `content/blogs/${blogId}/images/wallpaper/${blogId}blog_wallpaper${imageExtension}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
@@ -69,7 +69,7 @@ export class S3StorageAdapter {
   }
 
   async uploadPostMainImage(postId: number, image: Express.Multer.File, imageExtension: string) {
-    const key = `posts/${postId}/images/main/${postId}post_main${imageExtension}`;
+    const key = `content/posts/${postId}/images/main/${postId}post_main${imageExtension}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
