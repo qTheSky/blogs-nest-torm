@@ -8,8 +8,8 @@ export const validateImage = async (
 ): Promise<{ validatedImage: Express.Multer.File; imageExtension: string; imageMetaData: sharp.Metadata }> => {
   if (!image) throw new BadRequestException([{ field: 'file', message: 'no file' }]);
 
-  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image.png'];
-  console.log(image.mimetype);
+  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
   if (!allowedMimeTypes.includes(image.mimetype)) {
     throw new BadRequestException([{ field: 'file', message: 'file must be png, jpg or jpeg' }]);
   }
