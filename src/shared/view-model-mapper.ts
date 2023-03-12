@@ -74,7 +74,7 @@ export class ViewModelMapper {
     websiteUrl: blog.websiteUrl,
     isMembership: blog.isMembership,
     images: {
-      main: blog.mainImage ? [this.getImageViewModel(blog.mainImage)] : null,
+      main: blog.mainImage ? [this.getImageViewModel(blog.mainImage)] : [],
       wallpaper: blog.wallpaper ? this.getImageViewModel(blog.wallpaper) : null,
     },
   });

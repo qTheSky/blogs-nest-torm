@@ -14,7 +14,12 @@ export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
     const blog = await this.blogsRepo.get(command.blogId);
     if (!blog) throw new NotFoundException('Blog doesnt exist');
     if (blog.userId !== command.userId) throw new ForbiddenException('You cant delete not your blog');
-    await this.s3StorageAdapter.deleteFile(blog.mainImage.filePath);
+    if (blog.mainImage) {
+      await this.s3StorageAdapter.deleteFile(blog.mainImage.filePath);
+    }
+    if (blog.wallpaper) {
+      await this.s3StorageAdapter.deleteFile(blog.wallpaper.filePath);
+    }
     await this.blogsRepo.deleteBlog(command.blogId);
   }
 }

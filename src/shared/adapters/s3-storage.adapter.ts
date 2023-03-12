@@ -38,7 +38,7 @@ export class S3StorageAdapter {
   }
 
   async uploadBlogWallpaper(blogId: number, image: Express.Multer.File, imageExtension: string) {
-    const key = `blogs/${blogId}/images/main/${blogId}blog_main${imageExtension}`;
+    const key = `blogs/${blogId}/images/wallpaper/${blogId}blog_wallpaper${imageExtension}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,

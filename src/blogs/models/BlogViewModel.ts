@@ -9,7 +9,7 @@ export interface BlogViewModel {
   isMembership: boolean;
   images: {
     wallpaper: ImageViewModel | null;
-    main: ImageViewModel[] | null;
+    main: ImageViewModel[];
   };
 }
 
