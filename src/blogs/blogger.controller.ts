@@ -25,7 +25,7 @@ import { DeleteBlogCommand } from './application/use-cases/delete-blog.use-case'
 import { UpdateBlogModel } from './models/UpdateBlogModel';
 import { UpdateBlogCommand } from './application/use-cases/update-blog.use-case';
 import { PaginatorResponseType } from '../shared/types/paginator-response-type';
-import { BlogsQuery } from './models/QueryBlogModel';
+import { BlogsQuery } from './models/BlogsQuery';
 import { CreatePostModel } from './posts/models/CreatePostModel';
 import { PostViewModel } from './posts/models/PostViewModel';
 import { CreatePostCommand } from './posts/use-cases/create-post.use-case';
@@ -49,8 +49,32 @@ import { UploadMainImageCommand } from './application/use-cases/upload-main-imag
 import { ImageViewModel, UploadedImageViewModel } from './models/ImageViewModel';
 import { UploadWallpaperCommand } from './application/use-cases/upload-wallpaper.use-case';
 import { UploadPostMainImageCommand } from './posts/use-cases/upload-post-main-image.use-case';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { BadRequestApiExample } from '../shared/swagger/schema/bad-request-schema-example';
+import { unauthorizedSwaggerMessage } from '../shared/swagger/constants/unauthorized-swagger-message';
+import { getPaginatorExample } from '../shared/swagger/schema/common/get-paginator-example';
+import { bannedUserInBlogExample } from '../shared/swagger/schema/blogs/banned-user-in-blog-example';
+import { fileSchemaExample } from '../shared/swagger/schema/common/file-schema-example';
+import { blogImagesExample } from '../shared/swagger/schema/blogs/blog-images-example';
+import { commentForBlogExample } from '../shared/swagger/schema/blogs/comment-for-blog-example';
+import { blogViewModelExample } from '../shared/swagger/schema/blogs/blog-view-model-example';
+import { postViewModelExample } from '../shared/swagger/schema/post';
 
+@ApiTags('Blogger')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('blogger')
 export class BloggerController {
   constructor(
@@ -62,8 +86,23 @@ export class BloggerController {
     private blogsRepo: BlogsRepo,
   ) {}
 
-  @UseInterceptors(FileInterceptor('file'))
   @Post('blogs/:blogId/images/wallpaper')
+  @ApiOperation({
+    summary:
+      'Upload background wallpaper for Blog (.png or .jpg (.jpeg) file (max size is 100KB, width must be 1028, height must be 312px))',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: fileSchemaExample })
+  @ApiParam({ name: 'blogId', type: 'string' })
+  @ApiResponse({
+    status: 201,
+    description: 'Uploaded image information object',
+    schema: { example: blogImagesExample },
+  })
+  @ApiBadRequestResponse({ description: 'If file format is incorrect', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to update blog that doesn't belong to current user" })
+  @UseInterceptors(FileInterceptor('file'))
   async uploadBlogWallpaper(
     @UploadedFile() wallpaper: Express.Multer.File,
     @CurrentUserId() currentUserId: number,
@@ -74,8 +113,23 @@ export class BloggerController {
     );
   }
 
-  @UseInterceptors(FileInterceptor('file'))
   @Post('blogs/:blogId/images/main')
+  @ApiOperation({
+    summary:
+      'Upload main square image for Blog (.png or .jpg (.jpeg) file (max size is 100KB, width must be 156, height must be 156))',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: fileSchemaExample })
+  @ApiParam({ name: 'blogId', type: 'string', description: 'blog id' })
+  @ApiResponse({
+    status: 201,
+    description: 'Uploaded image information object',
+    schema: { example: blogImagesExample },
+  })
+  @ApiBadRequestResponse({ description: 'If file format is incorrect', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to update blog that doesn't belong to current user" })
+  @UseInterceptors(FileInterceptor('file'))
   async uploadMainBlogImage(
     @UploadedFile() mainImage: Express.Multer.File,
     @CurrentUserId() currentUserId: number,
@@ -86,8 +140,22 @@ export class BloggerController {
     );
   }
 
-  @UseInterceptors(FileInterceptor('file'))
   @Post('blogs/:blogId/posts/:postId/images/main')
+  @ApiOperation({
+    summary:
+      'Upload main image for Post (.png or .jpg (.jpeg) file (max size is 100KB, width must be 940, height must be 432))',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: fileSchemaExample })
+  @ApiResponse({
+    status: 201,
+    description: 'Uploaded image information object',
+    schema: { example: blogImagesExample },
+  })
+  @ApiBadRequestResponse({ description: 'If file format is incorrect', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to update blog that doesn't belong to current user" })
+  @UseInterceptors(FileInterceptor('file'))
   async uploadPostMainImage(
     @UploadedFile() postMainImage: Express.Multer.File,
     @CurrentUserId() currentUserId: number,
@@ -99,7 +167,14 @@ export class BloggerController {
     );
   }
 
-  @Get('/blogs/comments')
+  @Get('blogs/comments')
+  @ApiOperation({ summary: 'Returns all comments for all posts inside all current user blogs' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    schema: { example: getPaginatorExample<CommentForBloggerViewModel>(commentForBlogExample) },
+  })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
   async getAllCommentsForPostsOfBlogger(
     @CurrentUserId() currentUserId: number,
     @Query() query: CommentsQuery,
@@ -114,7 +189,12 @@ export class BloggerController {
     return { ...commentsWithPaging, items: commentsViewModels };
   }
 
-  @Put('/blogs/:blogId')
+  @Put('blogs/:blogId')
+  @ApiOperation({ summary: 'Update existing Blog by id with InputModel' })
+  @ApiResponse({ status: 204, description: 'No Content' })
+  @ApiBadRequestResponse({ description: 'If the inputModel has incorrect values', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to update blog that doesn't belong to current user" })
   @HttpCode(204)
   async updateBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
@@ -126,16 +206,29 @@ export class BloggerController {
     );
   }
 
-  @Delete('/blogs/:id')
+  @Delete('blogs/:blogId')
+  @ApiOperation({ summary: 'Delete blog specified by id' })
+  @ApiResponse({ status: 204, description: 'No Content' })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
   @HttpCode(204)
   async deleteBlog(
-    @Param('id', ParseNumberPipe) blogId: number,
+    @Param('blogId', ParseNumberPipe) blogId: number,
     @CurrentUserId() currentUserId: number,
   ): Promise<void> {
     await this.commandBus.execute<DeleteBlogCommand, void>(new DeleteBlogCommand(currentUserId, blogId));
   }
 
-  @Post('/blogs')
+  @Post('blogs')
+  @ApiOperation({ summary: 'Create new blog' })
+  @ApiResponse({
+    status: 201,
+    description: 'Returns the newly created blog',
+    schema: { example: blogViewModelExample },
+  })
+  @ApiBadRequestResponse({ description: 'If the inputModel has incorrect values', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
   async createBlog(
     @Body() createBlogModel: CreateBlogModel,
     @CurrentUserId() currentUserId: number,
@@ -147,6 +240,13 @@ export class BloggerController {
   }
 
   @Get('blogs')
+  @ApiOperation({ summary: 'Returns blogs (for which current user is owner) with paging' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    schema: { example: getPaginatorExample<BlogViewModel>(blogViewModelExample) },
+  })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
   async getOwnBlogs(
     @Query() query: BlogsQuery,
     @CurrentUserId() currentUserId: number,
@@ -162,6 +262,16 @@ export class BloggerController {
 
   // POSTS FOR BLOG
   @Post('/blogs/:blogId/posts')
+  @ApiOperation({ summary: 'Create new post for specific blog' })
+  @ApiResponse({
+    status: 201,
+    description: 'Returns the newly created post',
+    schema: { example: postViewModelExample },
+  })
+  @ApiBadRequestResponse({ description: 'If the inputModel has incorrect values', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to add post to blog that doesn't belong to current user" })
+  @ApiNotFoundResponse({ description: "If specific blog doesn't exists" })
   async createPostForBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
     @Body() createPostModel: CreatePostModel,
@@ -172,6 +282,12 @@ export class BloggerController {
   }
 
   @Put('/blogs/:blogId/posts/:postId')
+  @ApiOperation({ summary: 'Update existing post by id with InputModel' })
+  @ApiResponse({ description: 'No Content', status: 204 })
+  @ApiBadRequestResponse({ description: 'If the inputModel has incorrect values', schema: BadRequestApiExample })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to add post to blog that doesn't belong to current user" })
+  @ApiNotFoundResponse({ description: "If specific blog doesn't exists" })
   @HttpCode(204)
   async updatePost(
     @CurrentUserId() currentUserId,
@@ -185,6 +301,11 @@ export class BloggerController {
   }
 
   @Delete('/blogs/:blogId/posts/:postId')
+  @ApiOperation({ summary: 'Delete post by id' })
+  @ApiResponse({ status: 204, description: 'No Content' })
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
+  @ApiForbiddenResponse({ description: "If user try to delete post that doesn't belong to current user" })
+  @ApiNotFoundResponse({ description: "If specific post or blog doesn't exists" })
   @HttpCode(204)
   async deletePost(
     @CurrentUserId() currentUserId,
@@ -198,6 +319,15 @@ export class BloggerController {
 
   // USERS
   @Put('/users/:userId/ban')
+  @ApiOperation({ summary: 'Ban/Unban user' })
+  @ApiParam({ name: 'userId', type: 'string', description: 'User ID that should be banned' })
+  @ApiResponse({ status: 204, description: 'No Content' })
+  @ApiBadRequestResponse({
+    description: 'If the inputModel has incorrect values',
+    schema: { example: BadRequestApiExample },
+  })
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
   @HttpCode(204)
   async banUserForBlog(
     @Param('userId', ParseNumberPipe) userId: number,
@@ -210,6 +340,15 @@ export class BloggerController {
   }
 
   @Get('/users/blog/:blogId')
+  @ApiOperation({ summary: 'Returns all banned users for blog' })
+  @ApiParam({ name: 'blogId', type: 'string' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    schema: { example: getPaginatorExample<BannedUserInBlogViewModel>(bannedUserInBlogExample) },
+  })
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: unauthorizedSwaggerMessage })
   async findBannedUsersOfSpecifiedBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
     @Query() query: BannedUsersInBlogsQuery,
@@ -220,6 +359,5 @@ export class BloggerController {
     if (blog.userId !== currentUserId) throw new ForbiddenException();
     return this.bannedUsersInBlogQueryRepo.findUsers(query, blog.id);
   }
-
   // USERS
 }

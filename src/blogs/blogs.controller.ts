@@ -10,8 +10,12 @@ import { ParseNumberPipe } from '../shared/pipes/parse-number-pipe';
 import { BlogsRepo } from './blogs.repo';
 import { BlogsQueryRepo } from './blogs.query.repo';
 import { PostsQueryRepo } from './posts/posts.query.repo';
-import { BlogsQuery } from './models/QueryBlogModel';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BlogsQuery } from './models/BlogsQuery';
+import { blogViewModelExample } from '../shared/swagger/schema/blogs/blog-view-model-example';
+import { getPaginatorExample } from '../shared/swagger/schema/common/get-paginator-example';
 
+@ApiTags('Blogs')
 @Controller('blogs')
 export class BlogsController {
   constructor(
@@ -21,8 +25,15 @@ export class BlogsController {
     private viewModelMapper: ViewModelMapper,
   ) {}
 
-  //BLOGS
   @Get('')
+  @ApiOperation({ summary: 'Returns blogs with paging' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    schema: {
+      example: getPaginatorExample<BlogViewModel>(blogViewModelExample),
+    },
+  })
   async findBlogs(@Query() query: BlogsQuery): Promise<PaginatorResponseType<BlogViewModel[]>> {
     const foundBlogsWithPagination = await this.blogsQueryRepo.findBlogs(query);
     return {
@@ -31,17 +42,9 @@ export class BlogsController {
     };
   }
 
-  @Get(':id')
-  async getBlogById(@Param('id', ParseNumberPipe) id: number): Promise<BlogViewModel> {
-    const blog = await this.blogsRepo.findById(id);
-    if (!blog) throw new NotFoundException('Blog doesnt exist');
-    return this.viewModelMapper.getBlogViewModel(blog);
-  }
-
-  //BLOGS
-
-  // POSTS FOR BLOG
   @Get('/:blogId/posts')
+  @ApiOperation({ summary: 'Returns all posts for specified blog' })
+  @ApiParam({ name: 'blogId', description: 'Existing blog id', type: 'string' })
   @UseGuards(IfAuthGuard)
   async findPostsOfBlog(
     @Param('blogId', ParseNumberPipe) blogId: number,
@@ -55,5 +58,13 @@ export class BlogsController {
     return { ...response, items: postsViewModels };
   }
 
-  // POSTS FOR BLOG
+  @Get(':blogId')
+  @ApiOperation({ summary: 'Returns blog by id' })
+  @ApiParam({ name: 'blogId', description: 'Existing blog id', type: 'string' })
+  @ApiResponse({ status: 200, description: 'Success', schema: { example: blogViewModelExample } })
+  async getBlogById(@Param('blogId', ParseNumberPipe) id: number): Promise<BlogViewModel> {
+    const blog = await this.blogsRepo.findById(id);
+    if (!blog) throw new NotFoundException('Blog doesnt exist');
+    return this.viewModelMapper.getBlogViewModel(blog);
+  }
 }

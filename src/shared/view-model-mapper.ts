@@ -96,7 +96,7 @@ export class ViewModelMapper {
         if (newestLikes.length === 3) return newestLikes;
         if (like.status === 'Like') {
           newestLikes.push({
-            addedAt: like.addedAt,
+            addedAt: like.addedAt.toISOString(),
             userId: like.userId.toString(),
             login: like.user.login,
           });

@@ -1,12 +1,12 @@
 import { DefaultPagination } from '../../shared/dto/BasePagination';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class BannedUsersInBlogsQuery extends DefaultPagination {
+export class BlogsQuery extends DefaultPagination {
   @ApiProperty({
+    description: 'Search term for blog Name: Name should contains this term in any position',
     required: false,
     default: null,
     type: String,
-    description: 'Search term for user Login: Login should contains this term in any position',
   })
-  searchLoginTerm = '';
+  searchNameTerm = '';
 }

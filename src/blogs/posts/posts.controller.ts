@@ -18,7 +18,22 @@ import { ParseNumberPipe } from '../../shared/pipes/parse-number-pipe';
 import { PostsRepo } from './posts.repo';
 import { PostsQueryRepo } from './posts.query.repo';
 import { CommentsQueryRepo } from './comments/comments.query.repo';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { BadRequestApiExample } from '../../shared/swagger/schema/bad-request-schema-example';
+import { getPaginatorExample } from '../../shared/swagger/schema/common/get-paginator-example';
+import { commentViewModelExample } from '../../shared/swagger/schema/comment/comment-view-model-example';
+import { postViewModelExample } from '../../shared/swagger/schema/post';
 
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(
@@ -30,8 +45,15 @@ export class PostsController {
   ) {}
 
   @Put(':postId/like-status')
-  @HttpCode(204)
+  @ApiOperation({ summary: 'Make like/unlike/dislike/undislike operation' })
+  @ApiParam({ name: 'postId', type: 'string' })
+  @ApiResponse({ status: 204 })
+  @ApiBadRequestResponse({ schema: BadRequestApiExample, description: 'If the inputModel has incorrect values' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: "If post with specified id doesn't exists" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
   async likePost(
     @Param('postId', ParseNumberPipe) postId: number,
     @Body() likeModel: LikeModel,
@@ -43,11 +65,20 @@ export class PostsController {
   }
 
   @Get(':postId/comments')
-  @UseGuards(IfAuthGuard)
+  @ApiOperation({ summary: 'Returns comments for specified post' })
+  @ApiParam({ name: 'postId', type: 'string' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    schema: {
+      example: getPaginatorExample<CommentViewModel>(commentViewModelExample),
+    },
+  })
+  @ApiNotFoundResponse({ description: "If post for passed postId doesn't exist" })
   async findCommentsOfPost(
     @Param('id', ParseNumberPipe) id: number,
     @Query() query: CommentsQuery,
-    @GetCurrentUserIdOrNull() currentUserId: number,
+    @GetCurrentUserIdOrNull() currentUserId: number | null,
   ): Promise<PaginatorResponseType<CommentViewModel[]>> {
     const post = await this.postsRepo.findPostById(id);
     if (!post) throw new NotFoundException('Post doesnt exist');
@@ -62,6 +93,13 @@ export class PostsController {
   }
 
   @Post('/:postId/comments')
+  @ApiOperation({ summary: 'Create new comment' })
+  @ApiParam({ name: 'postId', type: 'string' })
+  @ApiResponse({ status: 201, schema: { example: commentViewModelExample } })
+  @ApiBadRequestResponse({ schema: BadRequestApiExample, description: 'If the inputModel has incorrect values' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: "If post with specified id doesn't exists" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async createComment(
     @Param('postId', ParseNumberPipe) postId: number,
@@ -74,6 +112,8 @@ export class PostsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Returns all posts' })
+  @ApiResponse({ status: 200, schema: { example: getPaginatorExample<PostViewModel>(postViewModelExample) } })
   @UseGuards(IfAuthGuard)
   async findAllPosts(@Query() query: PostsQuery, @GetCurrentUserIdOrNull() currentUserId: number | null) {
     const response = await this.postsQueryRepo.findPosts(query);
@@ -81,10 +121,14 @@ export class PostsController {
     return { ...response, items: postsViewModels };
   }
 
-  @Get('/:id')
+  @Get('/:postId')
+  @ApiOperation({ summary: 'Return post by id' })
+  @ApiParam({ name: 'postId', type: 'string' })
+  @ApiResponse({ status: 200, schema: { example: postViewModelExample } })
+  @ApiNotFoundResponse({ description: 'Not Found' })
   @UseGuards(IfAuthGuard)
   async getPostById(
-    @Param('id', ParseNumberPipe) id: number,
+    @Param('postId', ParseNumberPipe) id: number,
     @GetCurrentUserIdOrNull() currentUserId: number,
   ): Promise<PostViewModel> {
     const foundPost = await this.postsRepo.findPostById(id);

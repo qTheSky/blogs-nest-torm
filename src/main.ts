@@ -5,6 +5,7 @@ import { HttpExceptionFilter } from './shared/exception.filters';
 import { useContainer } from 'class-validator';
 import { TrimStrings } from './shared/interceptors/trim-strings-in-body/TrimStrings';
 import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -34,6 +35,15 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
+  //swagger
+  const config = new DocumentBuilder()
+    .setTitle('Blogs API')
+    .setDescription('I haven`t made up the description yet ;(')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+  //swagger
   await app.listen(3000);
 }
 

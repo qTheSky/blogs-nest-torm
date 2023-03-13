@@ -1,6 +1,8 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('testing')
 export class TestingController {
   constructor(
