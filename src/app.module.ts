@@ -103,6 +103,8 @@ import { S3StorageAdapter } from './shared/adapters/s3-storage.adapter';
 import { UploadMainImageUseCase } from './blogs/application/use-cases/upload-main-image.use-case';
 import { UploadWallpaperUseCase } from './blogs/application/use-cases/upload-wallpaper.use-case';
 import { UploadPostMainImageUseCase } from './blogs/posts/use-cases/upload-post-main-image.use-case';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 //USE CASES
 const authUseCases = [
@@ -226,6 +228,10 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'swagger-static'),
+      serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
+    }),
     ScheduleModule.forRoot(),
     CqrsModule,
     ConfigModule.forRoot(),
