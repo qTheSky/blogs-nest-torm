@@ -38,8 +38,8 @@ import {
 } from '@nestjs/swagger';
 import { BadRequestApiExample } from '../shared/swagger/schema/bad-request-schema-example';
 import { Throttle } from '@nestjs/throttler';
-import { tooManyRequestsMessage } from 'src/shared/swagger/constants/too-many-requests-message';
 import { AuthCredentialsModel } from './models/AuthCredentialsModel';
+import { tooManyRequestsMessage } from '../shared/swagger/constants/too-many-requests-message';
 
 @ApiTags('Auth')
 @Controller('auth')
