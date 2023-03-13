@@ -66,7 +66,6 @@ export class PostsController {
 
   @Get(':postId/comments')
   @ApiOperation({ summary: 'Returns comments for specified post' })
-  @ApiParam({ name: 'postId', type: 'string' })
   @ApiResponse({
     status: 200,
     description: 'Success',
@@ -76,7 +75,7 @@ export class PostsController {
   })
   @ApiNotFoundResponse({ description: "If post for passed postId doesn't exist" })
   async findCommentsOfPost(
-    @Param('id', ParseNumberPipe) id: number,
+    @Param('postId', ParseNumberPipe) id: number,
     @Query() query: CommentsQuery,
     @GetCurrentUserIdOrNull() currentUserId: number | null,
   ): Promise<PaginatorResponseType<CommentViewModel[]>> {

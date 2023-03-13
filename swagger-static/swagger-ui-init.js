@@ -575,7 +575,7 @@ window.onload = function() {
           "summary": "Returns comments for specified post",
           "parameters": [
             {
-              "name": "id",
+              "name": "postId",
               "required": true,
               "in": "path",
               "schema": {
@@ -619,14 +619,6 @@ window.onload = function() {
                   "asc",
                   "desc"
                 ],
-                "type": "string"
-              }
-            },
-            {
-              "name": "postId",
-              "required": true,
-              "in": "path",
-              "schema": {
                 "type": "string"
               }
             }
