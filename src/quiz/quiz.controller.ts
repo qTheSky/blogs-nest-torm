@@ -43,6 +43,7 @@ import { statisticsExample } from '../shared/swagger/schema/quiz/statistics-exam
 import { getPaginatorExample } from '../shared/swagger/schema/common/get-paginator-example';
 import { gameExample } from '../shared/swagger/schema/quiz/game-example';
 import { answerExample } from '../shared/swagger/schema/quiz/answer-example';
+import { TopPlayerViewModel } from './models/TopPlayerViewModel';
 
 @ApiTags('PairQuizGame')
 @Controller('pair-game-quiz')
@@ -58,7 +59,7 @@ export class QuizController {
 
   @Get('users/top')
   @ApiOperation({ summary: 'Get users top' })
-  @ApiResponse({ status: 200, schema: { example: topPlayerExample } })
+  @ApiResponse({ status: 200, schema: { example: getPaginatorExample<TopPlayerViewModel>(topPlayerExample) } })
   async getTopUsers(@Query() query: TopPlayersQuery) {
     return this.topPlayersQueryRepo.findTopPlayers(query);
   }
