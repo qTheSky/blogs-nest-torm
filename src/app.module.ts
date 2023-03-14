@@ -105,6 +105,9 @@ import { UploadWallpaperUseCase } from './blogs/application/use-cases/upload-wal
 import { UploadPostMainImageUseCase } from './blogs/posts/use-cases/upload-post-main-image.use-case';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { UserPasswordRecoveryEntity } from './users/entities/userPasswordRecovery.entity';
+import { SendPasswordRecoveryCodeUseCase } from './auth/application/use-cases/send-password-recovery-code.use-case';
+import { UpdateUserPasswordUseCase } from './auth/application/use-cases/update-user-password.use-case';
 
 //USE CASES
 const authUseCases = [
@@ -116,6 +119,8 @@ const authUseCases = [
   LoginUseCase,
   GetAuthUserDataUseCase,
   UpdateEmailConfirmationCodeUseCase,
+  SendPasswordRecoveryCodeUseCase,
+  UpdateUserPasswordUseCase,
 ];
 const blogsUseCases = [
   DeleteBlogUseCase,
@@ -239,6 +244,7 @@ export const localTypeOrmOptions: TypeOrmModuleOptions = {
       GameEntity,
       PlayerEntity,
       PlayerStatisticsEntity,
+      UserPasswordRecoveryEntity,
     ]),
     TypeOrmModule.forRoot(process.env.NODE_ENV === 'development' ? localTypeOrmOptions : cloudTypeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),

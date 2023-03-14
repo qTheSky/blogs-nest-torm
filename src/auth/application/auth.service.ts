@@ -46,7 +46,7 @@ export class AuthService {
     return !!foundRefreshToken;
   }
 
-  async generateHash(password: string) {
+  async generateHash(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
   }
 }

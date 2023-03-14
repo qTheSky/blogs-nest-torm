@@ -40,4 +40,12 @@ export class UsersRepo {
   findUserByLoginOrEmail(loginOrEmail: string): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy([{ login: loginOrEmail }, { email: loginOrEmail }]);
   }
+
+  findUserByPasswordRecoveryCode(code: string): Promise<UserEntity | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.passwordRecovery', 'passwordRecovery')
+      .where('passwordRecovery.recoveryCode = :code', { code: code })
+      .getOne();
+  }
 }

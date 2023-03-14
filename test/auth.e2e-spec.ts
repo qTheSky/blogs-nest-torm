@@ -6,9 +6,13 @@ import { newUser } from './models-for-tests/positive/create/User';
 import { createCommonUser } from './utils/create-user-and-get-token/create-common-user';
 import { getAppAndCleanDB } from './utils/getAppAndCleanDB';
 import { cleanDb } from './utils/cleanDb';
-import { createUserAndGetTokens } from './utils/create-user-and-get-token/create-user-and-get-token';
+import {
+  createUserAndGetAccessToken,
+  createUserAndGetTokens,
+} from './utils/create-user-and-get-token/create-user-and-get-token';
 import { EmailResendModel } from '../src/auth/models/EmailResendModel';
 import request from 'supertest';
+import { UserViewModel } from '../src/users/models/UserViewModel';
 
 jest.setTimeout(15000);
 describe('AuthController (e2e)', () => {
@@ -126,7 +130,6 @@ describe('AuthController (e2e)', () => {
       expect(response.headers['set-cookie'][0]).toEqual(expect.stringContaining('.'));
     });
   });
-
   describe('/email-resending', () => {
     beforeAll(async () => {
       await cleanDb(app);
@@ -141,6 +144,23 @@ describe('AuthController (e2e)', () => {
         .post('/auth/registration-email-resending')
         .send({ email: newUser.email } as EmailResendModel)
         .expect(204);
+    });
+  });
+  describe('/password-recovery', () => {
+    let user: UserViewModel;
+    beforeAll(async () => {
+      await cleanDb(app);
+      user = await createCommonUser(app);
+    });
+    it('should send password recovery code', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/registration-email-resending')
+        .send({ email: user.email } as EmailResendModel)
+        .expect(204);
+      await request(app.getHttpServer())
+        .post('/auth/registration-email-resending')
+        .send({ email: 'invalid.email' } as EmailResendModel)
+        .expect(400);
     });
   });
 });

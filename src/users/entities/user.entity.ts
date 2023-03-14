@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 import { UserEmailConfirmation } from './userEmailConfirmation.entity';
 import { UserBanInfo } from './userBanInfo.entity';
+import { UserPasswordRecoveryEntity } from './userPasswordRecovery.entity';
 
 @Entity('Users')
 export class UserEntity {
@@ -31,6 +32,9 @@ export class UserEntity {
   })
   banInfo: UserBanInfo;
 
+  @OneToOne(() => UserPasswordRecoveryEntity, (p) => p.user, { cascade: true })
+  passwordRecovery: UserPasswordRecoveryEntity;
+
   isEmailCanBeConfirmed(code: string): boolean {
     if (this.emailConfirmation.isConfirmed) return false;
     if (this.emailConfirmation.confirmationCode !== code) return false;
@@ -58,6 +62,35 @@ export class UserEntity {
     this.banInfo.isBanned = false;
     this.banInfo.banDate = null;
     this.banInfo.banReason = null;
+  }
+
+  createPasswordRecovery(): string {
+    const passwordRecovery = new UserPasswordRecoveryEntity();
+    passwordRecovery.isCodeAlreadyUsed = false;
+    passwordRecovery.user = this;
+    passwordRecovery.recoveryCode = randomUUID();
+    passwordRecovery.expirationDate = add(new Date(), { hours: 1 });
+
+    this.passwordRecovery = passwordRecovery;
+    return passwordRecovery.recoveryCode;
+  }
+
+  isNewPasswordCanBeSet(passwordRecoveryCode: string): boolean {
+    if (this.passwordRecovery.isCodeAlreadyUsed) return false;
+    if (passwordRecoveryCode !== this.passwordRecovery.recoveryCode) return false;
+    if (this.passwordRecovery.expirationDate < new Date()) return false;
+    return true;
+  }
+
+  makePasswordRecoveryCodeUsed() {
+    this.passwordRecovery.isCodeAlreadyUsed = true;
+  }
+
+  updatePasswordHash(newPasswordHash: string, passwordRecoveryCode: string) {
+    if (!this.isNewPasswordCanBeSet(passwordRecoveryCode)) {
+      throw new Error('New password can`t be set');
+    }
+    this.passwordHash = newPasswordHash;
   }
 
   public static create(login: string, email: string, passwordHash: string, isConfirmedEmail: boolean): UserEntity {

@@ -16,15 +16,15 @@ export class EmailsManager {
                       </p>`,
     );
   }
-  // async sendPasswordConfirmationCode(user: UserDocument) {
-  //   await emailAdapter.sendEmail(
-  //     user.accountData.email,
-  //     'password recovery',
-  //     ` <h1>Password recovery</h1>
-  //                    <p>To finish password recovery please follow the link below:
-  //                       <a href='https://somesite.com/password-recovery?recoveryCode=${user.passwordRecovery?.confirmationCode}'>recovery password</a>
-  //                       ${user.passwordRecovery?.confirmationCode}
-  //                     </p>`,
-  //   );
-  // }
+  async sendPasswordRecoveryCode(userEmail: string, recoveryCode: string) {
+    await this.emailAdapter.sendEmail(
+      userEmail,
+      'password recovery',
+      ` <h1>Password recovery</h1>
+                     <p>To finish password recovery please follow the link below:
+                        <a href='https://localhost:3000/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
+                        ${recoveryCode}
+                      </p>`,
+    );
+  }
 }

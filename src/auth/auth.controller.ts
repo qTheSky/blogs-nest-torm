@@ -30,6 +30,8 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -40,18 +42,42 @@ import { BadRequestApiExample } from '../shared/swagger/schema/bad-request-schem
 import { Throttle } from '@nestjs/throttler';
 import { AuthCredentialsModel } from './models/AuthCredentialsModel';
 import { tooManyRequestsMessage } from '../shared/swagger/constants/too-many-requests-message';
+import { PasswordRecoveryModel } from './models/PasswordRecoveryModel';
+import { SendPasswordRecoveryCodeCommand } from './application/use-cases/send-password-recovery-code.use-case';
+import { UpdatePasswordModel } from './models/UpdatePasswordModel';
+import { UpdateUserPasswordCommand } from './application/use-cases/update-user-password.use-case';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private commandBus: CommandBus) {}
 
-  //todo make two routes for password recovery via email and confirm password recovery
+  @Post('password-recovery')
+  @ApiOperation({ summary: 'Password recovery via Email confirmation. Email should be sent with RecoveryCode inside' })
+  @ApiResponse({
+    status: 204,
+    description: "Even if current email is not registered (for prevent user's email detection)",
+  })
+  @ApiBadRequestResponse({ description: 'If the inputModel has invalid email (for example 222^gmail.com)' })
+  @ApiTooManyRequestsResponse({ description: tooManyRequestsMessage })
+  @Throttle(5, 10)
+  async sendPasswordRecoveryCode(@Body() model: PasswordRecoveryModel): Promise<void> {
+    await this.commandBus.execute(new SendPasswordRecoveryCodeCommand(model.email));
+  }
+
+  @Post('new-password')
+  @ApiOperation({ summary: 'Confirm password recovery' })
+  @ApiResponse({ status: 204, description: 'If code is valid and new password is accepted' })
+  @ApiForbiddenResponse({ description: 'If code is wrong' })
+  @ApiTooManyRequestsResponse({ description: tooManyRequestsMessage })
+  @ApiNotFoundResponse({ description: 'If user with this code doesnt exist' })
+  @Throttle(5, 10)
+  async updateUserPassword(@Body() { newPassword, recoveryCode }: UpdatePasswordModel): Promise<void> {
+    await this.commandBus.execute(new UpdateUserPasswordCommand(recoveryCode, newPassword));
+  }
 
   @Post('login')
-  @ApiOperation({
-    summary: 'Try login user to the system',
-  })
+  @ApiOperation({ summary: 'Try login user to the system' })
   @ApiBody({ description: 'Example request body', type: AuthCredentialsModel })
   @ApiResponse({
     status: 200,
@@ -117,9 +143,7 @@ export class AuthController {
 
   @Post('registration-confirmation')
   @HttpCode(204)
-  @ApiOperation({
-    summary: 'Confirm registration.',
-  })
+  @ApiOperation({ summary: 'Confirm registration.' })
   @ApiResponse({ status: 204, description: 'Email was verified. Account was activated' })
   @ApiBadRequestResponse({
     description: 'If the confirmation code is incorrect, expired or already been applied',
@@ -157,9 +181,7 @@ export class AuthController {
 
   @Post('registration-email-resending')
   @HttpCode(204)
-  @ApiOperation({
-    summary: 'Resend confirmation registration Email if user exists',
-  })
+  @ApiOperation({ summary: 'Resend confirmation registration Email if user exists' })
   @ApiResponse({
     status: 204,
     description:
@@ -178,9 +200,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @ApiOperation({
-    summary: 'In cookie client must send correct refreshToken that will be revoked',
-  })
+  @ApiOperation({ summary: 'In cookie client must send correct refreshToken that will be revoked' })
   @ApiResponse({
     status: 204,
     description: 'No content',
@@ -193,9 +213,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @ApiOperation({
-    summary: 'Get information about current user',
-  })
+  @ApiOperation({ summary: 'Get information about current user' })
   @ApiResponse({
     status: 200,
     description: 'Success',
