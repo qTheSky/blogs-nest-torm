@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdatePasswordModel {
   @IsString()
-  @ApiProperty({ description: 'Recovery code', example: 'uuid-d-s-x-sad', type: 'string' })
+  @ApiProperty({ description: 'Recovery code', example: 'uuid-from-email-message', type: 'string' })
   recoveryCode: string;
   @Length(6, 20)
   @IsString()
