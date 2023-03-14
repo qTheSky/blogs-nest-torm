@@ -3596,7 +3596,7 @@ window.onload = function() {
             "recoveryCode": {
               "type": "string",
               "description": "Recovery code",
-              "example": "uuid-d-s-x-sad"
+              "example": "uuid-from-email-message"
             },
             "newPassword": {
               "type": "string",
