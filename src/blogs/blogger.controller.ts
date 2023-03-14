@@ -319,7 +319,7 @@ export class BloggerController {
 
   // USERS
   @Put('/users/:userId/ban')
-  @ApiOperation({ summary: 'Ban/Unban user' })
+  @ApiOperation({ summary: 'Ban/Unban user (banned user can`t comment posts for your blog)' })
   @ApiParam({ name: 'userId', type: 'string', description: 'User ID that should be banned' })
   @ApiResponse({ status: 204, description: 'No Content' })
   @ApiBadRequestResponse({
