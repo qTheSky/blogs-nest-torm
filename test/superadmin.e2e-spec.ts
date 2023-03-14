@@ -4,7 +4,7 @@ import request from 'supertest';
 import { CreateUserModel } from '../src/users/models/CreateUserModel';
 import { UserViewModel } from '../src/users/models/UserViewModel';
 import { newUser } from './models-for-tests/positive/create/User';
-import { superAdminBasicHeader } from './constants';
+import { superAdminBasicHeader } from './utils/constants';
 import { cleanDb } from './utils/cleanDb';
 import { createCommonUser } from './utils/create-user-and-get-token/create-common-user';
 import { BanUserModel } from '../src/super-admin/models/BanUserModel';

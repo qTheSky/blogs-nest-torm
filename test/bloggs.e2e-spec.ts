@@ -47,6 +47,7 @@ describe('/blogger controller', () => {
             websiteUrl: newBlog.websiteUrl,
             createdAt: expect.any(String),
             isMembership: false,
+            images: { main: [], wallpaper: null },
           } as BlogViewModel);
         });
     });
@@ -68,6 +69,7 @@ describe('/blogger controller', () => {
             createdAt: expect.any(String),
             description: updateBlogModel.description,
             name: updateBlogModel.name,
+            images: { main: [], wallpaper: null },
           } as BlogViewModel);
         });
     });

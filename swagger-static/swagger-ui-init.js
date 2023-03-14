@@ -2085,7 +2085,7 @@ window.onload = function() {
       "/blogger/users/{userId}/ban": {
         "put": {
           "operationId": "BloggerController_banUserForBlog",
-          "summary": "Ban/Unban user",
+          "summary": "Ban/Unban user (banned user can`t comment posts for your blog)",
           "parameters": [
             {
               "name": "userId",

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppModule, typeOrmOptions } from '../../src/app.module';
+import { AppModule, localTypeOrmOptions } from '../../src/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { useContainer } from 'class-validator';
@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser'; // deploy
 
 export const getAppAndCleanDB = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
-    imports: [TypeOrmModule.forRoot(typeOrmOptions), AppModule],
+    imports: [TypeOrmModule.forRoot(localTypeOrmOptions), AppModule],
   }).compile();
   const app: INestApplication = moduleFixture.createNestApplication();
 

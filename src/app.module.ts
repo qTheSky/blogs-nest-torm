@@ -185,20 +185,8 @@ const services = [BlogsService, PostsService, CommentsService, SessionsService, 
 
 const authStrategies = [LocalStrategy, JwtStrategy, BasicStrategy];
 //CLOUD
-//elephant
-export const __typeOrmOptions: TypeOrmModuleOptions = {
-  type: 'postgres',
-  host: 'snuffleupagus.db.elephantsql.com',
-  port: 5432,
-  username: 'fqidihfj',
-  password: 'GsfjixstNork6WFqSctdeNAXCyLL4mAC',
-  database: 'fqidihfj',
-  autoLoadEntities: true,
-  synchronize: true,
-};
-//elephant
 //neon
-export const typeOrmOptions: TypeOrmModuleOptions = {
+export const cloudTypeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'ep-curly-unit-690125.eu-central-1.aws.neon.tech',
   port: 5432,
@@ -212,7 +200,7 @@ export const typeOrmOptions: TypeOrmModuleOptions = {
 //neon
 //CLOUD
 //LOCAL
-export const _typeOrmOptions: TypeOrmModuleOptions = {
+export const localTypeOrmOptions: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -223,7 +211,6 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
   synchronize: true,
   // logging: true,
 };
-
 //LOCAL
 
 @Module({
@@ -253,7 +240,7 @@ export const _typeOrmOptions: TypeOrmModuleOptions = {
       PlayerEntity,
       PlayerStatisticsEntity,
     ]),
-    TypeOrmModule.forRoot(typeOrmOptions),
+    TypeOrmModule.forRoot(process.env.NODE_ENV === 'development' ? localTypeOrmOptions : cloudTypeOrmOptions),
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),
     PassportModule,
     JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: process.env.ACCESS_TOKEN_TIME } }),

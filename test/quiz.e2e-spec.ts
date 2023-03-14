@@ -8,7 +8,7 @@ import { getCreateModels } from './utils/get-create-models';
 import { CreateQuizQuestionModel } from '../src/super-admin/models/quiz/CreateQuizQuestionModel';
 import { createManyItemsToDb } from './utils/create-many-items-to-db';
 import { PublishQuestionModel } from '../src/super-admin/models/quiz/PublishQuestionModel';
-import { superAdminBasicHeader } from './constants';
+import { superAdminBasicHeader } from './utils/constants';
 import { AnswerInputModel } from '../src/quiz/models/AnswerInputModel';
 import { PaginatorResponseType } from '../src/shared/types/paginator-response-type';
 import { maxQuestionsCount } from '../src/quiz/constants/maxQuestionsCount';

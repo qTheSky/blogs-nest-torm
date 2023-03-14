@@ -60,6 +60,7 @@ describe('posts', () => {
               myStatus: 'None',
               newestLikes: expect.any(Array),
             },
+            images: { main: [] },
           } as PostViewModel);
         });
     });
@@ -88,6 +89,7 @@ describe('posts', () => {
               myStatus: 'None',
               newestLikes: expect.any(Array),
             },
+            images: { main: [] },
           } as PostViewModel);
         });
     });
