@@ -2255,9 +2255,339 @@ window.onload = function() {
           ]
         }
       },
+      "/sa/quiz/questions": {
+        "get": {
+          "operationId": "SuperAdminController_findQuestions",
+          "summary": "Returns all questions with pagination and filtering",
+          "parameters": [
+            {
+              "name": "pageNumber",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": 1,
+                "type": "number"
+              }
+            },
+            {
+              "name": "pageSize",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": 10,
+                "type": "number"
+              }
+            },
+            {
+              "name": "sortBy",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": "createdAt",
+                "type": "string"
+              }
+            },
+            {
+              "name": "sortDirection",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": "desc",
+                "enum": [
+                  "asc",
+                  "desc"
+                ],
+                "type": "string"
+              }
+            },
+            {
+              "name": "bodySearchTerm",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": null,
+                "type": "string"
+              }
+            },
+            {
+              "name": "publishedStatus",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": "all",
+                "enum": [
+                  "all",
+                  "published",
+                  "notPublished"
+                ],
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "pagesCount": 0,
+                      "page": 0,
+                      "pageSize": 0,
+                      "totalCount": 0,
+                      "items": [
+                        {
+                          "id": "string",
+                          "body": "string",
+                          "correctAnswers": [
+                            "string"
+                          ],
+                          "published": false,
+                          "createdAt": "2023-03-13T14:30:27.512Z",
+                          "updatedAt": "2023-03-13T14:30:27.512Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
+        },
+        "post": {
+          "operationId": "SuperAdminController_createQuestion",
+          "summary": "Create question",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateQuizQuestionModel"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "id": "string",
+                      "body": "string",
+                      "correctAnswers": [
+                        "string"
+                      ],
+                      "published": false,
+                      "createdAt": "2023-03-13T14:30:27.512Z",
+                      "updatedAt": "2023-03-13T14:30:27.512Z"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "If the inputModel has incorrect values",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "errorsMessages": [
+                        {
+                          "message": "string",
+                          "field": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
+        }
+      },
+      "/sa/quiz/questions/{questionId}": {
+        "delete": {
+          "operationId": "SuperAdminController_deleteQuestion",
+          "summary": "Delete question",
+          "parameters": [
+            {
+              "name": "questionId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "number"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "No Content"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "Not found"
+            }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
+        },
+        "put": {
+          "operationId": "SuperAdminController_updateQuestion",
+          "summary": "Update question",
+          "parameters": [
+            {
+              "name": "questionId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "number"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateQuizQuestionModel"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "No Content"
+            },
+            "400": {
+              "description": "If the inputModel has incorrect values",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "errorsMessages": [
+                        {
+                          "message": "string",
+                          "field": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "Not found"
+            }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
+        }
+      },
+      "/sa/quiz/questions/{questionId}/publish": {
+        "put": {
+          "operationId": "SuperAdminController_publishQuestion",
+          "summary": "Update question",
+          "parameters": [
+            {
+              "name": "questionId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "number"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishQuestionModel"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "No Content"
+            },
+            "400": {
+              "description": "If the inputModel has incorrect values",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "errorsMessages": [
+                        {
+                          "message": "string",
+                          "field": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
+        }
+      },
       "/sa/blogs/{blogId}/ban": {
         "put": {
           "operationId": "SuperAdminController_banBlog",
+          "summary": "Ban/unban blog",
           "parameters": [
             {
               "name": "blogId",
@@ -2280,14 +2610,43 @@ window.onload = function() {
           },
           "responses": {
             "204": {
-              "description": ""
+              "description": "No Content"
+            },
+            "400": {
+              "description": "If the inputModel has incorrect values",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "errorsMessages": [
+                        {
+                          "message": "string",
+                          "field": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
             }
-          }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
         }
       },
       "/sa/blogs": {
         "get": {
           "operationId": "SuperAdminController_findBlogs",
+          "summary": "Returns blogs with paging",
           "parameters": [
             {
               "name": "pageNumber",
@@ -2342,163 +2701,56 @@ window.onload = function() {
           ],
           "responses": {
             "200": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/sa/quiz/questions": {
-        "get": {
-          "operationId": "SuperAdminController_findQuestions",
-          "parameters": [
-            {
-              "name": "pageNumber",
-              "required": false,
-              "in": "query",
-              "schema": {
-                "default": 1,
-                "type": "number"
-              }
-            },
-            {
-              "name": "pageSize",
-              "required": false,
-              "in": "query",
-              "schema": {
-                "default": 10,
-                "type": "number"
-              }
-            },
-            {
-              "name": "sortBy",
-              "required": false,
-              "in": "query",
-              "schema": {
-                "default": "createdAt",
-                "type": "string"
-              }
-            },
-            {
-              "name": "sortDirection",
-              "required": false,
-              "in": "query",
-              "schema": {
-                "default": "desc",
-                "enum": [
-                  "asc",
-                  "desc"
-                ],
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
-        "post": {
-          "operationId": "SuperAdminController_createQuestion",
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateQuizQuestionModel"
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "pagesCount": 0,
+                      "page": 0,
+                      "pageSize": 0,
+                      "totalCount": 0,
+                      "items": [
+                        {
+                          "id": "string",
+                          "name": "string",
+                          "description": "string",
+                          "websiteUrl": "string",
+                          "createdAt": "2023-03-13T14:30:27.512Z",
+                          "isMembership": false,
+                          "blogOwnerInfo": {
+                            "userId": "string",
+                            "userLogin": "string"
+                          },
+                          "banInfo": {
+                            "isBanned": true,
+                            "banDate": "2023-03-13T14:30:27.512Z"
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
               }
+            },
+            "401": {
+              "description": "Unauthorized"
             }
           },
-          "responses": {
-            "201": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/sa/quiz/questions/{questionId}": {
-        "delete": {
-          "operationId": "SuperAdminController_deleteQuestion",
-          "parameters": [
-            {
-              "name": "questionId",
-              "required": true,
-              "in": "path",
-              "schema": {
-                "type": "number"
-              }
-            }
+          "tags": [
+            "Super admin"
           ],
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          }
-        },
-        "put": {
-          "operationId": "SuperAdminController_updateQuestion",
-          "parameters": [
+          "security": [
             {
-              "name": "questionId",
-              "required": true,
-              "in": "path",
-              "schema": {
-                "type": "number"
-              }
+              "basic": []
             }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateQuizQuestionModel"
-                }
-              }
-            }
-          },
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/sa/quiz/questions/{questionId}/publish": {
-        "put": {
-          "operationId": "SuperAdminController_publishQuestion",
-          "parameters": [
-            {
-              "name": "questionId",
-              "required": true,
-              "in": "path",
-              "schema": {
-                "type": "number"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublishQuestionModel"
-                }
-              }
-            }
-          },
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          }
+          ]
         }
       },
       "/sa/users/{id}/ban": {
         "put": {
           "operationId": "SuperAdminController_banUser",
+          "summary": "Ban/unban user (banned user cant log in, and likes by banned users don`t return)",
           "parameters": [
             {
               "name": "id",
@@ -2521,14 +2773,43 @@ window.onload = function() {
           },
           "responses": {
             "204": {
-              "description": ""
+              "description": "No Content"
+            },
+            "400": {
+              "description": "If the inputModel has incorrect values",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "errorsMessages": [
+                        {
+                          "message": "string",
+                          "field": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
             }
-          }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
         }
       },
       "/sa/users": {
         "get": {
           "operationId": "SuperAdminController_findUsers",
+          "summary": "Returns all users with paging",
           "parameters": [
             {
               "name": "pageNumber",
@@ -2569,16 +2850,87 @@ window.onload = function() {
                 ],
                 "type": "string"
               }
+            },
+            {
+              "name": "searchLoginTerm",
+              "required": false,
+              "in": "query",
+              "description": "Search term for user Login: Login should contains this term in any position",
+              "schema": {
+                "default": null,
+                "type": "string"
+              }
+            },
+            {
+              "name": "searchEmailTerm",
+              "required": false,
+              "in": "query",
+              "description": "Search term for user Email: Email should contains this term in any position",
+              "schema": {
+                "default": null,
+                "type": "string"
+              }
+            },
+            {
+              "name": "banStatus",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "default": "all",
+                "enum": [
+                  "all",
+                  "banned",
+                  "notBanned"
+                ],
+                "type": "string"
+              }
             }
           ],
           "responses": {
             "200": {
-              "description": ""
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "pagesCount": 0,
+                      "page": 0,
+                      "pageSize": 0,
+                      "totalCount": 0,
+                      "items": [
+                        {
+                          "id": "string",
+                          "login": "string",
+                          "email": "string",
+                          "createdAt": "2023-03-13T14:30:27.512Z",
+                          "banInfo": {
+                            "isBanned": true,
+                            "banDate": "2023-03-13T14:30:27.512Z",
+                            "banReason": "string"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
             }
-          }
+          },
+          "tags": [
+            "Super admin"
+          ],
+          "security": [
+            {
+              "basic": []
+            }
+          ]
         },
         "post": {
           "operationId": "SuperAdminController_createUserByAdmin",
+          "summary": "Add new user to the system. User creates with verified email",
           "parameters": [],
           "requestBody": {
             "required": true,
@@ -2592,29 +2944,54 @@ window.onload = function() {
           },
           "responses": {
             "201": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/sa/users/{id}": {
-        "delete": {
-          "operationId": "SuperAdminController_deleteUser",
-          "parameters": [
-            {
-              "name": "id",
-              "required": true,
-              "in": "path",
-              "schema": {
-                "type": "number"
+              "description": "Returns the newly created user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "id": "string",
+                      "login": "string",
+                      "email": "string",
+                      "createdAt": "2023-03-13T14:30:27.512Z",
+                      "banInfo": {
+                        "isBanned": true,
+                        "banDate": "2023-03-13T14:30:27.512Z",
+                        "banReason": "string"
+                      }
+                    }
+                  }
+                }
               }
+            },
+            "400": {
+              "description": "If the inputModel has incorrect values",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "example": {
+                      "errorsMessages": [
+                        {
+                          "message": "string",
+                          "field": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
             }
+          },
+          "tags": [
+            "Super admin"
           ],
-          "responses": {
-            "204": {
-              "description": ""
+          "security": [
+            {
+              "basic": []
             }
-          }
+          ]
         }
       },
       "/pair-game-quiz/users/top": {
@@ -3389,25 +3766,95 @@ window.onload = function() {
             "blogId"
           ]
         },
-        "BanBlogInputModel": {
-          "type": "object",
-          "properties": {}
-        },
         "CreateQuizQuestionModel": {
           "type": "object",
-          "properties": {}
+          "properties": {
+            "body": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 500
+            },
+            "correctAnswers": {
+              "example": [
+                "example1",
+                "example2"
+              ],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "body",
+            "correctAnswers"
+          ]
         },
         "UpdateQuizQuestionModel": {
           "type": "object",
-          "properties": {}
+          "properties": {
+            "body": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 500
+            },
+            "correctAnswers": {
+              "example": [
+                "example1",
+                "example2"
+              ],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "body",
+            "correctAnswers"
+          ]
         },
         "PublishQuestionModel": {
           "type": "object",
-          "properties": {}
+          "properties": {
+            "published": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          "required": [
+            "published"
+          ]
+        },
+        "BanBlogInputModel": {
+          "type": "object",
+          "properties": {
+            "isBanned": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          "required": [
+            "isBanned"
+          ]
         },
         "BanUserModel": {
           "type": "object",
-          "properties": {}
+          "properties": {
+            "isBanned": {
+              "type": "boolean",
+              "example": true
+            },
+            "banReason": {
+              "type": "string",
+              "example": "string",
+              "minLength": 20
+            }
+          },
+          "required": [
+            "isBanned",
+            "banReason"
+          ]
         },
         "AnswerInputModel": {
           "type": "object",

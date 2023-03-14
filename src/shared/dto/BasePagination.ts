@@ -13,7 +13,7 @@ export class BasicPagination {
 export class DefaultPagination extends BasicPagination {
   @ApiProperty({ required: false, default: 'createdAt', type: String })
   sortBy = 'createdAt';
-  @ApiProperty({ required: false, default: 'desc', type: String, enum: ['asc', 'desc'] })
+  @ApiProperty({ required: false, default: 'desc', enum: ['asc', 'desc'] })
   sortDirection = 'desc';
 }
 
